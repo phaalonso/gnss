@@ -2,7 +2,8 @@ import sqlite3 from "sqlite3";
 import { stat } from "fs/promises";
 import path from "path";
 
-const databasePath = path.resolve(path.dirname("."), "..", "dados.db");
+	const databasePath = path.resolve(path.dirname("."), "dados.db");
+console.log(databasePath);
 
 /**
  * @description verifica se existe um arquivo no caminho passado por parametro
