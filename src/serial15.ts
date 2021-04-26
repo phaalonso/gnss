@@ -1,23 +1,23 @@
-import { createConnection } from "./database/sqlite/connection";
-import { std, mean, log } from "mathjs";
-import { saveGPSData } from "./gsp_data";
+import { PrnIndicesRepository } from "./database/sqlite/prnindices";
+import { PrnInfoRepository } from "./database/sqlite/prninfo";
+import { SQLite } from "./database/sqlite/DAO";
+import { DBCONFIG } from "./config/database";
+import { std, mean } from "mathjs";
 import gps from "./gps";
-import { Database } from "sqlite3";
 
 const TAXA = 0.1;
 const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
 
-const aCadaMinuto = (connection: Database, time: Date) => {
-	var prninfoGrouped = "select prn, count(snr) as total from prninfo where time between ?-60000 and ? group by prn";
+const db = new SQLite(DBCONFIG.sqlitePath);
+const prnindices = new PrnIndicesRepository(db);
+const prninfo = new PrnInfoRepository(db);
 
-	// Query selecionando os prn, e contando sua quantidade em um periodo de tempo
-	connection.all(prninfoGrouped, [time, time], (err, rows) => {
+const aCadaMinuto = async (time: Date) => {
+	try {
+		const rows = await prninfo.getGroupedPrn(time);
+
 		console.log("PrninfoGrouped", rows);
-		if (err) {
-			console.error(err);
-			process.exit(1);
-		}
 		for (const row of rows) {
 			if (row.total >= MIN_QTDE) {
 				let vSnr = [];
@@ -25,66 +25,46 @@ const aCadaMinuto = (connection: Database, time: Date) => {
 				let intensidadeSinalQuadrado = 0;
 				let intensidade = 0;
 
-				var prnInfoMinute = "SELECT prn, snr FROM prninfo where time between ?-60000 and ? and prn = ?";
+				try {
+					const prnData = await prninfo.getByPrn(time, row.prn);
 
-				// Realiza select all na query sql
-				connection.all(
-					prnInfoMinute,
-					[time, time, row.prn],
-					(err, rows) => {
-						console.log('prnInfoMinute');
-						if (err) {
-							console.log(err);
-							throw err;
+					console.log("prnInfoMinute");
+					prnData.forEach((row) => {
+						if (row.snr) {
+							//console.log(row.prn + " -->" + row.snr);
+							intensidade = Math.pow(10, row.snr / 10);
+							vSnr.push(row.snr);
+							vIntensidadeSinal.push(intensidade);
+							intensidadeSinalQuadrado += Math.pow(
+								intensidade,
+								2
+							);
 						}
-						rows.forEach((row) => {
-							if (row.snr) {
-								//console.log(row.prn + " -->" + row.snr);
-								intensidade = Math.pow(10, row.snr / 10);
-								vSnr.push(row.snr);
-								vIntensidadeSinal.push(intensidade);
-								intensidadeSinalQuadrado += Math.pow(
-									intensidade,
-									2
-								);
-							}
-						});
+					});
 
-						var dpSnr = std(vSnr);
-						intensidadeSinalQuadrado /= vIntensidadeSinal.length;
-						var mediaIntensidadeSinalQuadrado = Math.pow(
-							mean(vIntensidadeSinal),
-							2
-						);
-						var s4 = Math.sqrt(
-							(intensidadeSinalQuadrado -
-								mediaIntensidadeSinalQuadrado) /
-								mediaIntensidadeSinalQuadrado
-						);
+					var dpSnr = std(vSnr);
+					intensidadeSinalQuadrado /= vIntensidadeSinal.length;
+					var mediaIntensidadeSinalQuadrado = Math.pow(
+						mean(vIntensidadeSinal),
+						2
+					);
+					var s4 = Math.sqrt(
+						(intensidadeSinalQuadrado -
+							mediaIntensidadeSinalQuadrado) /
+							mediaIntensidadeSinalQuadrado
+					);
 
-						console.log("S4", s4);
-						//salvar na tabela prnindices
-						var stmt3 =
-							"INSERT INTO prnindices (prn, mediasnr, mediaazi, mediaelev, tinicial, tfinal, dpsnr, s4) SELECT prn, AVG(snr), AVG(azi), AVG(elev), min(time), max(time), ?, ? from prninfo where time between ?-60000 and ? and prn = ? group by prn";
-
-						connection.all(
-							stmt3,
-							[dpSnr, s4, time, time, row.prn],
-							(err, _) => {
-								console.log('saving prnindices')
-								if (err) {
-									console.log(err);
-									throw err;
-								} else {
-									console.log("add prnindice");
-								}
-							}
-						);
-					}
-				);
+					console.log("S4", s4);
+					prnindices.insertProcessedData(dpSnr, s4, time, row.prn);
+				} catch (err) {
+					console.log(err);
+				}
 			}
 		}
-	});
+	} catch (err) {
+		console.error(err);
+		process.exit(1);
+	}
 };
 
 /**
@@ -95,40 +75,54 @@ const aCadaMinuto = (connection: Database, time: Date) => {
  *	- VTG -> speed, track
  *	- RMC -> lat, lon, speed, track, faa
  */
+async function application() {
+	try {
+		await prnindices.createTable();
+		await prninfo.createTable();
 
-createConnection().then((connection) => {
-	let controle = null;
-	let time = new Date();
-	let lat;
-	let lon;
+		let time = new Date();
+		let controle: number;
+		let lat: number;
+		let lon: number;
 
-	connection.serialize(function () {
-		gps.on("data", function (data) {
-			//console.log("Data", data);
+		// Querys rodaram sequencialmente
+		db.serialize(() => {
+			gps.on("data", async function (data) {
+				//console.log(data);
+				if (data.time) {
+					time = data.time;
+					lat = data.lat;
+					lon = data.lon;
+				}
 
-			if (data.time) {
-				time = data.time;
-				lat = data.lat;
-				lon = data.lon;
-			}
+				if (data.msgNumber != undefined && data.msgNumber != "null" && data.satellites) {
+					for (const satelite of data.satellites) {
+						//console.log(satelite);
+						await prninfo.insert(
+							satelite.prn,
+							satelite.snr,
+							satelite.azimuth,
+							satelite.elevation,
+							lat,
+							lon,
+							time
+						);
+					}
+				}
 
+				if (time.getSeconds() == 0 && time.getMinutes() != controle) {
+					// Executada a cada minuto
+					controle = time.getMinutes();
+					console.log(`CONTROLE ${controle}`);
 
-			saveGPSData(connection, data, lat, lon, time);
-
-			// console.log("time.getUTCSeconds = "+time.getUTCSeconds());
-			// console.log("controle"+controle);
-
-			if (
-				time &&
-				time.getUTCSeconds() == 0 &&
-				time.getMinutes() != controle
-			) {
-				// Executada a cada minuto
-				controle = time.getMinutes();
-				console.log(`CONTROLE ${controle}`);
-
-				aCadaMinuto(connection, time);
-			}
+					aCadaMinuto(time);
+				}
+			});
 		});
-	});
-});
+	} catch (err) {
+		console.log(err);
+		process.exit(1);
+	}
+}
+
+application();
