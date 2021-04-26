@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./src/serial15.ts"
+    "start": "ts-node ./src/serial.ts"
   },
   "author": "",
   "license": "ISC",
