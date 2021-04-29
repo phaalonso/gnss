@@ -1,6 +1,6 @@
 import { SQLite } from "./DAO"
 
-export class PrnIndicesRepository {
+export class PrnIndicesSqlite {
 	private dao: SQLite;
 
 	constructor(dao: SQLite) {

@@ -1,6 +1,6 @@
 import { SQLite } from "./DAO"
 
-export class PrnInfoRepository {
+export class PrnInfoSqlite {
 	private dao: SQLite;
 
 	/**
