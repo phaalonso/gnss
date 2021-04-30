@@ -11,13 +11,13 @@ listeningChannels['ram'] = [];
 
 const server = net.createServer();
 
-function subscribe(channel: string, socket: net.Socket) {
+export function subscribe(channel: string, socket: net.Socket) {
 	if (!listeningChannels[channel]) return;
 
 	listeningChannels[channel].push(socket);
 }
 
-function publish(channel: string, message: string) {
+export function publish(channel: string, message: string) {
 	if (!listeningChannels[channel]) return;
 
 	for (const sc of listeningChannels[channel]) {
@@ -50,7 +50,7 @@ server.on('connection', socket => {
 		}
 
 		console.error(new Error(`Comando desconhecido ${msg}`));
-	})
+	});
 })
 
 let count = 0;
