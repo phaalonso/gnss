@@ -75,7 +75,7 @@ function sendCpu() {
 
 function sendRam() {
 	ram.used().then(ram => {
-		publish('ram', `ram_${ram}`);
+		publish('ram', `ram_${ram.usedMemMb}`);
 	});
 }
 

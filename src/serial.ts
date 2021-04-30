@@ -113,9 +113,9 @@ async function application() {
 				if (time.getSeconds() == 0 && time.getMinutes() != controle) {
 					// Executada a cada minuto
 					controle = time.getMinutes();
-					console.log(`CONTROLE ${controle}`);
+					//console.log(`CONTROLE ${controle}`);
 
-					aCadaMinuto(time);
+					//aCadaMinuto(time);
 				}
 			});
 		});
@@ -126,3 +126,4 @@ async function application() {
 }
 
 application();
+
