@@ -6,9 +6,6 @@ const HOST = 'localhost';
 
 const listeningChannels = {};
 
-listeningChannels['cpu'] = [];
-listeningChannels['ram'] = [];
-
 const server = net.createServer();
 
 export function subscribe(channel: string, socket: net.Socket) {
@@ -21,6 +18,7 @@ export function publish(channel: string, message: string) {
 	if (!listeningChannels[channel]) return;
 
 	for (const sc of listeningChannels[channel]) {
+		console.log(`Sending message to ${sc.address()}`);
 		sc.write(message);
 	}
 }
@@ -80,6 +78,7 @@ const ram = osu.mem;
 
 function sendCpu() {
 	cpu.usage().then(cpu => {
+		console.log(cpu);
 		publish('cpu', `cpu_${cpu}`);
 	});
 }
@@ -103,7 +102,7 @@ server.listen(PORT, HOST, () => {
 	console.log(`Servidor iniciado em`, server.address());
 
 	listeningChannels['cpu'] = [];
-	//listeningChannels['ram'] = [];
+	listeningChannels['ram'] = [];
 	
 	setInterval(sendCpu, 1000);
 	setInterval(sendRam, 1000);
