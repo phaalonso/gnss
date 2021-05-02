@@ -1,6 +1,6 @@
 import { model } from "mongoose";
-import PrnInfoSchema from "./prninfo.schema";
-import { IPrnInfoDocument } from "./prninfo.type";
+import { IPrnIndicesDocument } from "./prnindices.type";
+import PrnIndicesSchema from './prnindices.schema';
 
-export const PrnInfoModel = model<IPrnInfoDocument>('prninfo', PrnInfoSchema);
+export const PrnIndicesModel = model<IPrnIndicesDocument>('prnindices', PrnIndicesSchema);
 

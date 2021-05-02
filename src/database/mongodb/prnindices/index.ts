@@ -1,3 +1,3 @@
-export * from './prninfo.schema';
-export * from './prninfo.type';
-export * from './prninfo.model';
+export * from './prnindices.schema';
+export * from './prnindices.type';
+export * from './prnindices.model';

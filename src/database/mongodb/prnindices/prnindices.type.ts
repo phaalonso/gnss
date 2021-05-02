@@ -31,5 +31,5 @@ export interface IPrnIndices {
 	}
 }
 
-export interface IPrnInfoDocument extends IPrnIndices, Document {}
-export interface IPrnInfoModel extends Model<IPrnInfoDocument> {}
+export interface IPrnIndicesDocument extends IPrnIndices, Document {}
+export interface IPrnIndicesModel extends Model<IPrnIndicesDocument> {}

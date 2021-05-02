@@ -1,7 +1,15 @@
 import { PrnInfoModel } from "./prninfo/prninfo.model";
 
 export class PrnInfoMongo {
-	insert(prn: number, snr: number, azimuth: number, elevation: number, lat: number, lon: number, time: Date) {
+	insert(
+		prn: number,
+		snr: number,
+		azimuth: number,
+		elevation: number,
+		lat: number,
+		lon: number,
+		time: Date
+	) {
 		return new PrnInfoModel({
 			prn,
 			snr,
@@ -9,7 +17,7 @@ export class PrnInfoMongo {
 			elev: elevation,
 			lat,
 			long: lon,
-			time
+			time,
 		}).save();
 	}
 
@@ -18,11 +26,24 @@ export class PrnInfoMongo {
 	 * @param time tempo sera relativo a esse parametro
 	 */
 	public getGroupedPrn(time: Date) {
-		return PrnInfoModel.find({ 
-			time: { 
-				$lte: time,
-				$gt: new Date(time.getTime() - 1000 * 60),
-			} });
+		console.log('Get gropuped prn');
+		return PrnInfoModel.aggregate()
+			.match({
+				time: {
+					$lte: time,
+					$gt: new Date(time.getTime() - 1000 * 60),
+				},
+			})
+			.group({
+				_id: "$prn",
+				total: { $sum: 1 },
+			})
+			.project({
+				_id: false,
+				prn: "$_id",
+				total: "$total",
+			})
+			.exec();
 	}
 
 	/**
@@ -32,15 +53,15 @@ export class PrnInfoMongo {
 	 */
 	public getByPrn(time: Date, prn: number) {
 		//return this.dao.all(
-			//'SELECT prn, snr FROM prninfo WHERE time BETWEEN ?-60000 AND ? AND prn = ?',
-			//[time, time, prn]
+		//'SELECT prn, snr FROM prninfo WHERE time BETWEEN ?-60000 AND ? AND prn = ?',
+		//[time, time, prn]
 		//);
 		return PrnInfoModel.find({
 			prn: prn,
 			time: {
 				$lte: time,
 				$gt: new Date(time.getTime() - 1000 * 60),
-			}
+			},
 		});
 	}
 }
