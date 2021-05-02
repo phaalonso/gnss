@@ -3,14 +3,16 @@
 //import { DBCONFIG } from "./config/database/sqlite";
 //import { SQLite } from "./database/sqlite/DAO";
 import { std, mean } from "mathjs";
-import gps from "./gps";
 import { PrnInfoMongo } from "./database/mongodb/prninfo";
 import { PrnIndicesMongo } from "./database/mongodb/prnindices";
 import { connect } from "./database/mongodb/connection";
+import { GpsDataStream } from './GpsDataStream';
 
 const TAXA = 0.1;
 const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
+
+const dataStream = new GpsDataStream();
 
 //const db = new SQLite(DBCONFIG.sqlitePath);
 //const prnindices = new PrnIndicesSqlite(db);
@@ -19,7 +21,6 @@ const MIN_QTDE = (60 / TAXA) * DISP;
 const prninfo = new PrnInfoMongo();
 const prnindices = new PrnIndicesMongo();
 
-/*
 const aCadaMinuto = async (time: Date) => {
 	try {
 		const rows = await prninfo.getGroupedPrn(time);
@@ -38,7 +39,7 @@ const aCadaMinuto = async (time: Date) => {
 					console.log("prnInfoMinute");
 					prnData.forEach((row) => {
 						if (row.snr) {
-							//console.log(row.prn + " -->" + row.snr);
+							// console.log(row.prn + " -->" + row.snr);
 							intensidade = Math.pow(10, row.snr / 10);
 							vSnr.push(row.snr);
 							vIntensidadeSinal.push(intensidade);
@@ -65,6 +66,7 @@ const aCadaMinuto = async (time: Date) => {
 					prnindices.insertProcessedData(dpSnr, s4, time, row.prn);
 				} catch (err) {
 					console.log(err);
+					process.exit(1);
 				}
 			}
 		}
@@ -73,7 +75,7 @@ const aCadaMinuto = async (time: Date) => {
 		process.exit(1);
 	}
 };
-*/
+
 
 /**
  * Types:
@@ -97,7 +99,7 @@ async function application() {
 
 		// Querys rodaram sequencialmente
 		//db.serialize(() => {
-			gps.on("data", async function (data) {
+			dataStream.on("data", async function (data) {
 				//console.log(data);
 				if (data.time) {
 					time = data.time;
@@ -121,13 +123,13 @@ async function application() {
 					}
 				}
 
-				//if (time.getSeconds() == 0 && time.getMinutes() != controle) {
-				//    // Executada a cada minuto
-				//    controle = time.getMinutes();
-				//    console.log(`CONTROLE ${controle}`);
+				if (time.getSeconds() == 0 && time.getMinutes() != controle) {
+					// Executada a cada minuto
+					controle = time.getMinutes();
+					console.log(`CONTROLE ${controle}`);
 
-				//    aCadaMinuto(time);
-				//}
+					aCadaMinuto(time);
+				}
 			});
 		//});
 	} catch (err) {
