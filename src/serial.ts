@@ -36,7 +36,7 @@ const aCadaMinuto = async (time: Date) => {
 				try {
 					const prnData = await prninfo.getByPrn(time, row.prn);
 
-					console.log("prnInfoMinute");
+					// console.log('Prn info by binute', prnData);
 					prnData.forEach((row) => {
 						if (row.snr) {
 							// console.log(row.prn + " -->" + row.snr);
@@ -66,7 +66,6 @@ const aCadaMinuto = async (time: Date) => {
 					prnindices.insertProcessedData(dpSnr, s4, time, row.prn);
 				} catch (err) {
 					console.log(err);
-					process.exit(1);
 				}
 			}
 		}
@@ -110,7 +109,7 @@ async function application() {
 				if (data.msgNumber != undefined && data.msgNumber != "null" && data.satellites) {
 					if (!lat || !lon) return;
 					for (const satelite of data.satellites) {
-						//console.log('Satelite', satelite);
+						// console.log('Satelite', satelite);
 						await prninfo.insert(
 							satelite.prn,
 							satelite.snr,

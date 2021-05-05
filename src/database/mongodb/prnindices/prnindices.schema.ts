@@ -19,8 +19,12 @@ const PrnIndicesSchema = new Schema({
 		type: Number,
 		required: true,
 	},
-	tininical: {
-		type: Number,
+	minTime: {
+		type: Date,
+		required: true,
+	},
+	maxTime: {
+		type: Date,
 		required: true,
 	},
 	dpsnr: {
