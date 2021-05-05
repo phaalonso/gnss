@@ -41,7 +41,7 @@ export class PrnInfoMongo {
 			.project({
 				_id: false,
 				prn: "$_id",
-				total: "$total",
+				total: true,
 			})
 			.exec();
 	}
