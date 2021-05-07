@@ -1,27 +1,15 @@
 import net from 'net';
 import osu from 'node-os-utils';
+import { PubSub } from "./PubSub";
 
 const PORT = 2108;
 const HOST = 'localhost';
 
-const listeningChannels = {};
+const pubSub = new PubSub<net.Socket>();
+pubSub.createChannel('cpu');
+pubSub.createChannel('ram');
 
 const server = net.createServer();
-
-export function subscribe(channel: string, socket: net.Socket) {
-	if (!listeningChannels[channel]) return;
-
-	listeningChannels[channel].push(socket);
-}
-
-export function publish(channel: string, message: string) {
-	if (!listeningChannels[channel]) return;
-
-	for (const sc of listeningChannels[channel]) {
-		console.log(`Sending message to ${sc.address()}`);
-		sc.write(message);
-	}
-}
 
 server.on('connection', socket => {
 	console.log(`Nova conexão criada`);
@@ -33,7 +21,7 @@ server.on('connection', socket => {
 
 		if (matchSub && matchSub[1]) {
 			const channel = matchSub[1];
-			subscribe(channel, socket);
+			pubSub.sub(channel, socket);
 			return;
 		}
 		
@@ -43,7 +31,7 @@ server.on('connection', socket => {
 			const channel = matchPub[1];
 			const message = matchPub[2];
 
-			publish(channel, message);
+			pubSub.pub(channel, message);
 			return;
 		}
 
@@ -79,13 +67,13 @@ const ram = osu.mem;
 function sendCpu() {
 	cpu.usage().then(cpu => {
 		console.log(cpu);
-		publish('cpu', `cpu_${cpu}`);
+		pubSub.pub('cpu', `cpu_${cpu}`);
 	});
 }
 
 function sendRam() {
 	ram.used().then(ram => {
-		publish('ram', `ram_${ram.usedMemMb}`);
+		pubSub.pub('ram', `ram_${ram.usedMemMb}`);
 	});
 }
 
@@ -101,9 +89,6 @@ function sendRam() {
 server.listen(PORT, HOST, () => {
 	console.log(`Servidor iniciado em`, server.address());
 
-	listeningChannels['cpu'] = [];
-	listeningChannels['ram'] = [];
-	
 	setInterval(sendCpu, 1000);
 	setInterval(sendRam, 1000);
 	//setInterval(sendDiskUsage, 1000);
