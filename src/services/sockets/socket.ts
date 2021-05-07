@@ -1,75 +1,74 @@
 import net from 'net';
 import osu from 'node-os-utils';
-import { PubSub } from "./PubSub";
+import { PubSub, CustomSocket } from "./PubSub";
 
 const PORT = 2108;
 const HOST = 'localhost';
 
-const pubSub = new PubSub<net.Socket>();
-pubSub.createChannel('cpu');
-pubSub.createChannel('ram');
+const { cpu, mem } = osu;
 
-const SocketServer = net.createServer();
+class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
+	private _socketServer: net.Server;
 
-SocketServer.on('connection', socket => {
-	console.log(`Nova conexão criada`);
-	
-	socket.on('data', data => {
-		pubSub.handleMessage(socket, data);
-	});
-})
+	constructor() {
+		super('write');
+		this.createChannel('cpu');
+		this.createChannel('ram');
 
-let count = 0;
+		this._socketServer = net.createServer();
 
-SocketServer.on('error', err => {
-	//@ts-ignore
-	if (err.code === 'EADDRINUSE') {
-		count++;
+		this._socketServer.on('connection', this.handleNewConnection.bind(this));
+		this._socketServer.on('error', this.handleError.bind(this));
 
-		if (count > 5) {
-			process.exit(1);
-		}
+		this._socketServer.listen(PORT, HOST, () => {
+			console.log(`Servidor iniciado em`, this._socketServer.address());
 
-		console.log('Endereço já está em uso, tentando novamente...');
-		setTimeout(() => {
-			SocketServer.close();
-			SocketServer.listen(PORT, HOST);
-		}, 1000 * count);
-	} else {
-		console.log(err);
+			// setInterval((server: SocketPubSub) => {
+			//     if (server.listeningChannels.get('cpu').size > 0) {
+			// 		cpu.usage().then(cpu => {
+			// 			// console.log(cpu);
+			// 			server.pub('cpu', `cpu_${cpu}`);
+			// 		});
+			// 	}
+			//
+			//     if (server.listeningChannels.get('ram').size > 0) {
+			// 		mem.used().then(ram => {
+			// 			server.pub('ram', `ram_${ram.usedMemMb}`);
+			// 		});
+			// 	}
+			//
+			// }, 1000, this);
+		});
 	}
-});
 
-const cpu = osu.cpu;
-const ram = osu.mem;
-//const drive = osu.drive;
+	protected sendMessage(socket: CustomSocket<net.Socket>, message: string) {
+		socket.write(message);
+	}
 
-function sendCpu() {
-	cpu.usage().then(cpu => {
-		console.log(cpu);
-		pubSub.pub('cpu', `cpu_${cpu}`);
-	});
+	private handleNewConnection(socket) {
+		console.log(`Nova conexão criada`);
+		socket.channels = []; // Canais aos quais o socket está conecatdo
+
+		socket.on('data', data => {
+			this.handleMessage(socket, data);
+		});
+
+		socket.on('close', () => {
+			this.disconnectSocket(socket);
+		});
+	}
+
+	private handleError(err) {
+		if (err.code === 'EADDRINUSE') {
+			console.log('Endereço já está em uso, tentando novamente...');
+			setTimeout(() => {
+				this._socketServer.close();
+				this._socketServer.listen(PORT, HOST);
+			}, 1000);
+		} else {
+			console.log(err);
+		}
+	}
 }
 
-function sendRam() {
-	ram.used().then(ram => {
-		pubSub.pub('ram', `ram_${ram.usedMemMb}`);
-	});
-}
-
-//function sendDriveUsage() {
-	//// Como conseguir o nome do drive?
-	//drive.info().then(data => {
-		//publish('drive', `drive_free_${data.freeGb}`);
-		//publish('drive', `drive_used_${data.usedGb}`);
-
-	//});
-//}
-
-SocketServer.listen(PORT, HOST, () => {
-	console.log(`Servidor iniciado em`, SocketServer.address());
-
-	setInterval(sendCpu, 1000);
-	setInterval(sendRam, 1000);
-	//setInterval(sendDiskUsage, 1000);
-});
+const server = new SocketPubSub();

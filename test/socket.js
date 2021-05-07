@@ -8,5 +8,5 @@ socket.on('data', data => {
 	console.log(msg);
 });
 
-socket.write('sub_cpu');
-socket.write('sub_ram');
+socket.write('sub_cpu\n');
+socket.write('sub_ram\n');
