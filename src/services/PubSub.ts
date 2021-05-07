@@ -1,5 +1,10 @@
 export class PubSub<T> {
     private readonly listeningChannels = new Map<string, T[]>();
+    private methodName: string;
+
+    constructor(methodName = 'write') {
+        this.methodName = methodName;
+    }
 
     /**
      * @description create a channel with given channel name
@@ -31,7 +36,7 @@ export class PubSub<T> {
         if (!this.listeningChannels[channelName]) return;
 
         for (const con of this.listeningChannels[channelName]) {
-            con.write(message);
+            con[this.methodName](message);
         }
     }
 
@@ -39,7 +44,7 @@ export class PubSub<T> {
         this.listeningChannels.forEach(channel => {
             for (const con of channel) {
                 // @ts-ignore
-                con.write(message);
+                con[this.methodName](message);
             }
         })
     }
