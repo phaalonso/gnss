@@ -1,17 +1,25 @@
-import { PrnIndicesRepository } from "./database/sqlite/prnindices";
-import { PrnInfoRepository } from "./database/sqlite/prninfo";
-import { SQLite } from "./database/sqlite/DAO";
-import { DBCONFIG } from "./config/database";
+//import { PrnIndicesSqlite } from "./database/sqlite/prnindices";
+//import { PrnInfoSqlite } from "./database/sqlite/prninfo";
+//import { DBCONFIG } from "./config/database/sqlite";
+//import { SQLite } from "./database/sqlite/DAO";
 import { std, mean } from "mathjs";
-import gps from "./gps";
+import { PrnInfoMongo } from "./database/mongodb/prninfo";
+import { PrnIndicesMongo } from "./database/mongodb/prnindices";
+import { connect } from "./database/mongodb/connection";
+import { GpsDataStream } from './GpsDataStream';
 
 const TAXA = 0.1;
 const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
 
-const db = new SQLite(DBCONFIG.sqlitePath);
-const prnindices = new PrnIndicesRepository(db);
-const prninfo = new PrnInfoRepository(db);
+const dataStream = new GpsDataStream();
+
+//const db = new SQLite(DBCONFIG.sqlitePath);
+//const prnindices = new PrnIndicesSqlite(db);
+//const prninfo = new PrnInfoSqlite(db);
+
+const prninfo = new PrnInfoMongo();
+const prnindices = new PrnIndicesMongo();
 
 const aCadaMinuto = async (time: Date) => {
 	try {
@@ -28,10 +36,10 @@ const aCadaMinuto = async (time: Date) => {
 				try {
 					const prnData = await prninfo.getByPrn(time, row.prn);
 
-					console.log("prnInfoMinute");
+					// console.log('Prn info by binute', prnData);
 					prnData.forEach((row) => {
 						if (row.snr) {
-							//console.log(row.prn + " -->" + row.snr);
+							// console.log(row.prn + " -->" + row.snr);
 							intensidade = Math.pow(10, row.snr / 10);
 							vSnr.push(row.snr);
 							vIntensidadeSinal.push(intensidade);
@@ -67,6 +75,7 @@ const aCadaMinuto = async (time: Date) => {
 	}
 };
 
+
 /**
  * Types:
  *	- GSV -> Satelites([prn, elevation, azimuth, snr, status])
@@ -77,8 +86,10 @@ const aCadaMinuto = async (time: Date) => {
  */
 async function application() {
 	try {
-		await prnindices.createTable();
-		await prninfo.createTable();
+		await connect();
+
+		//await prnindices.createTable();
+		//await prninfo.createTable();
 
 		let time = new Date();
 		let controle: number;
@@ -86,8 +97,8 @@ async function application() {
 		let lon: number;
 
 		// Querys rodaram sequencialmente
-		db.serialize(() => {
-			gps.on("data", async function (data) {
+		//db.serialize(() => {
+			dataStream.on("data", async function (data) {
 				//console.log(data);
 				if (data.time) {
 					time = data.time;
@@ -96,8 +107,9 @@ async function application() {
 				}
 
 				if (data.msgNumber != undefined && data.msgNumber != "null" && data.satellites) {
+					if (!lat || !lon) return;
 					for (const satelite of data.satellites) {
-						//console.log(satelite);
+						// console.log('Satelite', satelite);
 						await prninfo.insert(
 							satelite.prn,
 							satelite.snr,
@@ -118,7 +130,7 @@ async function application() {
 					//aCadaMinuto(time);
 				}
 			});
-		});
+		//});
 	} catch (err) {
 		console.log(err);
 		process.exit(1);
