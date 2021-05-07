@@ -127,7 +127,7 @@ async function application() {
 					controle = time.getMinutes();
 					//console.log(`CONTROLE ${controle}`);
 
-					//aCadaMinuto(time);
+					aCadaMinuto(time);
 				}
 			});
 		//});

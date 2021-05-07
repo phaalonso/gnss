@@ -1,9 +1,9 @@
 export class PubSub<T> {
     private readonly listeningChannels = new Map<string, T[]>();
-    private methodName: string;
+    private _methodName: string;
 
     constructor(methodName = 'write') {
-        this.methodName = methodName;
+        this._methodName = methodName;
     }
 
     /**
@@ -36,7 +36,7 @@ export class PubSub<T> {
         if (!this.listeningChannels[channelName]) return;
 
         for (const con of this.listeningChannels[channelName]) {
-            con[this.methodName](message);
+            con[this._methodName](message);
         }
     }
 
@@ -44,8 +44,32 @@ export class PubSub<T> {
         this.listeningChannels.forEach(channel => {
             for (const con of channel) {
                 // @ts-ignore
-                con[this.methodName](message);
+                con[this._methodName](message);
             }
         })
+    }
+
+    public handleMessage(socket, data) {
+        const msg = data.toString();
+
+        const matchSub = msg.match(/^sub_(.*)$/);
+
+        if (matchSub && matchSub[1]) {
+            const channel = matchSub[1];
+            this.sub(channel, socket);
+            return;
+        }
+
+        const matchPub = msg.match(/^pub_(.*)_(.*)$/);
+
+        if (matchPub && matchPub[1]) {
+            const channel = matchPub[1];
+            const message = matchPub[2];
+
+            this.pub(channel, message);
+            return;
+        }
+
+        console.error(new Error(`Comando desconhecido ${msg}`));
     }
 }

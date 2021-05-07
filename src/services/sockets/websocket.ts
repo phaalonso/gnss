@@ -17,28 +17,7 @@ wss.on('connection', ws => {
 	console.log(`Nova conexão criada`);
 	
 	ws.on('message', data => {
-		console.log('Recebido: %s', data);
-		const msg = data.toString();
-
-		const matchSub = msg.match(/^sub_(.*)$/);
-
-		if (matchSub && matchSub[1]) {
-			const channel = matchSub[1];
-			pubSub.sub(channel, ws);
-			return;
-		}
-		
-		const matchPub = msg.match(/^pub_(.*)_(.*)$/);
-
-		if (matchPub && matchPub[1]) {
-			const channel = matchPub[1];
-			const message = matchPub[2];
-
-			pubSub.pub(channel, message);
-			return;
-		}
-
-		console.error(new Error(`Comando desconhecido ${msg}`));
+		pubSub.handleMessage(ws, data);
 	});
 })
 
