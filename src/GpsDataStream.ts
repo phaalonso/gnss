@@ -39,7 +39,7 @@ export class GpsDataStream extends GPS {
         this._serialPort.pipe(this._parser);
 
         this._parser.on('data', data => {
-			console.log(data);
+			//console.log(data);
             this.update(data);
 			// Use created channel to transmit nmea data
 			this.socket.pub('nmea', data);

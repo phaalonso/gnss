@@ -22,22 +22,6 @@ export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 
 		this._socketServer.listen(PORT, HOST, () => {
 			console.log(`Servidor iniciado em`, this._socketServer.address());
-
-			// setInterval((server: SocketPubSub) => {
-			//     if (server.listeningChannels.get('cpu').size > 0) {
-			// 		cpu.usage().then(cpu => {
-			// 			// console.log(cpu);
-			// 			server.pub('cpu', `cpu_${cpu}`);
-			// 		});
-			// 	}
-			//
-			//     if (server.listeningChannels.get('ram').size > 0) {
-			// 		mem.used().then(ram => {
-			// 			server.pub('ram', `ram_${ram.usedMemMb}`);
-			// 		});
-			// 	}
-			//
-			// }, 1000, this);
 		});
 	}
 

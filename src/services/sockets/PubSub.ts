@@ -59,12 +59,11 @@ export abstract class PubSub<T> {
         const channel = this.listeningChannels.get(channelName);
 
         if (!channel || channel.size == 0) {
-            console.log('Channel size:', channel.size);
+            //console.log('Channel size:', channel.size);
             return;
         }
 
-
-        console.log(`Sending ${message} on channel ${channelName}`)
+		console.log(`Sending ${message} on channel ${channelName}`)
 
         channel.forEach(con => {
             this.sendMessage(con, message);

@@ -116,7 +116,7 @@ const aCadaMinuto = async (time: Date) => {
 				if (!lat || !lon) return;
 				for (const satelite of data.satellites) {
 					// console.log('Satelite', satelite);
-					socketPubSub.pub('custom', `sat_${satelite.private.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${satelite.lat}_${satelite.lon}_${time}\n`)
+					socketPubSub.pub('custom', `sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`)
 					await prnInfo.insert(
 						satelite.prn,
 						satelite.snr,
