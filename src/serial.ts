@@ -6,7 +6,8 @@ import { std, mean } from "mathjs";
 import { PrnInfoMongo } from "./database/mongodb/prninfo";
 import { PrnIndicesMongo } from "./database/mongodb/prnindices";
 import { connect } from "./database/mongodb/connection";
-import { GpsDataStream } from './GpsDataStream';
+import { GpsDataStream } from "./GpsDataStream";
+import { socketPubSub } from "./services/sockets/socket";
 
 const TAXA = 0.1;
 const DISP = 0.5;
@@ -18,12 +19,12 @@ const dataStream = new GpsDataStream();
 //const prnindices = new PrnIndicesSqlite(db);
 //const prninfo = new PrnInfoSqlite(db);
 
-const prninfo = new PrnInfoMongo();
-const prnindices = new PrnIndicesMongo();
+const prnInfo = new PrnInfoMongo();
+const prnIndices = new PrnIndicesMongo();
 
 const aCadaMinuto = async (time: Date) => {
 	try {
-		const rows = await prninfo.getGroupedPrn(time);
+		const rows = await prnInfo.getGroupedPrn(time);
 
 		console.log("PrninfoGrouped", rows);
 		for (const row of rows) {
@@ -34,7 +35,7 @@ const aCadaMinuto = async (time: Date) => {
 				let intensidade = 0;
 
 				try {
-					const prnData = await prninfo.getByPrn(time, row.prn);
+					const prnData = await prnInfo.getByPrn(time, row.prn);
 
 					// console.log('Prn info by binute', prnData);
 					prnData.forEach((row) => {
@@ -63,7 +64,7 @@ const aCadaMinuto = async (time: Date) => {
 					);
 
 					console.log("S4", s4);
-					prnindices.insertProcessedData(dpSnr, s4, time, row.prn);
+					prnIndices.insertProcessedData(dpSnr, s4, time, row.prn);
 				} catch (err) {
 					console.log(err);
 				}
@@ -75,7 +76,6 @@ const aCadaMinuto = async (time: Date) => {
 	}
 };
 
-
 /**
  * Types:
  *	- GSV -> Satelites([prn, elevation, azimuth, snr, status])
@@ -84,9 +84,11 @@ const aCadaMinuto = async (time: Date) => {
  *	- VTG -> speed, track
  *	- RMC -> lat, lon, speed, track, faa
  */
-async function application() {
+(async () => {
 	try {
 		await connect();
+
+		socketPubSub.createChannel('custom');
 
 		//await prnindices.createTable();
 		//await prninfo.createTable();
@@ -98,44 +100,46 @@ async function application() {
 
 		// Querys rodaram sequencialmente
 		//db.serialize(() => {
-			dataStream.on("data", async function (data) {
-				//console.log(data);
-				if (data.time) {
-					time = data.time;
-					lat = data.lat;
-					lon = data.lon;
-				}
+		dataStream.on("data", async (data) => {
+			//console.log(data);
+			if (data.time) {
+				time = data.time;
+				lat = data.lat;
+				lon = data.lon;
+			}
 
-				if (data.msgNumber != undefined && data.msgNumber != "null" && data.satellites) {
-					if (!lat || !lon) return;
-					for (const satelite of data.satellites) {
-						// console.log('Satelite', satelite);
-						await prninfo.insert(
-							satelite.prn,
-							satelite.snr,
-							satelite.azimuth,
-							satelite.elevation,
-							lat,
-							lon,
-							time
-						);
-					}
+			if (
+				data.msgNumber != undefined &&
+				data.msgNumber != "null" &&
+				data.satellites
+			) {
+				if (!lat || !lon) return;
+				for (const satelite of data.satellites) {
+					// console.log('Satelite', satelite);
+					socketPubSub.pub('custom', `sat_${satelite.private.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${satelite.lat}_${satelite.lon}_${time}\n`)
+					await prnInfo.insert(
+						satelite.prn,
+						satelite.snr,
+						satelite.azimuth,
+						satelite.elevation,
+						lat,
+						lon,
+						time
+					);
 				}
+			}
 
-				if (time.getSeconds() == 0 && time.getMinutes() != controle) {
-					// Executada a cada minuto
-					controle = time.getMinutes();
-					//console.log(`CONTROLE ${controle}`);
+			if (time.getSeconds() == 0 && time.getMinutes() != controle) {
+				// Executada a cada minuto
+				controle = time.getMinutes();
+				//console.log(`CONTROLE ${controle}`);
 
-					aCadaMinuto(time);
-				}
-			});
+				aCadaMinuto(time);
+			}
+		});
 		//});
 	} catch (err) {
 		console.log(err);
 		process.exit(1);
 	}
-}
-
-application();
-
+})();

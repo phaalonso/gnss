@@ -7,7 +7,7 @@ const HOST = 'localhost';
 
 const { cpu, mem } = osu;
 
-class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
+export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 	private _socketServer: net.Server;
 
 	constructor() {
@@ -71,4 +71,4 @@ class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 	}
 }
 
-const server = new SocketPubSub();
+export const socketPubSub = new SocketPubSub();

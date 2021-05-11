@@ -66,4 +66,4 @@ class WSPubSub extends PubSub<CustomSocket<WebSocket>> {
 	}
 }
 
-const server = new WSPubSub();
+export const webSocketPubSub = new WSPubSub();
