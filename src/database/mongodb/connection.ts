@@ -25,7 +25,7 @@ export const connect = async () => {
 			});
 
 			resolve(connection);
-		});
+		}).catch(err => reject(err));
 	});
 };
 

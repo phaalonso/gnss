@@ -18,7 +18,10 @@ export class PrnInfoMongo {
 			lat,
 			long: lon,
 			time,
-		}).save();
+		}).save()
+		.catch(err => {
+			console.log(err);
+		});
 	}
 
 	/**
@@ -26,7 +29,7 @@ export class PrnInfoMongo {
 	 * @param time tempo sera relativo a esse parametro
 	 */
 	public getGroupedPrn(time: Date) {
-		console.log('Get gropuped prn');
+		//console.log('Get gropuped prn');
 		return PrnInfoModel.aggregate()
 			.match({
 				time: {
