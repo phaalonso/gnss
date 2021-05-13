@@ -3,10 +3,10 @@
 //import { DBCONFIG } from "./config/database/sqlite";
 //import { SQLite } from "./database/sqlite/DAO";
 
-import { PrnInfoMongo } from "./database/mongodb/prninfo";
-import { PrnIndicesMongo } from "./database/mongodb/prnindices";
+import { PrnIndicesController } from "./controller/PrnIndices";
 import { std, mean } from "mathjs";
 import { Satellite } from "gps";
+import { PrnInfoControlller } from "./controller/PrnInfo";
 
 export interface CustomData {
 	prn: number;
@@ -19,135 +19,145 @@ export interface CustomData {
 }
 
 const TAXA = 0.1;
-const DISP = 0.5; const MIN_QTDE = (60 / TAXA) * DISP;
+const DISP = 0.5;
+const MIN_QTDE = (60 / TAXA) * DISP;
 
-//const db = new SQLite(DBCONFIG.sqlitePath);
-//const prnindices = new PrnIndicesSqlite(db);
-//const prninfo = new PrnInfoSqlite(db);
+export class ProcessData {
+	private timeController: number;
+	private prnInfo: PrnInfoControlller;
+	private prnIndices: PrnIndicesController;
 
-const prnInfo = new PrnInfoMongo();
-const prnIndices = new PrnIndicesMongo();
+	constructor(prnInfoController: PrnInfoControlller, prnIndicesController: PrnIndicesController) {
+		if (!prnInfoController || !prnIndicesController) {
+			throw new Error('You need to pass the controllers to ProcessData');
+		}
 
-export async function aCadaMinuto(time: Date) {
-	try {
-		const rows = await prnInfo.getGroupedPrn(time);
+		this.prnIndices = prnIndicesController;
+		this.prnInfo = prnInfoController;
+	}
 
-		//console.log("PrninfoGrouped", rows);
-		for (const row of rows) {
-			if (row.total >= MIN_QTDE) {
-				let vSnr = [];
-				let vIntensidadeSinal = [];
-				let intensidadeSinalQuadrado = 0;
-				let intensidade = 0;
+	public async processData(
+		satellite: Satellite[],
+		lat: number,
+		lon: number,
+		time: Date
+	) {
+		if (!this.timeController) {
+			this.timeController = time.getMinutes();
+		}
 
-				try {
-					const prnData = await prnInfo.getByPrn(time, row.prn);
-					//console.log(prnData);
+		for (const satelite of satellite) {
+			await this.prnInfo.insert(
+				satelite.prn,
+				satelite.snr,
+				satelite.azimuth,
+				satelite.elevation,
+				lat,
+				lon,
+				time
+			);
+		}
 
-					// console.log('Prn info by binute', prnData);
-					prnData.forEach((row) => {
-						if (row.snr) {
-							// console.log(row.prn + " -->" + row.snr);
-							intensidade = Math.pow(10, row.snr / 10);
-							vSnr.push(row.snr);
-							vIntensidadeSinal.push(intensidade);
-							intensidadeSinalQuadrado += Math.pow(
-								intensidade,
-								2
-							);
+		if (
+			time.getSeconds() == 0 &&
+			time.getMinutes() != this.timeController
+		) {
+			process.stdout.write(`${time} Salvando prnindices\n`);
+			this.timeController= time.getMinutes();
+
+			this.processMinute(time);
+		}
+	}
+
+	public async processMinute(time: Date) {
+		try {
+			console.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
+			
+			const rows = await this.prnInfo.getGroupedPrn(time);
+
+			//console.log("PrninfoGrouped", rows);
+			for (const row of rows) {
+				//console.log(row)
+				if (row.total >= MIN_QTDE) {
+					let vSnr = [];
+					let vIntensidadeSinal = [];
+					let intensidadeSinalQuadrado = 0;
+					let intensidade = 0;
+
+					try {
+						const prnData = await this.prnInfo.getByPrn(time, row.prn);
+						//console.log('Prn info by binute', prnData[0]);
+
+						prnData.forEach((row) => {
+							if (row.snr) {
+								// console.log(row.prn + " -->" + row.snr);
+								intensidade = Math.pow(10, row.snr / 10);
+								//console.log(row.snr);
+								vSnr.push(row.snr);
+								vIntensidadeSinal.push(intensidade);
+								intensidadeSinalQuadrado += Math.pow(
+									intensidade,
+									2
+								);
+							}
+						});
+
+						if (vSnr.length == 0) {
+							console.log("vSnr vazio");
+							return;
 						}
-					});
 
-					if (vSnr) {
-						console.log("vSnr vazio");
-						return;
+						var dpSnr = std(vSnr);
+						intensidadeSinalQuadrado /= vIntensidadeSinal.length;
+						var mediaIntensidadeSinalQuadrado = Math.pow(
+							mean(vIntensidadeSinal),
+							2
+						);
+						var s4 = Math.sqrt(
+							(intensidadeSinalQuadrado -
+								mediaIntensidadeSinalQuadrado) /
+								mediaIntensidadeSinalQuadrado
+						);
+
+						//console.log("S4", s4);
+						this.prnIndices.insertProcessedData(
+							dpSnr,
+							s4,
+							time,
+							row.prn
+						);
+					} catch (err) {
+						console.log(err);
 					}
-
-					var dpSnr = std(vSnr);
-					intensidadeSinalQuadrado /= vIntensidadeSinal.length;
-					var mediaIntensidadeSinalQuadrado = Math.pow(
-						mean(vIntensidadeSinal),
-						2
-					);
-					var s4 = Math.sqrt(
-						(intensidadeSinalQuadrado -
-							mediaIntensidadeSinalQuadrado) /
-							mediaIntensidadeSinalQuadrado
-					);
-
-					//console.log("S4", s4);
-					prnIndices.insertProcessedData(dpSnr, s4, time, row.prn);
-				} catch (err) {
-					console.log(err);
 				}
 			}
+		} catch (err) {
+			console.error(err);
+			process.exit(1);
 		}
-	} catch (err) {
-		console.error(err);
-		process.exit(1);
 	}
-}
 
-export async function saveSatellite(
-	satellite: Satellite,
-	lat: number,
-	lon: number,
-	time: Date
-) {
-	await prnInfo.insert(
-		satellite.prn,
-		satellite.snr,
-		satellite.azimuth,
-		satellite.elevation,
-		lat,
-		lon,
-		time
-	);
-}
+	async processCustomData(custom: CustomData) {
+		if (!this.timeController) {
+			this.timeController = custom.time.getMinutes();
+		}
 
-let controle: number = new Date().getMinutes();
-
-export async function processData(
-	satellite: Satellite[],
-	lat: number,
-	lon: number,
-	time: Date
-) {
-	for (const satelite of satellite) {
-		await prnInfo.insert(
-			satelite.prn,
-			satelite.snr,
-			satelite.azimuth,
-			satelite.elevation,
-			lat,
-			lon,
-			time
+		await this.prnInfo.insert(
+			custom.prn,
+			custom.snr,
+			custom.azimuth,
+			custom.elevation,
+			custom.lat,
+			custom.lon,
+			custom.time
 		);
-	}
 
-	if (time.getSeconds() == 0 && time.getMinutes() != controle) {
-		process.stdout.write(`${time} Salvando prnindices\n`);
-		controle = time.getMinutes();
+		if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
+			process.stdout.write(`${custom.time} Salvando prnindices\n`);
+			this.timeController = custom.time.getMinutes();
+			console.log(this.timeController);
 
-		aCadaMinuto(time);
-	}
-}
-
-export async function processCustomData(custom: CustomData) {
-	await prnInfo.insert(
-		custom.prn,
-		custom.snr,
-		custom.azimuth,
-		custom.elevation,
-		custom.lat,
-		custom.lon,
-		custom.time
-	);
-
-	if (custom.time.getSeconds() == 0 && custom.time.getMinutes() != controle) {
-		process.stdout.write(`${custom.time} Salvando prnindices\n`);
-		controle = custom.time.getMinutes();
-
-		aCadaMinuto(custom.time);
+			this.processMinute(custom.time);
+		}
 	}
 }

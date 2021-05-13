@@ -15,5 +15,7 @@ export const MongoConfig: Config = {
 		useCreateIndex: true,
 		useUnifiedTopology: true,
 		useFindAndModify: false,
+		keepAlive: true,
+		poolSize: 30,
 	}
 }

@@ -24,6 +24,7 @@ const PrnInfoSchema = new Schema({
 	time: {
 		type: Date,
 		required: true,
+		index: true,
 	}
 });
 
