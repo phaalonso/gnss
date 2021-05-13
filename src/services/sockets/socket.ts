@@ -1,11 +1,8 @@
 import net from 'net';
-import osu from 'node-os-utils';
 import { PubSub, CustomSocket } from "./PubSub";
 
 const PORT = 2108;
 const HOST = 'localhost';
-
-const { cpu, mem } = osu;
 
 export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 	private _socketServer: net.Server;

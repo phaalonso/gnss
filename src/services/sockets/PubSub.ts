@@ -63,7 +63,7 @@ export abstract class PubSub<T> {
             return;
         }
 
-		console.log(`Sending ${message} on channel ${channelName}`)
+		//process.stdout.write(`Sending ${message} on channel ${channelName}\n`);
 
         channel.forEach(con => {
             this.sendMessage(con, message);
@@ -90,16 +90,18 @@ export abstract class PubSub<T> {
             if (matchSub && matchSub[1]) {
                 const channel = matchSub[1];
                 this.sub(channel, socket);
+				this.sendMessage(socket, `rec_${msg}`);
                 return;
             }
 
             const matchPub = msg.match(/^pub_(.*)_(.*)$/);
 
-            if (matchPub && matchPub[1]) {
+            if (matchPub && matchPub[1] && matchPub[2]) {
                 const channel = matchPub[1];
                 const message = matchPub[2];
 
                 this.pub(channel, message);
+				this.sendMessage(socket, `rec_${msg}`);
                 return;
             }
 
