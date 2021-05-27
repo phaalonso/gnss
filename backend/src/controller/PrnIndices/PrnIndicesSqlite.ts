@@ -9,7 +9,8 @@ export class PrnIndicesSqlite extends PrnIndicesController {
 		this.dao = dao;
 	}
 
-	public createTable() {
+	public async createTable() {
+		console.log('Criando prnindices');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prnindices (
 				prn INTEGER,
