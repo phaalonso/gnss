@@ -1,7 +1,7 @@
 import { Database } from "sqlite3";
 
 export class SQLite {
-	private filePath: string;
+	private readonly filePath: string;
 	public con: Database;
 
 	constructor(dbFilePath?: string) {
