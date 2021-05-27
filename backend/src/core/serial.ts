@@ -1,6 +1,6 @@
-import { connect } from "./database/mongodb/connection";
+// import { connect } from "./database/mongodb/connection";
 import { GpsDataStream } from "./GpsDataStream";
-import { socketPubSub } from "./services/sockets/SocketPubSub";
+import { socketPubSub } from "./services/PubSub";
 //import { processData } from "./processData";
 
 
@@ -15,7 +15,7 @@ import { socketPubSub } from "./services/sockets/SocketPubSub";
 (async () => {
 	try {
 		const dataStream = new GpsDataStream();
-		await connect();
+		// await connect();
 
 		socketPubSub.createChannel('custom');
 

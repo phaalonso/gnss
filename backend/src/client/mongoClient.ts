@@ -1,9 +1,8 @@
 import { PrnIndicesMongo } from "../controller/PrnIndices";
 import { PrnInfoMongo } from "../controller/PrnInfo";
 import { connect } from "../database/mongodb/connection";
-import { ProcessData } from "../processData";
+import { ProcessData } from "../core/processData";
 import { Client } from "./Client";
-
 
 if (require.main == module) {
 	connect().then(() => {

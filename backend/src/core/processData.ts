@@ -3,10 +3,10 @@
 //import { DBCONFIG } from "./config/database/sqlite";
 //import { SQLite } from "./database/sqlite/DAO";
 
-import { PrnIndicesController } from "./controller/PrnIndices";
 import { std, mean } from "mathjs";
 import { Satellite } from "gps";
-import { PrnInfoControlller } from "./controller/PrnInfo";
+import { PrnInfoController } from "../controller/PrnInfo";
+import { PrnIndicesController } from "../controller/PrnIndices";
 
 export interface CustomData {
 	prn: number;
@@ -24,10 +24,10 @@ const MIN_QTDE = (60 / TAXA) * DISP;
 
 export class ProcessData {
 	private timeController: number;
-	private prnInfo: PrnInfoControlller;
+	private prnInfo: PrnInfoController;
 	private prnIndices: PrnIndicesController;
 
-	constructor(prnInfoController: PrnInfoControlller, prnIndicesController: PrnIndicesController) {
+	constructor(prnInfoController: PrnInfoController, prnIndicesController: PrnIndicesController) {
 		if (!prnInfoController || !prnIndicesController) {
 			throw new Error('You need to pass the controllers to ProcessData');
 		}
@@ -107,13 +107,13 @@ export class ProcessData {
 							return;
 						}
 
-						var dpSnr = std(vSnr);
+						let dpSnr = std(vSnr);
 						intensidadeSinalQuadrado /= vIntensidadeSinal.length;
-						var mediaIntensidadeSinalQuadrado = Math.pow(
+						let mediaIntensidadeSinalQuadrado = Math.pow(
 							mean(vIntensidadeSinal),
 							2
 						);
-						var s4 = Math.sqrt(
+						let s4 = Math.sqrt(
 							(intensidadeSinalQuadrado -
 								mediaIntensidadeSinalQuadrado) /
 								mediaIntensidadeSinalQuadrado

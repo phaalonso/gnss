@@ -1,6 +1,6 @@
 import SerialPort, { parsers } from 'serialport';
-import { GPSConfig } from './config/gpsConfig';
-import { SocketPubSub, socketPubSub } from './services/sockets/SocketPubSub';
+import { GPSConfig } from '../config/gpsConfig';
+import { SocketPubSub, socketPubSub } from './services/PubSub';
 import GPS from 'gps';
 
 /**

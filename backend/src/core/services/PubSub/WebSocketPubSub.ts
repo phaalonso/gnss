@@ -4,7 +4,7 @@ import WebSocket from 'ws';
 
 const { cpu, mem } = osu;
 
-class WSPubSub extends PubSub<CustomSocket<WebSocket>> {
+export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 	private _webSocketServer: WebSocket.Server;
 
 	constructor() {
@@ -22,7 +22,7 @@ class WSPubSub extends PubSub<CustomSocket<WebSocket>> {
 		this._webSocketServer.on('listening', () => {
 			console.log(`Servidor iniciado em`, this._webSocketServer.address());
 
-			setInterval((server: WSPubSub) => {
+			setInterval((server: WebsocketPubSub) => {
 				if (server.listeningChannels.get('cpu').size > 0) {
 					cpu.usage().then(cpu => {
 						server.pub('cpu', `cpu_${cpu}`);
@@ -66,4 +66,4 @@ class WSPubSub extends PubSub<CustomSocket<WebSocket>> {
 	}
 }
 
-export const webSocketPubSub = new WSPubSub();
+export const webSocketPubSub = new WebsocketPubSub();

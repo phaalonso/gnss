@@ -1,5 +1,5 @@
 import net from "net";
-import { CustomData, ProcessData } from "../processData";
+import { CustomData, ProcessData } from "../core/processData";
 
 export class Client {
     //TODO restabelecer a conexão automaticamente
@@ -41,8 +41,6 @@ export class Client {
                 //console.log(matchCustom[7]);
 
                 if ( matchCustom && matchCustom[1] && matchCustom[2] && matchCustom[3] && matchCustom[4] && matchCustom[5] && matchCustom[6] && matchCustom[7]) {
-                    const snr = parseFloat(matchCustom[2]) || null;
-                    //console.log(msg, snr);
                     const customData: CustomData = {
                         prn: parseInt(matchCustom[1]),
                         snr: parseFloat(matchCustom[2]) || null,
