@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="bcc94266-753e-4c2d-adb2-5e5c3b627a7c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/../.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/gps.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/public/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/public/styles/basic.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/saida.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/setup.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/GpsDataStream.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/client/Client.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/client/mongoClient.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/client/sqliteClient.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/config/database/mongodb.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/config/database/sqlite.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/config/gpsConfig.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/controller/PrnIndices.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/controller/PrnInfo.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/connection.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prnindices/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prnindices/prnindices.model.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prnindices/prnindices.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prnindices/prnindices.type.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prninfo/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prninfo/prninfo.model.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prninfo/prninfo.schema.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prninfo/prninfo.type.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/database/sqlite/DAO.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/legacyserial.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/processData.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/serial.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/services/sockets/PubSub.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/services/sockets/socket.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/src/services/sockets/websocket.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/test/socket.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/test/ws.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/tsconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/yarn.lock" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1spAW79unOllH9c1au1iNT2WZLi" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_interpreter_path" value="node" />
+    <property name="nodejs_package_manager_path" value="yarn" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager" selected="npm.npm start">
+    <configuration name="Debug Application" type="JavascriptDebugType" uri="http://localhost:3000">
+      <method v="2" />
+    </configuration>
+    <configuration name="npm start" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bcc94266-753e-4c2d-adb2-5e5c3b627a7c" name="Default Changelist" comment="" />
+      <created>1621559185313</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1621559185313</updated>
+      <workItem from="1621559186535" duration="4548000" />
+      <workItem from="1621892559383" duration="16000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+</project>
