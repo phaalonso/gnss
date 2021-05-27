@@ -1,0 +1,111 @@
+export type CustomSocket<T> = T & { channels?: string[] }
+
+export abstract class PubSub<T> {
+    protected readonly listeningChannels = new Map<string, Set<CustomSocket<T>>>();
+    protected _methodName: string;
+
+    // Se é recomendado utilizar um constructor abstrato com Protected, pois só será utilizado por classes que implementam a atual
+    protected constructor(methodName = 'write') {
+        this._methodName = methodName;
+    }
+
+    protected abstract sendMessage(socket: T, message: string);
+
+    /**
+     * @description create a channel with given channel name
+     * @param channelName
+     */
+    public createChannel(channelName: string) {
+        this.listeningChannels.set(channelName, new Set<CustomSocket<T>>());
+        console.log(`Creating channel with name ${channelName}`);
+    }
+
+    /**
+     * @description Subscribe a socket in determined channel
+     * @param channelName
+     * @param socket
+     */
+    public sub(channelName: string, socket) {
+        const channel = this.listeningChannels.get(channelName);
+
+        if (!channel || channel.has(socket))
+            return;
+
+        channel.add(socket);
+        console.log(`Subscribe in ${channelName}`);
+        socket.channels.push(channelName);
+    }
+
+    /**
+     * @description desconecta um socket de todos os canais o qual este esta inscrito
+     * @param socket
+     */
+    public disconnectSocket(socket: CustomSocket<T>) {
+        if (socket.channels && socket.channels.length > 0) {
+            for (const channelName of socket.channels) {
+                const channel = this.listeningChannels.get(channelName);
+
+                if (channel) channel.delete(socket);
+            }
+        }
+    }
+
+    /**
+     * @description Publish a message in determined channel
+     * @param channelName
+     * @param message
+     */
+    public pub(channelName: string, message: string) {
+        const channel = this.listeningChannels.get(channelName);
+
+        if (!channel || channel.size == 0) {
+            //console.log('Channel size:', channel.size);
+            return;
+        }
+
+		//process.stdout.write(`Sending ${message} on channel ${channelName}\n`);
+
+        channel.forEach(con => {
+            this.sendMessage(con, message);
+        });
+    }
+
+    public echo(message: string) {
+        this.listeningChannels.forEach(channel => {
+            channel.forEach(con => {
+                // @ts-ignore
+                con[this._methodName](message);
+            })
+        })
+    }
+
+    public handleMessage(socket, data) {
+        const msgArray = data.toString().split('\n');
+
+        for (const msg of msgArray) {
+            console.log(`Received message: ${msg}`);
+
+            const matchSub = msg.match(/^sub_(.*)$/);
+
+            if (matchSub && matchSub[1]) {
+                const channel = matchSub[1];
+                this.sub(channel, socket);
+				this.sendMessage(socket, `rec_${msg}`);
+                return;
+            }
+
+            const matchPub = msg.match(/^pub_(.*)_(.*)$/);
+
+            if (matchPub && matchPub[1] && matchPub[2]) {
+                const channel = matchPub[1];
+                const message = matchPub[2];
+
+                this.pub(channel, message);
+				this.sendMessage(socket, `rec_${msg}`);
+                return;
+            }
+
+            console.error(new Error(`Comando desconhecido ${msg}`));
+        }
+    }
+}
