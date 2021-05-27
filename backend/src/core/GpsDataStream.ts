@@ -44,5 +44,9 @@ export class GpsDataStream extends GPS {
 			// Use created channel to transmit nmea data
 			this.socket.pub('nmea', data);
         });
+
+        this._parser.on('error', err => {
+            console.log('Parser:', err);
+        })
     }
 }

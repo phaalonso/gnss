@@ -2,28 +2,46 @@ import net from "net";
 import { CustomData, ProcessData } from "../core/processData";
 
 export class Client {
-    //TODO restabelecer a conexão automaticamente
+    private readonly config: net.SocketConnectOpts;
+    private callback: Function;
     public socket: net.Socket;
-    private cb: Function;
-    public config: net.SocketConnectOpts = { port: 3000, host: '192.168.3.23' }
     public active = false;
-    private timeout: NodeJS.Timeout;
     private processData: ProcessData;
+    private timeout: NodeJS.Timeout;
+    private connectedChannels: Set<string>;
+    //TODO restabelecer a conexão automaticamente
 
-    constructor(processData: ProcessData) {
+    constructor(processData: ProcessData, config: net.SocketConnectOpts) {
         if (!processData) {
             throw new Error('Client requires processData');
         }
+
+        if (!config) {
+            throw new Error('Client requires socket config');
+        }
+
+        this.config = config;
+
+        this.connectedChannels = new Set<string>();
 
         this.processData = processData;
         this.socket = new net.Socket();
         this.socket.on("connect", () => {
             console.log("Conexão estabelecida");
-            //TODO criar buffer de mensagens
-            this.socket.write('sub_custom');
+
+            // Em casos em que o cliente recupera a conexão, irá utilizar a lista para
+            // se reinscrever nos canais
+            if (this.connectedChannels.size > 0) {
+                this.connectedChannels.forEach(channelName => {
+                    this.writeSubcribe(channelName);
+                })
+            } else {
+                this.listenToChannel('custom');
+            }
         });
 
         this.socket.on('data', data => {
+            //TODO criar buffer de mensagens
             const msgs = data.toString().split("\n");
             //console.log(msgs)
 
@@ -70,19 +88,44 @@ export class Client {
         });
 
         this.socket.on("end", () => {
-            console.log("End");
+            console.log("Conexão fechada");
+            this.setReconnect();
             this.active = false;
         });
     }
 
-    setReconnect() {
-        this.timeout = setTimeout((client) => {
-            client.run(client.cb);
-        }, 1000 * 5, this);
+    /**
+     * @param name
+     * @description helper method to subscribe to an channel
+     * @private
+     */
+    private writeSubcribe(name: string) {
+        this.socket.write(`sub_${name}`);
     }
 
-    run(cb?: Function): net.Socket {
-        this.cb = cb;
+    /**
+     * @description set the client to listen to a channel
+     * @param name
+     */
+    public listenToChannel(name: string) {
+        if (!this.connectedChannels.has(name)) {
+            this.connectedChannels.add(name);
+
+            this.writeSubcribe(name);
+        }
+    }
+
+    private setReconnect() {
+        const time = 1000 * 5;
+        console.log(`Tentando reconectar em ${time} ms`)
+        this.timeout = setTimeout((client) => {
+            console.log('Tentando reconectar');
+            client.run(client.callback);
+        }, time, this);
+    }
+
+    public run(cb?: Function): net.Socket {
+        this.callback = cb;
 
         this.socket.on( "lookup", ( err: Error, address: string, family: string | number, host: string) => {
                 if (err) {
@@ -102,9 +145,11 @@ export class Client {
                 this.timeout = null;
             }
 
-            if (cb)
+            if (cb) {
                 return cb();
-            return;
+            } else {
+                return;
+            }
         });
     }
 }

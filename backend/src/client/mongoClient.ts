@@ -10,11 +10,11 @@ if (require.main == module) {
 		const prnIndices = new PrnIndicesMongo()
 		const processData = new ProcessData(prnInfo, prnIndices);
 
-		const client = new Client(processData);
+		const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
 
 		client.run(() => {
 			console.log('Client is running');
-		})
+		});
 	}).catch((err) => {
 		console.log(err);
 	});
