@@ -46,7 +46,7 @@ export class PrnIndicesMongo extends PrnIndicesController {
 
         return new PrnIndicesModel(data)
             .save()
-            .then(() => console.log('Saved prnindice'))
+            // .then(() => console.log('Saved prnindice'))
             .catch((err) => {
                 console.log(err);
             });

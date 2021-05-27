@@ -45,7 +45,11 @@ import { socketPubSub } from "./services/PubSub";
 				//processData(data.satellites, lat, lon, time);
 			}
 		});
-		//});
+
+		dataStream.on('error', (err) => {
+			console.log('Erro no GpsDataStream');
+			console.log(err);
+		});
 	} catch (err) {
 		console.log(err);
 		process.exit(1);
