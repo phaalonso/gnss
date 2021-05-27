@@ -16,6 +16,7 @@ export class PrnInfoSqlite extends PrnInfoController {
 	 * @description Cria a tabela prninfo se ela não existir
 	 */
 	createTable() {
+		console.log('Criando prninfo');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prninfo (
 				prn INTEGER,

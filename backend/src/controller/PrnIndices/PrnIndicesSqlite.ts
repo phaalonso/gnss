@@ -10,6 +10,7 @@ export class PrnIndicesSqlite extends PrnIndicesController {
 	}
 
 	public createTable() {
+		console.log('Criando prnindices');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prnindices (
 				prn INTEGER,

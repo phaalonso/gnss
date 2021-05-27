@@ -6,19 +6,25 @@ import { Client } from "./Client";
 import { SQLite } from "../database/sqlite/DAO";
 
 
-if (require.main == module) {
-	connect().then(() => {
-		const dao = new SQLite();
-		const prnInfo = new PrnInfoSqlite(dao);
-		const prnIndices = new PrnIndicesSqlite(dao)
-		const processData = new ProcessData(prnInfo, prnIndices);
+(async () => {
+	if (require.main == module) {
+		connect().then(() => {
+			const dao = new SQLite();
+			const prnInfo = new PrnInfoSqlite(dao);
+			// @ts-ignore
+			await prnInfo.createTable();
+			const prnIndices = new PrnIndicesSqlite(dao)
+			// @ts-ignore
+			await prnIndices.createTable();
+			const processData = new ProcessData(prnInfo, prnIndices);
 
-		const client = new Client(processData);
+			const client = new Client(processData);
 
-		client.run(() => {
-			console.log('Client is running');
-		})
-	}).catch((err) => {
-		console.log(err);
-	});
-}
+			client.run(() => {
+				console.log('Client is running');
+			})
+		}).catch((err) => {
+			console.log(err);
+		});
+	}
+})()
