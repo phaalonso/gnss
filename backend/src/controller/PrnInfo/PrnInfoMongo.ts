@@ -1,5 +1,6 @@
 import { PrnInfoController } from "./PrnInfoController";
 import { PrnInfoModel } from "../../database/mongodb/prninfo";
+import logger from "../../logger";
 
 export class PrnInfoMongo extends PrnInfoController {
     insert(
@@ -20,9 +21,9 @@ export class PrnInfoMongo extends PrnInfoController {
             long: lon,
             time,
         }).save()
-            .catch(err => {
-                console.log(err);
-            });
+        .catch(err => {
+            logger.exception(err, 'On insert prninfo mongo');
+        });
     }
 
     /**

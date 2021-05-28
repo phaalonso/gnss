@@ -1,6 +1,7 @@
 import { CustomSocket, PubSub } from "./PubSub";
 import osu from 'node-os-utils';
 import WebSocket from 'ws';
+import logger from "../../../logger";
 
 const { cpu, mem } = osu;
 
@@ -20,7 +21,7 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 		this._webSocketServer.on('error', this.handleError.bind(this));
 
 		this._webSocketServer.on('listening', () => {
-			console.log(`Servidor iniciado em`, this._webSocketServer.address());
+			logger.log(`Servidor iniciado em`, this._webSocketServer.address());
 
 			setInterval((server: WebsocketPubSub) => {
 				if (server.listeningChannels.get('cpu').size > 0) {
@@ -58,10 +59,10 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 
 	private handleError(err) {
 		if (err.code === 'EADDRINUSE') {
-			console.log('Endereço já está em uso, tentando novamente...');
+			logger.log('Endereço já está em uso, tentando novamente...');
 			this._webSocketServer.close()
 		} else {
-			console.log(err);
+			logger.log(err);
 		}
 	}
 }

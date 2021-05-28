@@ -1,3 +1,5 @@
+import logger from "../../../logger";
+
 export type CustomSocket<T> = T & { channels?: string[] }
 
 export abstract class PubSub<T> {
@@ -17,7 +19,7 @@ export abstract class PubSub<T> {
      */
     public createChannel(channelName: string) {
         this.listeningChannels.set(channelName, new Set<CustomSocket<T>>());
-        console.log(`Creating channel with name ${channelName}`);
+        logger.log(`Creating channel with name ${channelName}`);
     }
 
     /**
@@ -32,7 +34,7 @@ export abstract class PubSub<T> {
             return;
 
         channel.add(socket);
-        console.log(`Subscribe in ${channelName}`);
+        logger.log(`Subscribe in ${channelName}`);
         socket.channels.push(channelName);
     }
 
@@ -83,7 +85,7 @@ export abstract class PubSub<T> {
         const msgArray = data.toString().split('\n');
 
         for (const msg of msgArray) {
-            console.log(`Received message: ${msg}`);
+            logger.log(`Received message: ${msg}`);
 
             const matchSub = msg.match(/^sub_(.*)$/);
 
@@ -105,7 +107,7 @@ export abstract class PubSub<T> {
                 return;
             }
 
-            console.error(new Error(`Comando desconhecido ${msg}`));
+            logger.exception(new Error(`Comando desconhecido ${msg}`));
         }
     }
 }

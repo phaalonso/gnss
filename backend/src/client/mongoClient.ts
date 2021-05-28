@@ -3,6 +3,7 @@ import { PrnInfoMongo } from "../controller/PrnInfo";
 import { connect } from "../database/mongodb/connection";
 import { ProcessData } from "../core/processData";
 import { Client } from "./Client";
+import logger from "../logger";
 
 if (require.main == module) {
 	connect().then(() => {
@@ -13,9 +14,9 @@ if (require.main == module) {
 		const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
 
 		client.run(() => {
-			console.log('Client is running');
+			logger.log('Client is running');
 		});
 	}).catch((err) => {
-		console.log(err);
+		logger.exception(err);
 	});
 }
