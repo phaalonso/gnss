@@ -7,6 +7,7 @@ import { std, mean } from "mathjs";
 import { Satellite } from "gps";
 import { PrnInfoController } from "../controller/PrnInfo";
 import { PrnIndicesController } from "../controller/PrnIndices";
+import logger from "../logger";
 
 export interface CustomData {
 	prn: number;
@@ -71,13 +72,13 @@ export class ProcessData {
 
 	public async processMinute(time: Date) {
 		try {
-			console.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
+			logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
 			
 			const rows = await this.prnInfo.getGroupedPrn(time);
 
-			//console.log("PrninfoGrouped", rows);
+			//logger.log("PrninfoGrouped", rows);
 			for (const row of rows) {
-				//console.log(row)
+				//logger.log(row)
 				if (row.total >= MIN_QTDE) {
 					let vSnr = [];
 					let vIntensidadeSinal = [];
@@ -86,13 +87,13 @@ export class ProcessData {
 
 					try {
 						const prnData = await this.prnInfo.getByPrn(time, row.prn);
-						//console.log('Prn info by binute', prnData[0]);
+						//logger.log('Prn info by binute', prnData[0]);
 
 						prnData.forEach((row) => {
 							if (row.snr) {
-								// console.log(row.prn + " -->" + row.snr);
+								// logger.log(row.prn + " -->" + row.snr);
 								intensidade = Math.pow(10, row.snr / 10);
-								//console.log(row.snr);
+								//logger.log(row.snr);
 								vSnr.push(row.snr);
 								vIntensidadeSinal.push(intensidade);
 								intensidadeSinalQuadrado += Math.pow(
@@ -103,7 +104,7 @@ export class ProcessData {
 						});
 
 						if (vSnr.length == 0) {
-							console.log("vSnr vazio");
+							logger.log("vSnr vazio");
 							return;
 						}
 
@@ -119,7 +120,7 @@ export class ProcessData {
 								mediaIntensidadeSinalQuadrado
 						);
 
-						//console.log("S4", s4);
+						//logger.log("S4", s4);
 						this.prnIndices.insertProcessedData(
 							dpSnr,
 							s4,
@@ -127,12 +128,12 @@ export class ProcessData {
 							row.prn
 						);
 					} catch (err) {
-						console.log(err);
+						logger.exception(err);
 					}
 				}
 			}
 		} catch (err) {
-			console.error(err);
+			logger.exception(err);
 			process.exit(1);
 		}
 	}
@@ -155,7 +156,7 @@ export class ProcessData {
 		if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
 			process.stdout.write(`${custom.time} Salvando prnindices\n`);
 			this.timeController = custom.time.getMinutes();
-			console.log(this.timeController);
+			logger.log(this.timeController);
 
 			this.processMinute(custom.time);
 		}

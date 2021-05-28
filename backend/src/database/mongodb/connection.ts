@@ -1,5 +1,6 @@
 import Mongoose, { Connection } from "mongoose";
 import { MongoConfig } from "../../config/database/mongodb";
+import logger from "../../logger";
 
 let connection: Connection;
 
@@ -8,7 +9,7 @@ export const connect = async () => {
 		if (connection) return resolve(connection);
 
 		if (!MongoConfig.url) {
-			console.log(`Nao foi possivel carregar a url ${MongoConfig.url}`);
+			logger.log(`Nao foi possivel carregar a url ${MongoConfig.url}`);
 			reject();
 		}
 
@@ -16,12 +17,12 @@ export const connect = async () => {
 			connection = Mongoose.connection;
 
 			connection.once("open", async () => {
-				console.info("Conectado ao banco de dados");
+				logger.log("Conectado ao banco de dados");
 			});
 
 			connection.on("error", async (err) => {
-				console.log("Erro no banco de dados");
-				console.log(err);
+				logger.log("Erro no banco de dados");
+				logger.log(err);
 			});
 
 			resolve(connection);
@@ -33,5 +34,5 @@ export const disconnect = async () => {
 	if (!connection) return;
 
 	await Mongoose.disconnect();
-	console.log("Desconectado!");
+	logger.log("Desconectado!");
 };

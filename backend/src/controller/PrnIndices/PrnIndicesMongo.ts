@@ -1,6 +1,7 @@
 import { PrnIndicesController } from "./PrnIndicesController";
 import { PrnInfoModel } from "../../database/mongodb/prninfo";
 import { IPrnIndices, PrnIndicesModel } from "../../database/mongodb/prnindices";
+import logger from "../../logger";
 
 export class PrnIndicesMongo extends PrnIndicesController {
     async insertProcessedData(
@@ -48,7 +49,7 @@ export class PrnIndicesMongo extends PrnIndicesController {
             .save()
             // .then(() => console.log('Saved prnindice'))
             .catch((err) => {
-                console.log(err);
+                logger.exception(err, 'On insert prnindices Mongo');
             });
     }
 }

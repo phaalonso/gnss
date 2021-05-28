@@ -1,6 +1,7 @@
 // import { connect } from "./database/mongodb/connection";
 import { GpsDataStream } from "./GpsDataStream";
 import { socketPubSub } from "./services/PubSub";
+import logger from "../logger";
 //import { processData } from "./processData";
 
 
@@ -29,7 +30,7 @@ import { socketPubSub } from "./services/PubSub";
 		// Querys rodaram sequencialmente
 		//db.serialize(() => {
 		dataStream.on("data", async (data) => {
-			//console.log(data);
+			//logger.log(data);
 			if (data.time) {
 				time = data.time;
 				lat = data.lat;
@@ -47,11 +48,11 @@ import { socketPubSub } from "./services/PubSub";
 		});
 
 		dataStream.on('error', (err) => {
-			console.log('Erro no GpsDataStream');
-			console.log(err);
+			logger.log('Erro no GpsDataStream');
+			logger.log(err);
 		});
 	} catch (err) {
-		console.log(err);
+		logger.exception(err);
 		process.exit(1);
 	}
 })();

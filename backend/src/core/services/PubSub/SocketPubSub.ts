@@ -1,5 +1,6 @@
 import net from 'net';
 import { PubSub, CustomSocket } from "./PubSub";
+import logger from "../../../logger";
 
 const PORT = 2108;
 const HOST = 'localhost';
@@ -18,7 +19,7 @@ export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 		this._socketServer.on('error', this.handleError.bind(this));
 
 		this._socketServer.listen(PORT, HOST, () => {
-			console.log(`Servidor iniciado em`, this._socketServer.address());
+			logger.log(`Servidor iniciado em`, this._socketServer.address());
 		});
 	}
 
@@ -27,7 +28,7 @@ export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 	}
 
 	private handleNewConnection(socket) {
-		console.log(`Nova conexão criada`);
+		logger.log(`Nova conexão criada`);
 		socket.channels = []; // Canais aos quais o socket está conecatdo
 
 		socket.on('data', data => {
@@ -41,13 +42,13 @@ export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 
 	private handleError(err) {
 		if (err.code === 'EADDRINUSE') {
-			console.log('Endereço já está em uso, tentando novamente...');
+			logger.log('Endereço já está em uso, tentando novamente...');
 			setTimeout(() => {
 				this._socketServer.close();
 				this._socketServer.listen(PORT, HOST);
 			}, 1000);
 		} else {
-			console.log(err);
+			logger.log(err);
 		}
 	}
 }

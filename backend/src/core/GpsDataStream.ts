@@ -2,6 +2,7 @@ import SerialPort, { parsers } from 'serialport';
 import { GPSConfig } from '../config/gpsConfig';
 import { SocketPubSub, socketPubSub } from './services/PubSub';
 import GPS from 'gps';
+import logger from "../logger";
 
 /**
  * @description GpsDataStream is a class to help extend GPS node package, receiving
@@ -32,9 +33,13 @@ export class GpsDataStream extends GPS {
             delimiter: '\r\n',
         });
 
+        this._parser.on('error', err => console.log('Parser errro', err));
+
         this._serialPort = new SerialPort(this.input, {
             baudRate: GPSConfig.baudRage,
         });
+
+        this._serialPort.on('error', err => console.log('Serial port', err));
         
         this._serialPort.pipe(this._parser);
 
@@ -46,7 +51,7 @@ export class GpsDataStream extends GPS {
         });
 
         this._parser.on('error', err => {
-            console.log('Parser:', err);
+            logger.exception(err, 'Parser');
         })
     }
 }
