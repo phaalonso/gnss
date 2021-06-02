@@ -5,8 +5,13 @@ import { Line } from 'react-chartjs-2';
 
 const ws = new WebSocket('ws://localhost:4312');
 
+interface GraphicData {
+  time: Date,
+  value: number,
+}
+
 const App: React.FC = () => {
-  const [ramData, setRamData] = useState<number[]>([]);
+  const [ramData, setRamData] = useState<GraphicData[]>([]);
   const [cpuData, setCpuData] = useState<number[]>([]);
 
   useEffect(() => {
@@ -23,9 +28,14 @@ const App: React.FC = () => {
     const ramMatch = msg.match(/^ram_(.*)$/);
 
     if (ramMatch) {
+      const data: GraphicData = {
+        time: new Date(),
+        value: parseFloat(ramMatch[1]),
+      }
+
       setRamData([
           ...ramData,
-          parseFloat(ramMatch[1])
+          data,
       ])
     }
 
@@ -66,40 +76,37 @@ const App: React.FC = () => {
           <div>
             <div>
               <span>Ram: </span>
-              <span>{ramData[ramData.length -1]}</span>
+              <span>{ramData[ramData.length -1].value}</span>
             </div>
 
             <Line
                 type='line'
                 title="Uso de RAM"
+                style={{ width: 700, height: 700 }}
                 data={{
+                  labels: ramData.map(r => r.time.toLocaleTimeString('pt-br')),
                   datasets: [{
                     title: 'Ram',
-                    data: ramData,
-                    borderColor: 'red',
+                    data: ramData.map(r => r.value),
+                    backgroundColor: 'rgb(75, 192, 192)',
                     borderWidth: 5,
-                    backgroundColor: 'red',
-                    lineTension: 0,
+                    lineTension: 0.1,
                   }]
                 }}
                 options={{
+                  animation: false,
                   scales: {
                     xAxes: [
                       {
                         type: 'time',
                         time: {
-                          unit: 'minutes'
+                          unit: 'minutes',
                         }
                       },
                     ],
-                    yAxes: [
-                      {
-                          type: 'number',
-                          number: {
-                            unit: 'number',
-                          }
-                      }
-                    ]
+                      // y: {
+                      //   beginAtZero: true,
+                      // }
                   }
                 }}
 
