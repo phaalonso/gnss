@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="bcc94266-753e-4c2d-adb2-5e5c3b627a7c" name="Default Changelist" comment="Solução para bug o qual causava o gráfico ficar branco">
+    <list default="true" id="bcc94266-753e-4c2d-adb2-5e5c3b627a7c" name="Default Changelist" comment="Criação de componente para o gráfico de métricas">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
     </list>
@@ -19,6 +19,14 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="ProjectId" id="1spAW79unOllH9c1au1iNT2WZLi" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -62,7 +70,8 @@
       <updated>1621559185313</updated>
       <workItem from="1621559186535" duration="4548000" />
       <workItem from="1621892559383" duration="16000" />
-      <workItem from="1622593757450" duration="4664000" />
+      <workItem from="1622593757450" duration="7912000" />
+      <workItem from="1622635877343" duration="1976000" />
     </task>
     <task id="LOCAL-00001" summary="WIP: corrigindo gráfico">
       <created>1622600058393</created>
@@ -78,7 +87,21 @@
       <option name="project" value="LOCAL" />
       <updated>1622601385823</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Limitando tamanho do gráfico">
+      <created>1622602359419</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1622602359419</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Criação de componente para o gráfico de métricas">
+      <created>1622605312616</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1622605312616</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -99,6 +122,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="WIP: corrigindo gráfico" />
     <MESSAGE value="Solução para bug o qual causava o gráfico ficar branco" />
-    <option name="LAST_COMMIT_MESSAGE" value="Solução para bug o qual causava o gráfico ficar branco" />
+    <MESSAGE value="Limitando tamanho do gráfico" />
+    <MESSAGE value="Criação de componente para o gráfico de métricas" />
+    <option name="LAST_COMMIT_MESSAGE" value="Criação de componente para o gráfico de métricas" />
   </component>
 </project>
