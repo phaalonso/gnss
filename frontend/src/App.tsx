@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 
-import { Line } from 'react-chartjs-2';
+import MetricChart from "./components/MetricChart";
 
 const ws = new WebSocket('ws://localhost:4312');
 
@@ -14,11 +14,7 @@ const MAX_DATA_LENGTH = 10;
 
 const App: React.FC = () => {
   const [ramData, setRamData] = useState<GraphicData[]>([]);
-  const [cpuData, setCpuData] = useState<number[]>([]);
-
-  useEffect(() => {
-    console.log(ramData);
-  }, [ramData]);
+  const [cpuData, setCpuData] = useState<GraphicData[]>([]);
 
   ws.onopen = () => {
     console.log('Conexão aberta')
@@ -30,12 +26,12 @@ const App: React.FC = () => {
     const ramMatch = msg.match(/^ram_(.*)$/);
 
     if (ramMatch) {
+      let array = ramData;
+
       const data: GraphicData = {
         time: new Date(),
         value: parseFloat(ramMatch[1]),
       }
-
-      let array = ramData;
 
       if (ramData.length > MAX_DATA_LENGTH) {
         const diff = ramData.length - MAX_DATA_LENGTH;
@@ -52,9 +48,22 @@ const App: React.FC = () => {
     const cpuMatch = msg.match(/^cpu_(.*)$/);
 
     if (cpuMatch) {
+      let array = cpuData;
+
+      const data: GraphicData = {
+        time: new Date(),
+        value: parseFloat(cpuMatch[1]),
+      }
+
+      if (cpuData.length > MAX_DATA_LENGTH) {
+        const diff = cpuData.length - MAX_DATA_LENGTH;
+
+        array = cpuData.slice(diff, cpuData.length);
+      }
+
       setCpuData([
-          ...cpuData,
-          parseFloat(cpuMatch[1]),
+          ...array,
+          data,
       ]);
     }
   }
@@ -89,36 +98,14 @@ const App: React.FC = () => {
               <span>{ramData[ramData.length -1].value}</span>
             </div>
 
-            <Line
-                type='line'
-                title="Uso de RAM"
-                style={{ width: 700, height: 700 }}
+            <MetricChart
                 data={{
                   labels: ramData.map(r => r.time.toLocaleTimeString('pt-br')),
                   datasets: [{
-                    title: 'Ram',
                     data: ramData.map(r => r.value),
                     backgroundColor: 'rgb(75, 192, 192)',
-                    lineTension: 0.1,
                   }]
                 }}
-                options={{
-                  animation: false,
-                  scales: {
-                    xAxes: [
-                      {
-                        type: 'time',
-                        time: {
-                          unit: 'minutes',
-                        }
-                      },
-                    ],
-                      // y: {
-                      //   beginAtZero: true,
-                      // }
-                  }
-                }}
-
             />
           </div>
       ) : <div> Dado não encontrado </div> }
@@ -127,17 +114,21 @@ const App: React.FC = () => {
           <div>
             <div>
               <span>Cpu: </span>
-              <span>{cpuData[cpuData.length -1]}</span>
+              <span>{cpuData[cpuData.length -1].value}</span>
             </div>
 
-            <Line
-                type='line'
+            <MetricChart
                 data={{
-                  labels: ['Cpu', 'Tempo'],
-                  dataset: {
-                    data: cpuData,
-                    backgroundColor: '#5555',
-                  }
+                  labels: cpuData.map(c => c.time.toLocaleTimeString('pt-br')),
+                  datasets: [{
+                    // title: 'Cpu',
+                    data: cpuData.map(c => c.value),
+                    backgroundColor: 'rgb(75, 192, 192)',
+                    // lineTension: 0.1,
+                    }]
+                  }}
+                options={{
+                  animation: false,
                 }}
             />
           </div>
