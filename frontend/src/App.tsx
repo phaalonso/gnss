@@ -104,6 +104,8 @@ const App: React.FC = () => {
                   datasets: [{
                     data: ramData.map(r => r.value),
                     backgroundColor: 'rgb(75, 192, 192)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1,
                   }]
                 }}
             />
@@ -121,10 +123,10 @@ const App: React.FC = () => {
                 data={{
                   labels: cpuData.map(c => c.time.toLocaleTimeString('pt-br')),
                   datasets: [{
-                    // title: 'Cpu',
                     data: cpuData.map(c => c.value),
                     backgroundColor: 'rgb(75, 192, 192)',
-                    // lineTension: 0.1,
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1,
                     }]
                   }}
                 options={{
