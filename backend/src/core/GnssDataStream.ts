@@ -5,10 +5,10 @@ import GPS from 'gps';
 import logger from "../logger";
 
 /**
- * @description GpsDataStream is a class to help extend GPS node package, receiving
+ * @description GnssDataStream is a class to help extend GPS node package, receiving
  * the NMEA data directly from the serial port
  */
-export class GpsDataStream extends GPS {
+export class GnssDataStream extends GPS {
     protected _serialPort: SerialPort;
     protected _parser: parsers.Readline;
     protected input: string;

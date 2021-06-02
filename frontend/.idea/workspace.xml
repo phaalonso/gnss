@@ -2,45 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bcc94266-753e-4c2d-adb2-5e5c3b627a7c" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/gps.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/public/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/public/styles/basic.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/saida.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/setup.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/GpsDataStream.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/client/Client.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/client/mongoClient.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/client/sqliteClient.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/config/database/mongodb.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/config/database/sqlite.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/config/gpsConfig.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/controller/PrnIndices.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/controller/PrnInfo.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/connection.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prnindices/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prnindices/prnindices.model.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prnindices/prnindices.schema.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prnindices/prnindices.type.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prninfo/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prninfo/prninfo.model.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prninfo/prninfo.schema.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/mongodb/prninfo/prninfo.type.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/database/sqlite/DAO.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/legacyserial.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/processData.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/serial.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/services/sockets/PubSub.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/services/sockets/socket.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/src/services/sockets/websocket.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/test/socket.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/test/ws.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/tsconfig.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../backend/yarn.lock" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../backend/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/setup.sh" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/setup.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/core/GpsDataStream.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/core/GnssDataStream.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/core/serial.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/core/serial.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,10 +34,11 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="yarn" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
-    <property name="ts.external.directory.path" value="$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/jsLanguageServicesImpl/external" />
+    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected="npm.npm start">
@@ -98,6 +66,7 @@
       <updated>1621559185313</updated>
       <workItem from="1621559186535" duration="4548000" />
       <workItem from="1621892559383" duration="16000" />
+      <workItem from="1622593757450" duration="2129000" />
     </task>
     <servers />
   </component>

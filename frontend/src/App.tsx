@@ -8,15 +8,9 @@ const ws = new WebSocket('ws://localhost:4312');
 const App: React.FC = () => {
   const [ramData, setRamData] = useState<number[]>([]);
   const [cpuData, setCpuData] = useState<number[]>([]);
-  const [chartData, setChartData] = useState({});
 
   useEffect(() => {
     console.log(ramData);
-    setChartData({
-      labels: 'Ram',
-      dataset: ramData,
-      redraw: true,
-    });
   }, [ramData]);
 
   ws.onopen = () => {
@@ -31,7 +25,7 @@ const App: React.FC = () => {
     if (ramMatch) {
       setRamData([
           ...ramData,
-          ramMatch[1],
+          parseFloat(ramMatch[1])
       ])
     }
 
@@ -40,7 +34,7 @@ const App: React.FC = () => {
     if (cpuMatch) {
       setCpuData([
           ...cpuData,
-          cpuMatch[1],
+          parseFloat(cpuMatch[1]),
       ]);
     }
   }
@@ -68,11 +62,70 @@ const App: React.FC = () => {
           <button onClick={onClickCpu} type="submit">CPU</button>
         </div>
 
-        <Line type={'line'} data={{      labels: ['Ram', 'Tempo'],
-          dataset: {
-            data: ramData,
-            backgroundColor: '#5555',
-          }}}/>
+      { ramData.length > 0 ? (
+          <div>
+            <div>
+              <span>Ram: </span>
+              <span>{ramData[ramData.length -1]}</span>
+            </div>
+
+            <Line
+                type='line'
+                title="Uso de RAM"
+                data={{
+                  datasets: [{
+                    title: 'Ram',
+                    data: ramData,
+                    borderColor: 'red',
+                    borderWidth: 5,
+                    backgroundColor: 'red',
+                    lineTension: 0,
+                  }]
+                }}
+                options={{
+                  scales: {
+                    xAxes: [
+                      {
+                        type: 'time',
+                        time: {
+                          unit: 'minutes'
+                        }
+                      },
+                    ],
+                    yAxes: [
+                      {
+                          type: 'number',
+                          number: {
+                            unit: 'number',
+                          }
+                      }
+                    ]
+                  }
+                }}
+
+            />
+          </div>
+      ) : <div> Dado não encontrado </div> }
+
+      { cpuData.length > 0 ? (
+          <div>
+            <div>
+              <span>Cpu: </span>
+              <span>{cpuData[cpuData.length -1]}</span>
+            </div>
+
+            <Line
+                type='line'
+                data={{
+                  labels: ['Cpu', 'Tempo'],
+                  dataset: {
+                    data: cpuData,
+                    backgroundColor: '#5555',
+                  }
+                }}
+            />
+          </div>
+      ) : <div> Dado não encontrado </div> }
     </div>
   );
 }

@@ -1,5 +1,5 @@
 // import { connect } from "./database/mongodb/connection";
-import { GpsDataStream } from "./GpsDataStream";
+import { GnssDataStream } from "./GnssDataStream";
 import { socketPubSub } from "./services/PubSub";
 import logger from "../logger";
 //import { processData } from "./processData";
@@ -15,7 +15,7 @@ import logger from "../logger";
  */
 (async () => {
 	try {
-		const dataStream = new GpsDataStream();
+		const dataStream = new GnssDataStream();
 		// await connect();
 
 		socketPubSub.createChannel('custom');
@@ -48,7 +48,7 @@ import logger from "../logger";
 		});
 
 		dataStream.on('error', (err) => {
-			logger.log('Erro no GpsDataStream');
+			logger.log('Erro no GnssDataStream');
 			logger.log(err);
 		});
 	} catch (err) {
