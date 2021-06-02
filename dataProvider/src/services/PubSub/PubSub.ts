@@ -1,4 +1,4 @@
-import logger from "../../../logger";
+import logger from "../../logger";
 
 export type CustomSocket<T> = T & { channels?: string[] }
 

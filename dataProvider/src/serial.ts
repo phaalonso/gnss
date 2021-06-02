@@ -1,9 +1,6 @@
-// import { connect } from "./database/mongodb/connection";
 import { GnssDataStream } from "./GnssDataStream";
 import { socketPubSub } from "./services/PubSub";
-import logger from "../logger";
-//import { processData } from "./processData";
-
+import logger from "./logger";
 
 /**
  * Types:
@@ -16,21 +13,14 @@ import logger from "../logger";
 (async () => {
 	try {
 		const dataStream = new GnssDataStream();
-		// await connect();
 
 		socketPubSub.createChannel('custom');
-
-		//await prnindices.createTable();
-		//await prninfo.createTable();
 
 		let time = new Date();
 		let lat: number;
 		let lon: number;
 
-		// Querys rodaram sequencialmente
-		//db.serialize(() => {
 		dataStream.on("data", async (data) => {
-			//logger.log(data);
 			if (data.time) {
 				time = data.time;
 				lat = data.lat;
@@ -43,7 +33,6 @@ import logger from "../logger";
 				for (const satelite of data.satellites) {
 -					socketPubSub.pub('custom', `sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`)
 				}
-				//processData(data.satellites, lat, lon, time);
 			}
 		});
 

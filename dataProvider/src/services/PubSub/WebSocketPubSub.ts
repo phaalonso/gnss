@@ -1,7 +1,7 @@
 import { CustomSocket, PubSub } from "./PubSub";
 import osu from 'node-os-utils';
 import WebSocket from 'ws';
-import logger from "../../../logger";
+import logger from "../../logger";
 
 const { cpu, mem } = osu;
 

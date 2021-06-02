@@ -1,8 +1,8 @@
 import SerialPort, { parsers } from 'serialport';
-import { GPSConfig } from '../config/gpsConfig';
+import { GPSConfig } from './config/gpsConfig';
 import { SocketPubSub, socketPubSub } from './services/PubSub';
 import GPS from 'gps';
-import logger from "../logger";
+import logger from "./logger";
 
 /**
  * @description GnssDataStream is a class to help extend GPS node package, receiving

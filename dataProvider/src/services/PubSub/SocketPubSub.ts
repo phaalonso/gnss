@@ -1,6 +1,6 @@
 import net from 'net';
 import { PubSub, CustomSocket } from "./PubSub";
-import logger from "../../../logger";
+import logger from "../../logger";
 
 const PORT = 2108;
 const HOST = 'localhost';
