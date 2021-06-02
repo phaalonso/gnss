@@ -10,6 +10,8 @@ interface GraphicData {
   value: number,
 }
 
+const MAX_DATA_LENGTH = 10;
+
 const App: React.FC = () => {
   const [ramData, setRamData] = useState<GraphicData[]>([]);
   const [cpuData, setCpuData] = useState<number[]>([]);
@@ -33,8 +35,16 @@ const App: React.FC = () => {
         value: parseFloat(ramMatch[1]),
       }
 
+      let array = ramData;
+
+      if (ramData.length > MAX_DATA_LENGTH) {
+        const diff = ramData.length - MAX_DATA_LENGTH;
+
+        array = ramData.slice(diff, ramData.length);
+      }
+
       setRamData([
-          ...ramData,
+          ...array,
           data,
       ])
     }
@@ -89,7 +99,6 @@ const App: React.FC = () => {
                     title: 'Ram',
                     data: ramData.map(r => r.value),
                     backgroundColor: 'rgb(75, 192, 192)',
-                    borderWidth: 5,
                     lineTension: 0.1,
                   }]
                 }}
