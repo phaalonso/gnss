@@ -1,5 +1,4 @@
 import { inspect } from 'util';
-import { Error } from "mongoose";
 const stdout = process.stdout;
 
 const log = (...args: any[]) => {
