@@ -2,8 +2,25 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bcc94266-753e-4c2d-adb2-5e5c3b627a7c" name="Default Changelist" comment="Criação de componente para o gráfico de métricas">
+      <change afterPath="$PROJECT_DIR$/src/components/Route/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/auth.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/hooks/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/Dashboard/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/Dashboard/styles.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/Login/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/NotFound/index.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/services/api.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/.env" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/controllers/Usuario.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/src/model/Usuario.ts" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/src/model/Usuario.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../backend/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../backend/yarn.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,6 +31,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
@@ -41,7 +59,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path" value="node" />
     <property name="nodejs_package_manager_path" value="yarn" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
     <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
@@ -72,6 +90,9 @@
       <workItem from="1621892559383" duration="16000" />
       <workItem from="1622593757450" duration="7912000" />
       <workItem from="1622635877343" duration="1976000" />
+      <workItem from="1622756925294" duration="4604000" />
+      <workItem from="1622777283013" duration="3047000" />
+      <workItem from="1622808244361" duration="604000" />
     </task>
     <task id="LOCAL-00001" summary="WIP: corrigindo gráfico">
       <created>1622600058393</created>
@@ -125,5 +146,9 @@
     <MESSAGE value="Limitando tamanho do gráfico" />
     <MESSAGE value="Criação de componente para o gráfico de métricas" />
     <option name="LAST_COMMIT_MESSAGE" value="Criação de componente para o gráfico de métricas" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

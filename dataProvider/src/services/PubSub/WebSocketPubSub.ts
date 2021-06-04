@@ -26,12 +26,15 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 			setInterval((server: WebsocketPubSub) => {
 				if (server.listeningChannels.get('cpu').size > 0) {
 					cpu.usage().then(cpu => {
+						logger.log(cpu);
 						server.pub('cpu', `cpu_${cpu}`);
 					});
 				}
 
 				if (server.listeningChannels.get('ram').size > 0) {
+					//logger.log(mem.totalMem());
 					mem.used().then(ram => {
+						logger.log(ram.usedMemMb);
 						server.pub('ram', `ram_${ram.usedMemMb}`);
 					});
 				}

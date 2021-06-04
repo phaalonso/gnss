@@ -9,7 +9,6 @@ interface MetricChartProps {
 
 const MetricChart: React.FC<MetricChartProps> = ({ data, options }) => {
     useEffect(() => console.log('b'), []);
-    console.log('a');
     return (
         <div style={{ width: 700 }}>
             <Line
