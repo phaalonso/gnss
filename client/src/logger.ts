@@ -1,5 +1,5 @@
 import { inspect } from 'util';
-import { Error } from "mongoose";
+
 const stdout = process.stdout;
 
 const log = (...args: any[]) => {
@@ -11,8 +11,8 @@ const log = (...args: any[]) => {
 }
 
 const exception = (err: Error | string, prefix?: string) => {
-    let message = '';
-    let stack = '';
+    let message: string;
+    let stack: string;
 
     if (err instanceof Error) {
         message = err.message;

@@ -69,4 +69,12 @@ export class PrnInfoMongo extends PrnInfoController {
             },
         });
     }
+
+    infoLength(): Promise<number> {
+        return new Promise((res, rej) => {
+            PrnInfoModel.countDocuments()
+                .then((count) => res(count))
+                .catch(err => rej(err));
+        });
+    }
 }

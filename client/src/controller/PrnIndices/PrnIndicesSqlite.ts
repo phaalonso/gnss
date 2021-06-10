@@ -33,4 +33,13 @@ export class PrnIndicesSqlite extends PrnIndicesController {
 			[dpSnr, s4, time, time, prn]
 		);
 	}
+
+	async indicesLength(): Promise<number> {
+		const sql = "SELECT COUNT(*) as total FROM prnindices";
+
+		const res: any = await this.dao.get(sql);
+
+		return res.total;
+	}
+
 }

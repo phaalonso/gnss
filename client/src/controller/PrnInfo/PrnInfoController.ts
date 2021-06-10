@@ -21,4 +21,6 @@ export abstract class PrnInfoController {
      * @param prn informa de qual prn será realizado a filtragem
      */
     abstract getByPrn(time: Date, prn: number);
+
+    abstract infoLength(): Promise<number>;
 }

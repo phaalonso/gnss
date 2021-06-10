@@ -6,7 +6,7 @@
 import { std, mean } from "mathjs";
 import { Satellite } from "gps";
 import { PrnInfoController } from "./controller/PrnInfo";
-import { PrnIndicesController } from "./controller/PrnIndices";
+import { PrnIndicesController, PrnIndicesSqlite } from "./controller/PrnIndices";
 import logger from "./logger";
 
 export interface CustomData {
@@ -35,6 +35,14 @@ export class ProcessData {
 
 		this.prnIndices = prnIndicesController;
 		this.prnInfo = prnInfoController;
+
+		setInterval(async ([prnIndices, prnInfo]: [PrnIndicesSqlite, PrnInfoController]) => {
+			const prninfoLength = await prnInfo.infoLength();
+			const prnindicesLength = await prnIndices.indicesLength();
+
+			logger.log(`Prninfo: ${prninfoLength}`);
+			logger.log(`Prnindices: ${prnindicesLength}`);
+		}, 1000 * 60, [prnIndicesController, prnInfoController]);
 	}
 
 	public async processData(
@@ -73,7 +81,7 @@ export class ProcessData {
 	public async processMinute(time: Date) {
 		try {
 			logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
-			
+
 			const rows = await this.prnInfo.getGroupedPrn(time);
 
 			//logger.log("PrninfoGrouped", rows);

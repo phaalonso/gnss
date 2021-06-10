@@ -16,7 +16,8 @@ import logger from "./logger";
 			await prnIndices.createTable();
 			const processData = new ProcessData(prnInfo, prnIndices);
 
-			const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
+			// const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
+			const client = new Client(processData,  { port: 2108, host: 'localhost' });
 
 			client.run(() => {
 				logger.log('Client is running');

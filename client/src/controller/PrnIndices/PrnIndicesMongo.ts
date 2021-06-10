@@ -52,4 +52,12 @@ export class PrnIndicesMongo extends PrnIndicesController {
                 logger.exception(err, 'On insert prnindices Mongo');
             });
     }
+
+    indicesLength(): Promise<number> {
+        return new Promise((res, rej) => {
+            PrnInfoModel.countDocuments()
+                .then((count) => res(count))
+                .catch(err => rej(err));
+        });
+    }
 }

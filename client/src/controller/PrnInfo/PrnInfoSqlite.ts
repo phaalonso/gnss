@@ -61,4 +61,12 @@ export class PrnInfoSqlite extends PrnInfoController {
 			[time, time, prn]
 		);
 	}
+
+	async infoLength(): Promise<number> {
+		const sql = "SELECT COUNT(*) as total FROM prninfo";
+
+		const res: any = await this.dao.get(sql);
+
+		return res.total;
+	}
 }

@@ -17,7 +17,7 @@ frequency=115200
   echo "Configurações realizadas."
 
   echo "Iniciando aplicação"
-  yarn start
+  #yarn start
 #else
   #echo "Não encontrei o dispositivo"
   #echo "Verifique se ele está conectado, ou está em outra entrada tty."
