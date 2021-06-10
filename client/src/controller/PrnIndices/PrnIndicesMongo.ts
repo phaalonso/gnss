@@ -55,7 +55,7 @@ export class PrnIndicesMongo extends PrnIndicesController {
 
     indicesLength(): Promise<number> {
         return new Promise((res, rej) => {
-            PrnInfoModel.countDocuments()
+            PrnIndicesModel.countDocuments()
                 .then((count) => res(count))
                 .catch(err => rej(err));
         });

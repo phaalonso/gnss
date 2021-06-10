@@ -42,7 +42,7 @@ export class ProcessData {
 
 			logger.log(`Prninfo: ${prninfoLength}`);
 			logger.log(`Prnindices: ${prnindicesLength}`);
-		}, 1000 * 60, [prnIndicesController, prnInfoController]);
+		}, 1000 * 60 * 60, [prnIndicesController, prnInfoController]);
 	}
 
 	public async processData(
