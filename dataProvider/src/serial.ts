@@ -38,7 +38,7 @@ async function Serial() {
 		// 1000 * 60 * 5 -> 5 minutos
 		setInterval((qtd) => {
 			logger.log(`Quantidade de dados enviadas: ${qtd.getQtd()}`);
-		}, 1000 * 60, qtd);
+		}, 1000 * 60 * 30, qtd);
 
 		dataStream.on("data", async (data) => {
 			if (data.time) {

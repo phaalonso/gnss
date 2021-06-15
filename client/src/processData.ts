@@ -62,7 +62,7 @@ export class ProcessData {
 			logger.log(`Quantidade de  dados ${qtd.getQtd()}`);
 			logger.log(`Prninfo: ${prninfoLength}`);
 			logger.log(`Prnindices: ${prnindicesLength}`);
-		}, 1000 * 60, [prnIndicesController, prnInfoController, this.qtd]);
+		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController, this.qtd]);
 	}
 
 	public async processData(
