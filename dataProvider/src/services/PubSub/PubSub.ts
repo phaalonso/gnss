@@ -11,7 +11,7 @@ export abstract class PubSub<T> {
         this._methodName = methodName;
     }
 
-    protected abstract sendMessage(socket: T, message: string);
+    protected abstract sendMessage(socket: T, message: string): void;
 
     /**
      * @description create a channel with given channel name
@@ -76,7 +76,7 @@ export abstract class PubSub<T> {
         this.listeningChannels.forEach(channel => {
             channel.forEach(con => {
                 // @ts-ignore
-                con[this._methodName](message);
+                this.sendMessage(con, message);
             })
         })
     }

@@ -38,6 +38,10 @@ export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 		socket.on('close', () => {
 			this.disconnectSocket(socket);
 		});
+
+		socket.on('error', err => {
+			logger.exception(err, 'Socket');
+		})
 	}
 
 	private handleError(err) {

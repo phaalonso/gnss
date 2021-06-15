@@ -6,22 +6,56 @@ import logger from "../../logger";
 const { cpu, mem } = osu;
 
 export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
-	private _webSocketServer: WebSocket.Server;
+	private wsS: WebSocket.Server;
 
 	constructor() {
 		super('write');
 		this.createChannel('cpu');
 		this.createChannel('ram');
 
-		this._webSocketServer = new WebSocket.Server({
+		this.wsS = new WebSocket.Server({
 			port: 4312
 		});
 
-		this._webSocketServer.on('connection', this.handleNewConnection.bind(this));
-		this._webSocketServer.on('error', this.handleError.bind(this));
+		this.handleNewConnection();
+		this.errorHandler();
 
-		this._webSocketServer.on('listening', () => {
-			logger.log(`Servidor iniciado em`, this._webSocketServer.address());
+		this.listening();
+	}
+
+	protected sendMessage(socket: CustomSocket<WebSocket>, message: string) {
+		socket.send(message);
+	}
+
+	private handleNewConnection() {
+		this.wsS.on('connection', (socket: CustomSocket<WebSocket>) => {
+			console.log(`Nova conexão criada`);
+			socket.channels = []; // Canais aos quais o socket está conecatdo
+
+			socket.on('message', data => {
+				this.handleMessage(socket, data);
+			});
+
+			socket.on('close', () => {
+				this.disconnectSocket(socket);
+			});
+		});
+	}
+
+	private errorHandler() {
+		this.wsS.on('error', (err) => {
+			if (err.name === 'EADDRINUSE') {
+				logger.log('Endereço já está em uso, tentando novamente...');
+				this.wsS.close()
+			} else {
+				logger.log(err);
+			}
+		});
+	}
+	
+	private listening() {
+		this.wsS.on('listening', () => {
+			logger.log(`Servidor iniciado em`, this.wsS.address());
 
 			setInterval((server: WebsocketPubSub) => {
 				if (server.listeningChannels.get('cpu').size > 0) {
@@ -41,32 +75,6 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 
 			}, 1000, this);
 		});
-	}
-
-	protected sendMessage(socket: CustomSocket<WebSocket>, message: string) {
-		socket.send(message);
-	}
-
-	private handleNewConnection(socket) {
-		console.log(`Nova conexão criada`);
-		socket.channels = []; // Canais aos quais o socket está conecatdo
-
-		socket.on('message', data => {
-			this.handleMessage(socket, data);
-		});
-
-		socket.on('close', () => {
-			this.disconnectSocket(socket);
-		});
-	}
-
-	private handleError(err) {
-		if (err.code === 'EADDRINUSE') {
-			logger.log('Endereço já está em uso, tentando novamente...');
-			this._webSocketServer.close()
-		} else {
-			logger.log(err);
-		}
 	}
 }
 
