@@ -1,4 +1,4 @@
-import { GnssDataStream } from "./GnssDataStream";
+import { NMEAStream } from "./GnssDataStream";
 import { socketPubSub } from "./services/PubSub";
 import logger from "./logger";
 
@@ -24,7 +24,10 @@ function logQtd() {
 
 async function Serial() {
 	try {
-		const dataStream = new GnssDataStream();
+		const dataStream = new NMEAStream();
+		dataStream.setSerialInput('/dev/ttyUSB0');
+		dataStream.pipeToGps();
+
 		const qtd = logQtd();
 
 		socketPubSub.createChannel('custom');

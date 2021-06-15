@@ -2,16 +2,16 @@ import SerialPort, { parsers } from 'serialport';
 import { GPSConfig } from './config/gpsConfig';
 import fs from 'fs';
 import path from 'path';
+import { NMEAStream } from './GnssDataStream';
 
-const writeStream = fs.createWriteStream(path.join(__dirname, '..', 'gpsData.nmea'));
+const filePath = path.join(__dirname, '..', 'gpsData.nmea');
 
-const serialPort = new SerialPort('/dev/ttyUSB0' , {
-    baudRate: GPSConfig.baudRate,
-});
+const stream = new NMEAStream();
+stream.setSerialInput('/dev/ttyUSB0');
 
-serialPort.pipe(writeStream);
+stream.pipeToFile(filePath);
 
 setTimeout(() => {
-    writeStream.close();
+    stream.close();
     process.exit(0);
-}, 1000 * 60 * 1);
+}, 1000 * 60 * 1);o
