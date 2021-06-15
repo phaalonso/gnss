@@ -1,9 +1,9 @@
 interface GpsConfig {
 	serialInput: string;
-	baudRage: number;
+	baudRate: number;
 }
 
 export const GPSConfig: GpsConfig = {
 	serialInput: '/dev/ttyUSB0',
-	baudRage: 115200
+	baudRate: 115200
 }

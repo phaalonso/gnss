@@ -38,7 +38,7 @@ export class GnssDataStream extends GPS {
         });
 
         this.serialPort = new SerialPort(this.input, {
-            baudRate: GPSConfig.baudRage,
+            baudRate: GPSConfig.baudRate,
         });
 
         this.serialPort.on('error', err => {
