@@ -6,6 +6,10 @@
   "author": "Pedro Henrique de Almeida Alonso",
   "license": "MIT",
   "private": true,
+  "scripts": {
+    "mongo": "ts-node ./src/mongoClient.ts",
+    "sqlite": "ts-node ./src/sqliteClient.ts"
+  },
   "dependencies": {
     "dotenv": "^10.0.0",
     "gps": "^0.6.0",

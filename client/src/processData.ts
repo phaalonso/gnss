@@ -22,11 +22,28 @@ export interface CustomData {
 const TAXA = 0.1;
 const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
+ 
+export interface LogQtd {
+	aumentar: () => void;
+	getQtd: () => number;
+}
+
+export function logQtd(): LogQtd {
+	let quantidade = 0;
+
+	return {
+		aumentar: () => {
+			quantidade = quantidade + 1;
+		},
+		getQtd: () => quantidade
+	}
+}
 
 export class ProcessData {
 	private timeController: number;
 	private prnInfo: PrnInfoController;
 	private prnIndices: PrnIndicesController;
+	private qtd: LogQtd;
 
 	constructor(prnInfoController: PrnInfoController, prnIndicesController: PrnIndicesController) {
 		if (!prnInfoController || !prnIndicesController) {
@@ -35,14 +52,17 @@ export class ProcessData {
 
 		this.prnIndices = prnIndicesController;
 		this.prnInfo = prnInfoController;
+		this.qtd = logQtd();
 
-		setInterval(async ([prnIndices, prnInfo]: [PrnIndicesSqlite, PrnInfoController]) => {
+
+		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesSqlite, PrnInfoController, LogQtd]) => {
 			const prninfoLength = await prnInfo.infoLength();
 			const prnindicesLength = await prnIndices.indicesLength();
 
+			logger.log(`Quantidade de  dados ${qtd.getQtd()}`);
 			logger.log(`Prninfo: ${prninfoLength}`);
 			logger.log(`Prnindices: ${prnindicesLength}`);
-		}, 1000 * 60 * 60, [prnIndicesController, prnInfoController]);
+		}, 1000 * 60, [prnIndicesController, prnInfoController, this.qtd]);
 	}
 
 	public async processData(
@@ -80,7 +100,7 @@ export class ProcessData {
 
 	public async processMinute(time: Date) {
 		try {
-			logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
+			//logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
 
 			const rows = await this.prnInfo.getGroupedPrn(time);
 
@@ -151,6 +171,8 @@ export class ProcessData {
 			this.timeController = custom.time.getMinutes();
 		}
 
+		this.qtd.aumentar();
+
 		await this.prnInfo.insert(
 			custom.prn,
 			custom.snr,
@@ -162,7 +184,6 @@ export class ProcessData {
 		);
 
 		if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
-			process.stdout.write(`${custom.time} Salvando prnindices\n`);
 			this.timeController = custom.time.getMinutes();
 			logger.log(this.timeController);
 

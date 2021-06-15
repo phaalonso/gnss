@@ -9,8 +9,8 @@ import logger from "./logger";
  * the NMEA data directly from the serial port
  */
 export class GnssDataStream extends GPS {
-    protected _serialPort: SerialPort;
-    protected _parser: parsers.Readline;
+    protected serialPort: SerialPort;
+    protected parser: parsers.Readline;
     protected input: string;
 	protected socket: SocketPubSub;
 
@@ -29,21 +29,25 @@ export class GnssDataStream extends GPS {
 
         this.input = input || GPSConfig.serialInput || '/dev/ttyUSB0';
 
-        this._parser = new SerialPort.parsers.Readline({
+        this.parser = new parsers.Readline({
             delimiter: '\r\n',
         });
 
-        this._parser.on('error', err => console.log('Parser errro', err));
+        this.parser.on('error', err => {
+            logger.exception(err, 'Parser');
+        });
 
-        this._serialPort = new SerialPort(this.input, {
+        this.serialPort = new SerialPort(this.input, {
             baudRate: GPSConfig.baudRage,
         });
 
-        this._serialPort.on('error', err => console.log('Serial port', err));
+        this.serialPort.on('error', err => {
+            logger.exception(err, 'Serial port')
+        });
         
-        this._serialPort.pipe(this._parser);
+        this.serialPort.pipe(this.parser);
 
-        this._parser.on('data', data => {
+        this.parser.on('data', data => {
             try {
                 //console.log(data);
                 this.update(data);
@@ -54,7 +58,7 @@ export class GnssDataStream extends GPS {
             }
         });
 
-        this._parser.on('error', err => {
+        this.parser.on('error', err => {
             logger.exception(err, 'Parser');
         })
     }
