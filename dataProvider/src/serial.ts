@@ -10,15 +10,35 @@ import logger from "./logger";
  *	- VTG -> speed, track
  *	- RMC -> lat, lon, speed, track, faa
  */
-(async () => {
+
+function logQtd() {
+	let quantidade = 0;
+
+	return {
+		aumentar: () => {
+			quantidade = quantidade + 1;
+		},
+		getQtd: () => quantidade
+	}
+}
+
+async function Serial() {
 	try {
 		const dataStream = new GnssDataStream();
+		const qtd = logQtd();
 
 		socketPubSub.createChannel('custom');
+		//webSocketPubSub.createChannel('custom');
 
 		let time = new Date();
 		let lat: number;
 		let lon: number;
+
+		// Inicia o log do contador, tempo em ms
+		// 1000 * 60 * 5 -> 5 minutos
+		setInterval((qtd) => {
+			logger.log(`Quantidade de dados enviadas: ${qtd.getQtd()}`);
+		}, 1000 * 60, qtd);
 
 		dataStream.on("data", async (data) => {
 			if (data.time) {
@@ -31,7 +51,9 @@ import logger from "./logger";
 				return;
 			} else {
 				for (const satelite of data.satellites) {
--					socketPubSub.pub('custom', `sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`)
+-					socketPubSub.pub('custom', `sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`);
+//-					webSocketPubSub.pub('custom', `sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`);
+					qtd.aumentar();
 				}
 			}
 		});
@@ -44,4 +66,6 @@ import logger from "./logger";
 		logger.exception(err);
 		process.exit(1);
 	}
-})();
+}
+
+Serial();
