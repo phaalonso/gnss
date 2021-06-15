@@ -1,3 +1,7 @@
 node_modules
 .env
+<<<<<<< HEAD
 dados.db
+=======
+*.db
+>>>>>>> 52666bc86216e51b6b2b0cc116200aeef08fe221
