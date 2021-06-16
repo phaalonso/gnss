@@ -18,7 +18,11 @@ export class MessageBuffer {
 
     public logBuffer() {
         logger.log(`Buffer content: ${this.buffer}`);
+<<<<<<< HEAD
         logger.log(`Buffer length: ${this.buffer.length}`);
+=======
+        console.log(`Buffer length: ${this.buffer.length}`);
+>>>>>>> 317a9dd34d5fe4cd753ca64f2382f3de40f8769b
     }
 
     /**
