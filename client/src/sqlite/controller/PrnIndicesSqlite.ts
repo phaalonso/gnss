@@ -1,5 +1,6 @@
 import { SQLite } from "../database/DAO";
 import { PrnIndicesController } from "../../core/controller/PrnIndicesController";
+import logger from "../../logger";
 
 export class PrnIndicesSqlite extends PrnIndicesController {
 	private dao: SQLite;
@@ -10,7 +11,7 @@ export class PrnIndicesSqlite extends PrnIndicesController {
 	}
 
 	public async createTable() {
-		console.log('Criando prnindices');
+		logger.log('Criando prnindices');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prnindices (
 				prn INTEGER,

@@ -1,5 +1,6 @@
 import { SQLite } from "../database/DAO";
 import { PrnInfoController } from "../../core/controller/PrnInfoController";
+import logger from "../../../../dataProvider/src/logger";
 
 export class PrnInfoSqlite extends PrnInfoController {
 	private dao: SQLite;
@@ -16,7 +17,7 @@ export class PrnInfoSqlite extends PrnInfoController {
 	 * @description Cria a tabela prninfo se ela não existir
 	 */
 	async createTable() {
-		console.log('Criando prninfo');
+		logger.log('Criando prninfo');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prninfo (
 				prn INTEGER,
