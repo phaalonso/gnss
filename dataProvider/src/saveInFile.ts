@@ -49,4 +49,12 @@ if (nmea) {
 setTimeout(() => {
     stream.close();
     process.exit(0);
+<<<<<<< HEAD
 }, 1000 * 60 * 60);
+=======
+<<<<<<< HEAD
+}, 1000 * 60 * 60);
+=======
+}, 1000 * 60 * 1);o
+>>>>>>> 6af98c3a3090cbc0fe1805fef9b58f0ef87bab1f
+>>>>>>> 5b06c6ca4f12af99e976da7e04fea572f861ab25

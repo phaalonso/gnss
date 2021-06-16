@@ -1,10 +1,9 @@
 import { PubSub } from './PubSub';
 import { SocketPubSub } from "./SocketPubSub";
-import { WebsocketPubSub, webSocketPubSub } from './WebSocketPubSub';
+import { WebsocketPubSub } from './WebSocketPubSub';
 
 export {
     PubSub,
     SocketPubSub,
     WebsocketPubSub,
-    webSocketPubSub,
 }
