@@ -56,5 +56,3 @@ export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 		}
 	}
 }
-
-export const socketPubSub = new SocketPubSub();

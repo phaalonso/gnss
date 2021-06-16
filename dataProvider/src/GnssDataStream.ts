@@ -1,16 +1,18 @@
 import SerialPort, { parsers } from 'serialport';
 import { GPSConfig } from './config/gpsConfig';
-import { SocketPubSub, socketPubSub } from './services/PubSub';
+import { SocketPubSub } from './services/PubSub';
 import fs, { ReadStream, WriteStream } from 'fs';
 import GPS from 'gps';
 import logger from "./logger";
+
+type Callback = (chunk: any) => void;
 
 /**
  * @description GnssDataStream is a class to help extend GPS node package, receiving
  * the NMEA data directly from the serial port
  */
-export class NMEAStream extends GPS {
-	protected socket?: SocketPubSub;
+export class DataProvider extends GPS {
+	public socket?: SocketPubSub;
 
     protected inputStream: SerialPort | ReadStream;
     protected parserStream: parsers.Readline;
@@ -30,34 +32,42 @@ export class NMEAStream extends GPS {
             throw new Error('There is already an input stream');
         }
 
+        logger.log(`Receiving data from serial input: ${input}`);
+
         this.inputStream = new SerialPort(input, {
             baudRate: GPSConfig.baudRate,
         });
 
-        this.inputStream.on('error', err => {
+        this.inputStream.on('error', (err: Error) => {
+            if (err.message.includes('No such file or directory')) {
+                logger.log(`Cant find input file ${input}`);
+                process.exit(1);
+            }
+
             logger.exception(err, 'Serial port')
         });
     }
 
-    public setFilelInput(filelInput: string) {
+    public setFileInput(fileInput: string) {
         if (this.inputStream) {
             throw new Error('There is already an input stream');
         }
 
-        this.inputStream = fs.createReadStream(filelInput);
+        logger.log(`Receiving data from file input ${fileInput}`);
+
+        this.inputStream = fs.createReadStream(fileInput);
 
         this.inputStream.on('error', err => {
             logger.exception(err, 'Serial port')
         });
+
+        this.inputStream.on('end', () => {
+            process.exit(0);
+        });
     }
 
-    public pipeToGps(sendNmea = false): void {
-		this.socket = socketPubSub;
-
-        if (sendNmea) {
-            // Create socket channel	
-            this.socket.createChannel('nmea');
-        }
+    public pipeToGps(): void {
+        logger.log(`Piping data to GPS`);
 
         this.parserStream = new parsers.Readline({
             delimiter: '\r\n',
@@ -71,10 +81,7 @@ export class NMEAStream extends GPS {
 
         this.parserStream.on('data', data => {
             try {
-                //console.log(data);
                 this.update(data);
-                // Use created channel to transmit nmea data
-                this.socket.pub('nmea', data);
             } catch (err) {
                 logger.exception(err.message);
             }
@@ -86,6 +93,7 @@ export class NMEAStream extends GPS {
     }
 
     public pipeToFile(file: string): void {
+        logger.log(`Piping data to file ${file}`);
         const writeStream = fs.createWriteStream(file);
 
         this.inputStream.pipe(writeStream);

@@ -1,12 +1,50 @@
 import path from 'path';
-import { NMEAStream } from './GnssDataStream';
+import { DataProvider } from './GnssDataStream';
+import { createWriteStream } from 'fs';
+import logger from './logger';
 
-const filePath = path.join(__dirname, '..', 'gpsData.nmea');
+const nmea = false;
 
-const stream = new NMEAStream();
-stream.setSerialInput('/dev/ttyUSB0');
+const stream = new DataProvider();
 
-stream.pipeToFile(filePath);
+if (nmea) {
+    const filePath = path.join(__dirname, '..', '..', 'gpsData.nmea');
+
+    logger.log(`Saving data into ${filePath}`);
+    stream.setSerialInput('/dev/ttyUSB0');
+
+    stream.pipeToFile(filePath);
+} else {
+    const filePath = path.join(__dirname, '..', '..','gpsData.custom');
+    const writeStream = createWriteStream(filePath);
+
+    logger.log(`Saving data into ${filePath}`);
+
+    stream.setSerialInput('/dev/ttyUSB0');
+
+    stream.pipeToGps();
+
+    let time = new Date();
+    let lat: number;
+    let lon: number;
+
+    stream.on('data', data => {
+			if (data.time) {
+				time = data.time;
+				lat = data.lat;
+				lon = data.lon;
+			}
+
+			if (!data.msgNumber || data.msgNumber == "null" || !data.satellites || !lat || !lon) {
+				return;
+			} else {
+				for (const satelite of data.satellites) {
+-					writeStream.write(`sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`);
+				}
+			}
+
+    });
+}
 
 setTimeout(() => {
     stream.close();
