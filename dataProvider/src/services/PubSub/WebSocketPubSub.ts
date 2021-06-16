@@ -77,5 +77,3 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 		});
 	}
 }
-
-export const webSocketPubSub = new WebsocketPubSub();
