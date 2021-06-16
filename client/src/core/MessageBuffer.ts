@@ -9,11 +9,16 @@ export class MessageBuffer {
         this.buffer = "";
 
         if (debug) {
-            setInterval((t: MessageBuffer) => {
-                logger.log(`Buffer content: ${t.buffer}`);
-                console.log(`Buffer length: ${t.buffer.length}`);
-            }, 1000 * 5, this);
+            setInterval(
+                this.logBuffer.bind(this), 
+                1000 * 5
+            );
         }
+    }
+
+    public logBuffer() {
+        logger.log(`Buffer content: ${this.buffer}`);
+        console.log(`Buffer length: ${this.buffer.length}`);
     }
 
     /**
