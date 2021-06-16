@@ -1,12 +1,15 @@
-import { PrnIndicesMongo } from "./controller/PrnIndices";
-import { PrnInfoMongo } from "./controller/PrnInfo";
-import { connect } from "./database/mongodb/connection";
-import { ProcessData } from "./processData";
-import { Client } from "./Client";
-import logger from "./logger";
+import { ProcessData } from "../core/processData";
+import { Client } from "../core/Client";
+import logger from "../logger";
+import path from 'path';
+import { connect } from "./database/connection";
+import { PrnInfoMongo } from "./controller/PrnInfoMongo";
+import { PrnIndicesMongo } from "./controller/PrnIndicesMongo";
 
 if (require.main == module) {
 	connect().then(() => {
+		const file = path.join(__dirname, '..', '..', '..', `sqlite.log`);
+		logger.enableWrite(file)
 		const prnInfo = new PrnInfoMongo();
 		const prnIndices = new PrnIndicesMongo()
 		const processData = new ProcessData(prnInfo, prnIndices);

@@ -1,6 +1,6 @@
 import Mongoose, { Connection } from "mongoose";
-import { MongoConfig } from "../../config/database/mongodb";
 import logger from "../../logger";
+import { MongoConfig } from "../config/mongodb";
 
 let connection: Connection;
 

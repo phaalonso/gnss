@@ -1,5 +1,5 @@
-import { SQLite } from "../../database/sqlite/DAO";
-import { PrnIndicesController } from "./PrnIndicesController";
+import { SQLite } from "../database/DAO";
+import { PrnIndicesController } from "../../core/controller/PrnIndicesController";
 
 export class PrnIndicesSqlite extends PrnIndicesController {
 	private dao: SQLite;

@@ -1,7 +1,7 @@
-import { PrnIndicesController } from "./PrnIndicesController";
-import { PrnInfoModel } from "../../database/mongodb/prninfo";
-import { IPrnIndices, PrnIndicesModel } from "../../database/mongodb/prnindices";
+import { PrnIndicesController } from "../../core/controller/PrnIndicesController";
+import { IPrnIndices, PrnIndicesModel } from "../database/prnindices";
 import logger from "../../logger";
+import { PrnInfoModel } from "../database/prninfo";
 
 export class PrnIndicesMongo extends PrnIndicesController {
     async insertProcessedData(

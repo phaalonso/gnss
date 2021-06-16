@@ -1,13 +1,8 @@
-//import { PrnIndicesSqlite } from "./database/sqlite/prnindices";
-//import { PrnInfoSqlite } from "./database/sqlite/prninfo";
-//import { DBCONFIG } from "./config/database/sqlite";
-//import { SQLite } from "./database/sqlite/DAO";
-
 import { std, mean } from "mathjs";
 import { Satellite } from "gps";
-import { PrnInfoController } from "./controller/PrnInfo";
-import { PrnIndicesController, PrnIndicesSqlite } from "./controller/PrnIndices";
-import logger from "./logger";
+import logger from "../logger";
+import { PrnInfoController } from "./controller/PrnInfoController";
+import { PrnIndicesController } from "./controller/PrnIndicesController";
 
 export interface CustomData {
 	prn: number;
@@ -55,7 +50,7 @@ export class ProcessData {
 		this.qtd = logQtd();
 
 
-		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesSqlite, PrnInfoController, LogQtd]) => {
+		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesController, PrnInfoController, LogQtd]) => {
 			const prninfoLength = await prnInfo.infoLength();
 			const prnindicesLength = await prnIndices.indicesLength();
 

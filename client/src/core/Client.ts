@@ -1,5 +1,5 @@
 import net from "net";
-import logger from "./logger";
+import logger from "../logger";
 import { MessageBuffer } from "./MessageBuffer";
 import { CustomData, ProcessData } from "./processData";
 

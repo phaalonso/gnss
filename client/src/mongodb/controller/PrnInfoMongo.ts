@@ -1,6 +1,6 @@
-import { PrnInfoController } from "./PrnInfoController";
-import { PrnInfoModel } from "../../database/mongodb/prninfo";
+import { PrnInfoController } from "../../core/controller/PrnInfoController";
 import logger from "../../logger";
+import { PrnInfoModel } from "../database/prninfo";
 
 export class PrnInfoMongo extends PrnInfoController {
     insert(

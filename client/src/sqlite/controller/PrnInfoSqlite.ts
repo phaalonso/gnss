@@ -1,5 +1,5 @@
-import { SQLite } from "../../database/sqlite/DAO";
-import { PrnInfoController } from "./PrnInfoController";
+import { SQLite } from "../database/DAO";
+import { PrnInfoController } from "../../core/controller/PrnInfoController";
 
 export class PrnInfoSqlite extends PrnInfoController {
 	private dao: SQLite;

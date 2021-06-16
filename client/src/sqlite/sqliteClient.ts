@@ -1,14 +1,17 @@
-import { PrnIndicesSqlite } from "./controller/PrnIndices";
-import { PrnInfoSqlite } from "./controller/PrnInfo";
-import { ProcessData } from "./processData";
-import { Client } from "./Client";
-import { SQLite } from "./database/sqlite/DAO";
-import logger from "./logger";
+import { PrnIndicesSqlite } from "./controller/PrnIndicesSqlite";
+import { PrnInfoSqlite } from "./controller/PrnInfoSqlite";
+import { ProcessData } from "../core/processData";
+import { SQLite } from "./database/DAO";
+import { Client } from "../core/Client";
+import path from 'path';
+import logger from "../logger";
 
 
 (async () => {
 	if (require.main == module) {
 	    try {
+			const file = path.join(__dirname, '..', '..', '..', `sqlite.log`);
+			logger.enableWrite(file)
 			const dao = new SQLite();
 			const prnInfo = new PrnInfoSqlite(dao);
 			await prnInfo.createTable();
