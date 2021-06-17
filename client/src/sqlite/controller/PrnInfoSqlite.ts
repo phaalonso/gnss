@@ -1,6 +1,7 @@
 import { SQLite } from "../database/DAO";
 import { PrnInfoController } from "../../core/controller/PrnInfoController";
 import logger from "../../../../dataProvider/src/logger";
+import { trackPromises } from "../../utils/trackPromises";
 
 export class PrnInfoSqlite extends PrnInfoController {
 	private dao: SQLite;
@@ -34,10 +35,12 @@ export class PrnInfoSqlite extends PrnInfoController {
 	}
 
 	insert(prn: number, snr: number, azimuth: number, elevation: number, lat: number, lon: number, time: Date) {
-		return this.dao.run(
+		const promise = this.dao.run(
 			'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES(?,?,?,?,?,?,?)',
 			[prn, snr, azimuth, elevation, lat, lon, time]
 		);
+
+		return trackPromises(promise);
 	}
 
 	/**
@@ -45,10 +48,12 @@ export class PrnInfoSqlite extends PrnInfoController {
 	 * @param time tempo sera relativo a esse parametro
 	 */
 	public getGroupedPrn(time: Date): Promise<any> {
-		return this.dao.all(
+		const promise = this.dao.all(
 			'select prn, count(snr) as total from prninfo where time between ?-60000 and ? group by prn',
 			[time, time]
 		);
+
+		return trackPromises(promise);
 	}
 
 	/**
@@ -57,10 +62,12 @@ export class PrnInfoSqlite extends PrnInfoController {
 	 * @param prn informa de qual prn será realizado a filtragem
 	 */
 	public getByPrn(time: Date, prn: number): Promise<any> {
-		return this.dao.all(
+		const promise = this.dao.all(
 			'SELECT prn, snr FROM prninfo WHERE time BETWEEN ?-60000 AND ? AND prn = ?',
 			[time, time, prn]
 		);
+
+		return trackPromises(promise);
 	}
 
 	async infoLength(): Promise<number> {
