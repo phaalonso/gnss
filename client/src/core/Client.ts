@@ -17,7 +17,7 @@ export class Client {
     constructor(processData: ProcessData, config: net.SocketConnectOpts) {
         this.config = config;
         this.connectedChannels = new Set<string>();
-        this.buffer = new MessageBuffer('\n', true);
+        this.buffer = new MessageBuffer('\n');
         this.processData = processData;
         this.client = new net.Socket();
 

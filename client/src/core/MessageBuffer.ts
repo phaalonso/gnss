@@ -4,16 +4,9 @@ export class MessageBuffer {
     private delimiter: string;
     private buffer: string;
 
-    constructor(delimiter: string, debug = false) {
+    constructor(delimiter: string) {
         this.delimiter = delimiter;
         this.buffer = "";
-
-        if (debug) {
-            setInterval(
-                this.logBuffer.bind(this), 
-                1000 * 5
-            );
-        }
     }
 
     public logBuffer() {
@@ -37,7 +30,7 @@ export class MessageBuffer {
         const delimiterIndex = this.buffer.indexOf(this.delimiter);
 
         if (delimiterIndex !== -1) {
-            const message = this.buffer.slice(0, delimiterIndex);
+            let message = new String(this.buffer.slice(0, delimiterIndex)).toString();
             this.buffer = this.buffer.replace(message + this.delimiter, "");
             return message;
         }

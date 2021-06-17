@@ -17,28 +17,12 @@ export interface CustomData {
 const TAXA = 0.1;
 const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
- 
-export interface LogQtd {
-	aumentar: () => void;
-	getQtd: () => number;
-}
-
-export function logQtd(): LogQtd {
-	let quantidade = 0;
-
-	return {
-		aumentar: () => {
-			quantidade = quantidade + 1;
-		},
-		getQtd: () => quantidade
-	}
-}
 
 export class ProcessData {
 	private timeController: number;
 	private prnInfo: PrnInfoController;
 	private prnIndices: PrnIndicesController;
-	private qtd: LogQtd;
+	private qtdDados = 0;
 
 	constructor(prnInfoController: PrnInfoController, prnIndicesController: PrnIndicesController) {
 		if (!prnInfoController || !prnIndicesController) {
@@ -47,17 +31,16 @@ export class ProcessData {
 
 		this.prnIndices = prnIndicesController;
 		this.prnInfo = prnInfoController;
-		this.qtd = logQtd();
 
 
-		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesController, PrnInfoController, LogQtd]) => {
+		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesController, PrnInfoController, number]) => {
 			const prninfoLength = await prnInfo.infoLength();
 			const prnindicesLength = await prnIndices.indicesLength();
 
-			logger.log(`Quantidade de  dados ${qtd.getQtd()}`);
+			logger.log(`Quantidade de  dados ${qtd}`);
 			logger.log(`Prninfo: ${prninfoLength}`);
 			logger.log(`Prnindices: ${prnindicesLength}`);
-		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController, this.qtd]);
+		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController, this.qtdDados]);
 	}
 
 	public async processData(
@@ -165,8 +148,6 @@ export class ProcessData {
 		if (!this.timeController) {
 			this.timeController = custom.time.getMinutes();
 		}
-
-		this.qtd.aumentar();
 
 		await this.prnInfo.insert(
 			custom.prn,
