@@ -1,0 +1,1 @@
+{"version":"1.0.0","name":"client","dependencies":{"better-sqlite3":{"version":"7.4.1"},"dotenv":{"version":"10.0.0"},"gps":{"version":"0.6.0"},"mathjs":{"version":"9.4.1"},"mongoose":{"version":"5.12.12"},"sqlite3":{"version":"5.0.2"},"typescript":{"version":"4.3.2"}}}

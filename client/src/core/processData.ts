@@ -72,7 +72,7 @@ export class ProcessData {
 			process.stdout.write(`${time} Salvando prnindices\n`);
 			this.timeController= time.getMinutes();
 
-			this.processMinute(time);
+			await this.processMinute(time);
 		}
 	}
 
@@ -163,7 +163,7 @@ export class ProcessData {
 			this.timeController = custom.time.getMinutes();
 			logger.log(this.timeController);
 
-			this.processMinute(custom.time);
+			await this.processMinute(custom.time);
 		}
 	}
 }
