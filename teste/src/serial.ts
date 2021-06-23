@@ -4,11 +4,15 @@ import { SQLite } from "./database/DAO";
 import { DataProvider } from "./services/GnssDataStream";
 import logger from "./logger";
 import { CustomData, ProcessData } from "./services/processData";
+import { WorkerPool } from "./worker/WorkerPool";
+import os from 'os';
 
 const dao = new SQLite();
 const prnInfo = new PrnInfoSqlite(dao);
 const prnIndices = new PrnIndicesSqlite(dao)
 const processData = new ProcessData(prnInfo, prnIndices);
+
+let dataBuffer: CustomData[] = [];
 
 /**
  * Types:
@@ -31,6 +35,8 @@ function logQtd() {
 }
 
 async function Serial() {
+	const pool = new WorkerPool(os.cpus().length);
+
 	try {
 		await prnInfo.createTable();
 		await prnIndices.createTable();
@@ -74,11 +80,28 @@ async function Serial() {
 						time: time,
 					};
 
-					processData.processCustomData(customData);
+					dataBuffer.push(customData);
+					// processData.processCustomData(customData);
 				}
 
 			}
 		});
+
+		setInterval(() => {
+			logger.log(`Adding new task to the queue! ${dataBuffer.length} objects`)
+
+			pool.runTask(dataBuffer, (err, data) => {
+				logger.log('Task done!');
+				if (err) {
+					logger.exception(err);
+					return;
+				}
+
+				logger.log(data);
+			});
+
+			dataBuffer = [];
+		}, 1000 * 60);
 
 		dataStream.on('error', (err) => {
 			logger.log('Erro no GnssDataStream');

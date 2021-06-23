@@ -12,7 +12,7 @@ export class SQLite {
 				logger.exception('Não foi possível conectar com o banco de dados');
 				process.exit(1);
 			} else {
-				logger.log('Conectado ao banco de dados');
+				logger.log('Creating database connection');
 				this.con.run("PRAGMA synchronous=OFF");
 			}
 		});

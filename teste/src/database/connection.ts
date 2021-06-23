@@ -1,5 +1,5 @@
 import Mongoose, { Connection } from "mongoose";
-import logger from "../../logger";
+import logger from "../logger";
 import { MongoConfig } from "../config/mongodb";
 
 let connection: Connection;
