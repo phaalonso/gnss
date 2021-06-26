@@ -3,25 +3,20 @@ import { PrnInfoSqlite } from "./controller/PrnInfoSqlite";
 import { SQLite } from "./database/DAO";
 import { DataProvider } from "./services/GnssDataStream";
 import logger from "./logger";
-import { CustomData, ProcessData } from "./services/processData";
+import { CustomData } from "./services/processData";
 import { WorkerPool } from "./worker/WorkerPool";
-import os from 'os';
 
 const dao = new SQLite();
 const prnInfo = new PrnInfoSqlite(dao);
 const prnIndices = new PrnIndicesSqlite(dao)
-const processData = new ProcessData(prnInfo, prnIndices);
 
 let dataBuffer: CustomData[] = [];
 
-/**
- * Types:
- *	- GSV -> Satelites([prn, elevation, azimuth, snr, status])
- *	- GSA -> Satelites(lista de prn), pdop, hdop, vdop
- *	- GGA -> time, lat, lon, alt, quality, num of satelites, hdop, geoidal, age
- *	- VTG -> speed, track
- *	- RMC -> lat, lon, speed, track, faa
- */
+// Intervalo entre as inserções
+const interval = 15000;
+
+// Quantidade minima de inserções para executar a query
+const minCounter = 60000 / interval;
 
 function logQtd() {
 	let quantidade = 0;
@@ -35,7 +30,8 @@ function logQtd() {
 }
 
 async function Serial() {
-	const pool = new WorkerPool(os.cpus().length);
+	//const pool = new WorkerPool(os.cpus().length);
+	const pool = new WorkerPool(2);
 
 	try {
 		await prnInfo.createTable();
@@ -48,6 +44,7 @@ async function Serial() {
 
 		const qtd = logQtd();
 
+		let counter = 0;
 		let time = new Date();
 		let lat: number;
 		let lon: number;
@@ -73,8 +70,8 @@ async function Serial() {
 					const customData: CustomData = {
 						prn: satelite.prn,
 						snr: satelite.snr,
-						azimuth: satelite.azimuth,
-						elevation: satelite.elevation,
+						azi: satelite.azimuth,
+						elev: satelite.elevation,
 						lat: lat,
 						lon: lon,
 						time: time,
@@ -88,9 +85,14 @@ async function Serial() {
 		});
 
 		setInterval(() => {
+			/**
+			* É executada a cada 15 segundos e processa os dados obtidos até então
+			* após o processamento limpa o array de dados
+			*/
 			logger.log(`Adding new task to the queue! ${dataBuffer.length} objects`)
+			const task_time = dataBuffer[0].time;
 
-			pool.runTask(dataBuffer, (err, data) => {
+			pool.runTask({ data: dataBuffer }, (err, data) => {
 				logger.log('Task done!');
 				if (err) {
 					logger.exception(err);
@@ -98,10 +100,25 @@ async function Serial() {
 				}
 
 				logger.log(data);
+				counter++;
+
+				// Garante que no determinado minuto os dados já foram processados
+				if (counter >= minCounter) {
+					logger.log(`Processing minute for ${time.toLocaleTimeString('pt-br')}`);
+					pool.runTask({ time: task_time }, (err, data) => {
+						if (err) {
+							logger.exception(err);
+							return;
+						}
+
+						logger.log('Processingo of minute was finished');
+					});
+					counter = 0;
+				}
 			});
 
 			dataBuffer = [];
-		}, 1000 * 60);
+		}, interval);
 
 		dataStream.on('error', (err) => {
 			logger.log('Erro no GnssDataStream');

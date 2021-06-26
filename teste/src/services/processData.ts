@@ -7,8 +7,8 @@ import { PrnIndicesController } from "../controller/PrnIndicesController";
 export interface CustomData {
 	prn: number;
 	snr: number;
-	azimuth: number;
-	elevation: number;
+	azi: number;
+	elev: number;
 	lat: number;
 	lon: number;
 	time: Date;
@@ -77,70 +77,65 @@ export class ProcessData {
 	}
 
 	public async processMinute(time: Date) {
-		try {
-			//logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
+		//logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
 
-			const rows = await this.prnInfo.getGroupedPrn(time);
+		const rows = await this.prnInfo.getGroupedPrn(time);
 
-			//logger.log("PrninfoGrouped", rows);
-			for (const row of rows) {
-				//logger.log(row)
-				if (row.total >= MIN_QTDE) {
-					let vSnr = [];
-					let vIntensidadeSinal = [];
-					let intensidadeSinalQuadrado = 0;
-					let intensidade = 0;
+		//logger.log("PrninfoGrouped", rows);
+		for (const row of rows) {
+			//logger.log(row)
+			if (row.total >= MIN_QTDE) {
+				let vSnr = [];
+				let vIntensidadeSinal = [];
+				let intensidadeSinalQuadrado = 0;
+				let intensidade = 0;
 
-					try {
-						const prnData = await this.prnInfo.getByPrn(time, row.prn);
-						//logger.log('Prn info by binute', prnData[0]);
+				try {
+					const prnData = await this.prnInfo.getByPrn(time, row.prn);
+					//logger.log('Prn info by binute', prnData[0]);
 
-						prnData.forEach((row) => {
-							if (row.snr) {
-								// logger.log(row.prn + " -->" + row.snr);
-								intensidade = Math.pow(10, row.snr / 10);
-								//logger.log(row.snr);
-								vSnr.push(row.snr);
-								vIntensidadeSinal.push(intensidade);
-								intensidadeSinalQuadrado += Math.pow(
-									intensidade,
-									2
-								);
-							}
-						});
-
-						if (vSnr.length == 0) {
-							logger.log("vSnr vazio");
-							return;
+					prnData.forEach((row) => {
+						if (row.snr) {
+							// logger.log(row.prn + " -->" + row.snr);
+							intensidade = Math.pow(10, row.snr / 10);
+							//logger.log(row.snr);
+							vSnr.push(row.snr);
+							vIntensidadeSinal.push(intensidade);
+							intensidadeSinalQuadrado += Math.pow(
+								intensidade,
+								2
+							);
 						}
+					});
 
-						let dpSnr = std(vSnr);
-						intensidadeSinalQuadrado /= vIntensidadeSinal.length;
-						let mediaIntensidadeSinalQuadrado = Math.pow(
-							mean(vIntensidadeSinal),
-							2
-						);
-						let s4 = Math.sqrt(
-							(intensidadeSinalQuadrado -
-								mediaIntensidadeSinalQuadrado) /
-								mediaIntensidadeSinalQuadrado
-						);
-
-						//logger.log("S4", s4);
-						this.prnIndices.insertProcessedData(
-							dpSnr,
-							s4,
-							time,
-							row.prn
-						);
-					} catch (err) {
-						logger.exception(err);
+					if (vSnr.length == 0) {
+						logger.log("vSnr vazio");
+						return;
 					}
+
+					let dpSnr = std(vSnr);
+					intensidadeSinalQuadrado /= vIntensidadeSinal.length;
+					let mediaIntensidadeSinalQuadrado = Math.pow(
+						mean(vIntensidadeSinal),
+						2
+					);
+					let s4 = Math.sqrt(
+						(intensidadeSinalQuadrado -
+							mediaIntensidadeSinalQuadrado) /
+							mediaIntensidadeSinalQuadrado
+					);
+
+					//logger.log("S4", s4);
+					this.prnIndices.insertProcessedData(
+						dpSnr,
+						s4,
+						time,
+						row.prn
+					);
+				} catch (err) {
+					logger.exception(err);
 				}
 			}
-		} catch (err) {
-			logger.exception(err);
-			process.exit(1);
 		}
 	}
 
@@ -152,8 +147,8 @@ export class ProcessData {
 		await this.prnInfo.insert(
 			custom.prn,
 			custom.snr,
-			custom.azimuth,
-			custom.elevation,
+			custom.azi,
+			custom.elev,
 			custom.lat,
 			custom.lon,
 			custom.time

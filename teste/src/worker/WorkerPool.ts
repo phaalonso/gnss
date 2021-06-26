@@ -3,6 +3,7 @@ import { AsyncResource } from 'async_hooks';
 import { EventEmitter } from 'events';
 import path from 'path';
 import logger from '../logger';
+import { CustomData } from '../services/processData';
 
 const kTaskInfo = Symbol('kTaskInfo');
 const kWorkerFreedEvent = Symbol('kWorkerFreedEvent');
@@ -12,6 +13,11 @@ type fn = (...any) => any;
 type Task = {
     task: any;
     callback: fn;
+}
+
+export interface IWorkerMessages {
+	data?: CustomData[]
+	time?: Date;
 }
 
 class WorkerPoolTaskInfo extends AsyncResource {
@@ -50,6 +56,7 @@ export class WorkerPool extends EventEmitter {
         }
 
         this.on(kWorkerFreedEvent, () => {
+			logger.log(`Freed worker, workers on Pool ${this.freeWorkers.length}`);
             // No evento de uma worker_thread possuir seu trabalho concluido, e haver mais processos a serem realizados
             // ela irá continuar processando a próxima tarefa
             if (this.tasks.length > 0) {
@@ -89,11 +96,10 @@ export class WorkerPool extends EventEmitter {
 
     public runTask(task: any, callback: fn) {
         if (this.freeWorkers.length === 0) {
-            logger.log('Not engouth workers, putting task in queue');
+			logger.log(`Not engouth workers, putting task in queue! Queue: ${this.tasks.length}`);
             this.tasks.push({ task: task, callback });
             return;
         }
-
 
         const worker = this.freeWorkers.pop();
         worker[kTaskInfo] = new WorkerPoolTaskInfo(callback);
