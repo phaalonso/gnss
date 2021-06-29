@@ -4,7 +4,7 @@ import { MongoConfig } from "../config/mongodb";
 
 let connection: Connection;
 
-export const connect = async () => {
+export function connect(): Promise<Connection> {
 	return new Promise((resolve, reject) => {
 		if (connection) return resolve(connection);
 

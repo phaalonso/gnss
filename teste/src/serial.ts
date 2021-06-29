@@ -1,6 +1,6 @@
 import { DataProvider } from "./services/GnssDataStream";
 import logger from "./logger";
-import { CustomData } from "./services/processData";
+import { CustomData, ProcessData } from "./services/processData";
 import { WorkerPool } from "./worker/WorkerPool";
 import { PrnInfoMongo } from "./controller/PrnInfoMongo";
 import { PrnIndicesMongo } from "./controller/PrnIndicesMongo";
