@@ -1,14 +1,10 @@
-import { PrnIndicesSqlite } from "./controller/PrnIndicesSqlite";
-import { PrnInfoSqlite } from "./controller/PrnInfoSqlite";
-import { SQLite } from "./database/DAO";
 import { DataProvider } from "./services/GnssDataStream";
 import logger from "./logger";
-import { CustomData } from "./services/processData";
+import { CustomData, ProcessData } from "./services/processData";
 import { WorkerPool } from "./worker/WorkerPool";
-
-const dao = new SQLite();
-const prnInfo = new PrnInfoSqlite(dao);
-const prnIndices = new PrnIndicesSqlite(dao)
+import { PrnInfoMongo } from "./controller/PrnInfoMongo";
+import { PrnIndicesMongo } from "./controller/PrnIndicesMongo";
+import { connect } from "./database/connection";
 
 let dataBuffer: CustomData[] = [];
 
@@ -18,42 +14,35 @@ const interval = 15000;
 // Quantidade minima de inserções para executar a query
 const minCounter = 60000 / interval;
 
-function logQtd() {
-	let quantidade = 0;
+connect().then(() => {
+    const prnInfo = new PrnInfoMongo();
+	const prnIndices = new PrnIndicesMongo();
 
-	return {
-		aumentar: () => {
-			quantidade = quantidade + 1;
-		},
-		getQtd: () => quantidade
-	}
-}
+	setInterval(() => {
+		prnInfo.infoLength().then(len => {
+			logger.log(`Prninfo length ${len}`);
+		});
+
+		prnIndices.indicesLength().then(len => {
+			logger.log(`Prnindices length ${len}`);
+		})
+	}, 1000 * 60 * 30);
+});
 
 async function Serial() {
 	//const pool = new WorkerPool(os.cpus().length);
 	const pool = new WorkerPool(2);
 
 	try {
-		await prnInfo.createTable();
-		await prnIndices.createTable();
-
 		const dataStream = new DataProvider();
 		dataStream.setSerialInput('/dev/ttyUSB0');
 
 		dataStream.pipeToGps();
 
-		const qtd = logQtd();
-
 		let counter = 0;
 		let time = new Date();
 		let lat: number;
 		let lon: number;
-
-		// Inicia o log do contador, tempo em ms
-		// 1000 * 60 * 5 -> 5 minutos
-		setInterval((qtd) => {
-			logger.log(`Quantidade de dados enviadas: ${qtd.getQtd()}`);
-		}, 1000 * 60 * 30, qtd);
 
 		dataStream.on("data", async (data) => {
 			if (data.time) {
