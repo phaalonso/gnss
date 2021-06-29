@@ -81,6 +81,12 @@ async function Serial() {
 			* após o processamento limpa o array de dados
 			*/
 			logger.log(`Adding new task to the queue! ${dataBuffer.length} objects`)
+
+			if (dataBuffer.length == 0) {
+				logger.log('BUFFER VAZIO!!');
+				return;
+			}
+
 			const task_time = dataBuffer[0].time;
 
 			pool.runTask({ data: dataBuffer }, (err, data) => {
