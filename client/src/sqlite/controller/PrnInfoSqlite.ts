@@ -2,6 +2,7 @@ import { SQLite } from "../database/DAO";
 import { PrnInfoController } from "../../core/controller/PrnInfoController";
 import logger from "../../../../dataProvider/src/logger";
 import { trackPromises } from "../../utils/trackPromises";
+import { CustomData } from "../../core/processData";
 
 export class PrnInfoSqlite extends PrnInfoController {
 	private dao: SQLite;
@@ -12,6 +13,10 @@ export class PrnInfoSqlite extends PrnInfoController {
 	constructor(dao: SQLite) {
 		super();
 		this.dao = dao;
+	}
+
+	insertMany(data: CustomData[]) {
+		throw Error();
 	}
 
 	/**

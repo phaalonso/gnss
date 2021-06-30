@@ -1,3 +1,5 @@
+import { CustomData } from "../processData";
+
 export abstract class PrnInfoController {
     abstract insert(
         prn: number,
@@ -8,6 +10,8 @@ export abstract class PrnInfoController {
         lon: number,
         time: Date
     );
+
+	abstract insertMany(data: CustomData[]);
 
     /**
      * @description Retorna dados inseridos em prninfo agrupados em um intervalo de um minuto relativo ao parametro time

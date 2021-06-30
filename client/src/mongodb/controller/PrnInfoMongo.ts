@@ -1,4 +1,5 @@
 import { PrnInfoController } from "../../core/controller/PrnInfoController";
+import { CustomData } from "../../core/processData";
 import logger from "../../logger";
 import { PrnInfoModel } from "../database/prninfo";
 
@@ -24,6 +25,10 @@ export class PrnInfoMongo extends PrnInfoController {
         .catch(err => {
             logger.exception(err, 'On insert prninfo mongo');
         });
+    }
+
+    insertMany(data: CustomData[]) {
+        return PrnInfoModel.insertMany(data);
     }
 
     /**

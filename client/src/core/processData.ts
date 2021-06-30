@@ -7,8 +7,8 @@ import { PrnIndicesController } from "./controller/PrnIndicesController";
 export interface CustomData {
 	prn: number;
 	snr: number;
-	azimuth: number;
-	elevation: number;
+	azi: number;
+	elev: number;
 	lat: number;
 	lon: number;
 	time: Date;
@@ -19,10 +19,14 @@ const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
 
 export class ProcessData {
-	private timeController: number;
-	private prnInfo: PrnInfoController;
-	private prnIndices: PrnIndicesController;
-	private qtdDados = 0;
+	public timeController: number;
+	public prnInfo: PrnInfoController;
+	public prnIndices: PrnIndicesController;
+	public buffer: CustomData[];
+	public interval = 15000;
+	public maxCounter = 60000 / this.interval;
+	public counter = 0;
+	public qtdDados = 0;
 
 	constructor(prnInfoController: PrnInfoController, prnIndicesController: PrnIndicesController) {
 		if (!prnInfoController || !prnIndicesController) {
@@ -32,6 +36,7 @@ export class ProcessData {
 		this.prnIndices = prnIndicesController;
 		this.prnInfo = prnInfoController;
 
+		this.buffer = [];
 
 		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesController, PrnInfoController, number]) => {
 			const prninfoLength = await prnInfo.infoLength();
@@ -41,6 +46,26 @@ export class ProcessData {
 			logger.log(`Prninfo: ${prninfoLength}`);
 			logger.log(`Prnindices: ${prnindicesLength}`);
 		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController, this.qtdDados]);
+
+		setInterval(async (process: ProcessData) => {
+			if (process.buffer.length == 0)	{
+				logger.log('Buffer vazio');
+				return;
+			}
+
+			const minute = this.buffer[this.buffer.length -1].time;
+
+			const clone = [...process.buffer];
+
+			await process.prnInfo.insertMany(clone);
+			process.buffer = [];
+			process.counter++;
+
+			if (process.counter >= process.maxCounter) {
+				this.counter = 0;
+				this.processMinute(minute);
+			}
+		}, this.interval, this);
 	}
 
 	public async processData(
@@ -149,21 +174,23 @@ export class ProcessData {
 			this.timeController = custom.time.getMinutes();
 		}
 
-		await this.prnInfo.insert(
-			custom.prn,
-			custom.snr,
-			custom.azimuth,
-			custom.elevation,
-			custom.lat,
-			custom.lon,
-			custom.time
-		);
+		this.buffer.push(custom);
 
-		if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
-			this.timeController = custom.time.getMinutes();
-			logger.log(this.timeController);
+		//await this.prnInfo.insert(
+			//custom.prn,
+			//custom.snr,
+			//custom.azi,
+			//custom.elev,
+			//custom.lat,
+			//custom.lon,
+			//custom.time
+		//);
 
-			await this.processMinute(custom.time);
-		}
+		//if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
+			//this.timeController = custom.time.getMinutes();
+			//logger.log(this.timeController);
+
+			//await this.processMinute(custom.time);
+		//}
 	}
 }

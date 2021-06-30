@@ -43,8 +43,8 @@ async function run() {
                 const customData: CustomData = {
                     prn: parseInt(matchCustom[1]),
                     snr: parseFloat(matchCustom[2]) || null,
-                    azimuth: parseFloat(matchCustom[3]) || null,
-                    elevation: parseFloat(matchCustom[4]) || null,
+                    azi: parseFloat(matchCustom[3]) || null,
+                    elev: parseFloat(matchCustom[4]) || null,
                     lat: parseFloat(matchCustom[5]),
                     lon: parseFloat(matchCustom[6]),
                     time,
