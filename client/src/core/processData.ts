@@ -26,8 +26,8 @@ export class ProcessData {
 	public interval = 15000;
 	public maxCounter = 60000 / this.interval;
 	public counter = 0;
-	public qtdDados = 0;
 
+	// TODO escolher controllers de acordo com variável do ambiente a qual indica a base de dados
 	constructor(prnInfoController: PrnInfoController, prnIndicesController: PrnIndicesController) {
 		if (!prnInfoController || !prnIndicesController) {
 			throw new Error('You need to pass the controllers to ProcessData');
@@ -42,10 +42,10 @@ export class ProcessData {
 			const prninfoLength = await prnInfo.infoLength();
 			const prnindicesLength = await prnIndices.indicesLength();
 
-			logger.log(`Quantidade de  dados ${qtd}`);
+			// logger.log(`Quantidade de  dados ${qtd}`);
 			logger.log(`Prninfo: ${prninfoLength}`);
 			logger.log(`Prnindices: ${prnindicesLength}`);
-		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController, this.qtdDados]);
+		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController]);
 
 		setInterval(async (process: ProcessData) => {
 			if (process.buffer.length == 0)	{

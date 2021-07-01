@@ -1,7 +1,8 @@
 import { SQLite } from "../database/DAO";
 import { PrnInfoController } from "./PrnInfoController";
 import logger from "../logger";
-import { trackPromises } from "../utils/trackPromises";
+//import { trackPromises } from "../utils/trackPromises";
+import { CustomData } from "../services/processData";
 
 export class PrnInfoSqlite extends PrnInfoController {
 	private dao: SQLite;
@@ -41,6 +42,14 @@ export class PrnInfoSqlite extends PrnInfoController {
 		);
 
 		return promise;
+	}
+
+	insertMany(data: CustomData[]) {
+		const placeholder = data.map(() => ('(?,?,?,?,?,?,?)')).join(',');
+		const query = 'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES ' + placeholder;
+		const flatList = data.map(d => [d.prn, d.snr, d.azi, d.elev, d.lat, d.lon, d.time]);
+
+		return this.dao.run(query, flatList);
 	}
 
 	/**

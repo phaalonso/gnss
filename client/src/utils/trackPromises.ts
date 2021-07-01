@@ -8,6 +8,6 @@ export function trackPromises(promise) {
     })
 }
 
-setInterval(() => {
-    console.log(`Promises: ${count}`);
-}, 1000 * 10);
+//setInterval(() => {
+    //console.log(`Promises: ${count}`);
+//}, 1000 * 10);

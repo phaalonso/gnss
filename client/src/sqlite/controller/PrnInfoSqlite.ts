@@ -15,10 +15,6 @@ export class PrnInfoSqlite extends PrnInfoController {
 		this.dao = dao;
 	}
 
-	insertMany(data: CustomData[]) {
-		throw Error();
-	}
-
 	/**
 	 * @description Cria a tabela prninfo se ela não existir
 	 */
@@ -46,6 +42,14 @@ export class PrnInfoSqlite extends PrnInfoController {
 		);
 
 		return trackPromises(promise);
+	}
+
+	insertMany(data: CustomData[]) {
+		const placeholder = data.map(() => ('(?,?,?,?,?,?,?)')).join(',');
+		const query = 'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES ' + placeholder;
+		const flatList = data.map(d => [d.prn, d.snr, d.azi, d.elev, d.lat, d.lon, d.time]);
+
+		return this.dao.run(query, flatList);
 	}
 
 	/**

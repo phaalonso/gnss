@@ -5,6 +5,14 @@ import { WorkerPool } from "./worker/WorkerPool";
 import { PrnInfoMongo } from "./controller/PrnInfoMongo";
 import { PrnIndicesMongo } from "./controller/PrnIndicesMongo";
 import { connect } from "./database/connection";
+import { PrnInfoController } from "./controller/PrnInfoController";
+import { SQLite } from "./database/DAO";
+import { PrnInfoSqlite } from "./controller/PrnInfoSqlite";
+import { PrnIndicesSqlite } from "./controller/PrnIndicesSqlite";
+import { PrnIndicesController } from "./controller/PrnIndicesController";
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 let dataBuffer: CustomData[] = [];
 
@@ -14,10 +22,34 @@ const interval = 15000;
 // Quantidade minima de inserções para executar a query
 const minCounter = 60000 / interval;
 
-connect().then(() => {
-    const prnInfo = new PrnInfoMongo();
-	const prnIndices = new PrnIndicesMongo();
+let prnInfo: PrnInfoController;
+let prnIndices: PrnIndicesController;
 
+if (process.env.DB === 'SQLITE') {
+	const db = new SQLite();
+
+	prnInfo = new PrnInfoSqlite(db);
+	prnIndices = new PrnIndicesSqlite(db);
+
+	//@ts-ignore
+	prnInfo.createTable().then(() => {
+		//@ts-ignore
+		prnIndices.createTable().then(() => {
+			Serial();
+		}).catch(err => logger.exception(err));
+	}).catch(err => logger.exception(err));
+} else if (process.env.DB === 'MONGO') {
+    prnInfo = new PrnInfoMongo();
+	prnIndices = new PrnIndicesMongo();
+
+	connect().then(() => {
+		Serial();
+	}).catch(err => {
+		console.log(err);
+	});
+}
+
+async function Serial() {
 	setInterval(() => {
 		prnInfo.infoLength().then(len => {
 			logger.log(`Prninfo length ${len}`);
@@ -27,11 +59,7 @@ connect().then(() => {
 			logger.log(`Prnindices length ${len}`);
 		})
 	}, 1000 * 60 * 30);
-}).catch(err => {
-	console.log(err);
-});
 
-async function Serial() {
 	//const pool = new WorkerPool(os.cpus().length);
 	const pool = new WorkerPool(2);
 
@@ -126,5 +154,3 @@ async function Serial() {
 		process.exit(1);
 	}
 }
-
-Serial();
