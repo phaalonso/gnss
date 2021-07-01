@@ -33,6 +33,7 @@ export class PrnIndicesSqlite extends PrnIndicesController {
 	}
 
 	insertProcessedData(dpSnr: number, s4: number, time: Date, prn: number) {
+		console.log('Inserindo processed data');
 		const promise = this.dao.run(
 			"INSERT INTO prnindices (prn, mediasnr, mediaazi, mediaelev, tinicial, tfinal, dpsnr, s4) SELECT prn, AVG(snr), AVG(azi), AVG(elev), min(time), max(time), ?, ? from prninfo where time between ?-60000 and ? and prn = ? group by prn",
 			[dpSnr, s4, time, time, prn]

@@ -1,4 +1,5 @@
 import { PrnInfoController } from "../../core/controller/PrnInfoController";
+import { CustomData } from "../../core/processData";
 import logger from "../../logger";
 import { SQLite } from "../database/DAO";
 
@@ -38,6 +39,18 @@ export class PrnInfoBetterSqlite extends PrnInfoController {
 			'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES(?,?,?,?,?,?,?)',
 			[prn, snr, azimuth, elevation, lat, lon, time.getTime()]
 		);
+	}
+
+	insertMany(data: CustomData[]) {
+		const placeholder = data.map(() => ('(?,?,?,?,?,?,?)')).join(',');
+		const query = 'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES ' + placeholder;
+		const flatList = [];
+
+		for (const d of data) {
+			flatList.push(d.prn, d.snr, d.azi, d.elev, d.lat, d.lon, d.time.getTime());
+		}
+
+		return this.dao.run(query, flatList);
 	}
 
 	/**

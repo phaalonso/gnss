@@ -58,10 +58,12 @@ export class ProcessData {
 			const clone = [...process.buffer];
 
 			await process.prnInfo.insertMany(clone);
+			logger.log(`Prninfo: inserted ${clone.length} data`);
 			process.buffer = [];
 			process.counter++;
 
 			if (process.counter >= process.maxCounter) {
+				//console.log(process.counter);
 				process.counter = 0;
 				process.processMinute(minute);
 			}
@@ -103,6 +105,7 @@ export class ProcessData {
 
 	public async processMinute(time: Date) {
 		try {
+			console.log(time.getTime())
 			//logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
 
 			const rows = await this.prnInfo.getGroupedPrn(time);
@@ -159,6 +162,7 @@ export class ProcessData {
 							row.prn
 						);
 					} catch (err) {
+						console.log(err);
 						logger.exception(err);
 					}
 				}

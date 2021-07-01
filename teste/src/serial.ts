@@ -36,8 +36,14 @@ if (process.env.DB === 'SQLITE') {
 		//@ts-ignore
 		prnIndices.createTable().then(() => {
 			Serial();
-		}).catch(err => logger.exception(err));
-	}).catch(err => logger.exception(err));
+		}).catch(err => {
+			logger.exception(err)
+			console.log('Não foi possível criar a tabela');
+		});
+	}).catch(err => {
+		logger.exception(err)
+		console.log('Não foi possível criar a tabela');
+	});
 } else if (process.env.DB === 'MONGO') {
     prnInfo = new PrnInfoMongo();
 	prnIndices = new PrnIndicesMongo();
@@ -46,6 +52,8 @@ if (process.env.DB === 'SQLITE') {
 		Serial();
 	}).catch(err => {
 		console.log(err);
+		console.log('Não foi possível conectar com a b ase de dados')
+		process.exit(1);
 	});
 }
 
