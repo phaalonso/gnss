@@ -62,8 +62,8 @@ export class ProcessData {
 			process.counter++;
 
 			if (process.counter >= process.maxCounter) {
-				this.counter = 0;
-				this.processMinute(minute);
+				process.counter = 0;
+				process.processMinute(minute);
 			}
 		}, this.interval, this);
 	}
