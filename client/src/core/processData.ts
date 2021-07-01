@@ -7,8 +7,8 @@ import { PrnIndicesController } from "./controller/PrnIndicesController";
 export interface CustomData {
 	prn: number;
 	snr: number;
-	azimuth: number;
-	elevation: number;
+	azi: number;
+	elev: number;
 	lat: number;
 	lon: number;
 	time: Date;
@@ -17,29 +17,17 @@ export interface CustomData {
 const TAXA = 0.1;
 const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
- 
-export interface LogQtd {
-	aumentar: () => void;
-	getQtd: () => number;
-}
-
-export function logQtd(): LogQtd {
-	let quantidade = 0;
-
-	return {
-		aumentar: () => {
-			quantidade = quantidade + 1;
-		},
-		getQtd: () => quantidade
-	}
-}
 
 export class ProcessData {
-	private timeController: number;
-	private prnInfo: PrnInfoController;
-	private prnIndices: PrnIndicesController;
-	private qtd: LogQtd;
+	public timeController: number;
+	public prnInfo: PrnInfoController;
+	public prnIndices: PrnIndicesController;
+	public buffer: CustomData[];
+	public interval = 15000;
+	public maxCounter = 60000 / this.interval;
+	public counter = 0;
 
+	// TODO escolher controllers de acordo com variável do ambiente a qual indica a base de dados
 	constructor(prnInfoController: PrnInfoController, prnIndicesController: PrnIndicesController) {
 		if (!prnInfoController || !prnIndicesController) {
 			throw new Error('You need to pass the controllers to ProcessData');
@@ -47,17 +35,37 @@ export class ProcessData {
 
 		this.prnIndices = prnIndicesController;
 		this.prnInfo = prnInfoController;
-		this.qtd = logQtd();
 
+		this.buffer = [];
 
-		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesController, PrnInfoController, LogQtd]) => {
+		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesController, PrnInfoController, number]) => {
 			const prninfoLength = await prnInfo.infoLength();
 			const prnindicesLength = await prnIndices.indicesLength();
 
-			logger.log(`Quantidade de  dados ${qtd.getQtd()}`);
+			// logger.log(`Quantidade de  dados ${qtd}`);
 			logger.log(`Prninfo: ${prninfoLength}`);
 			logger.log(`Prnindices: ${prnindicesLength}`);
-		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController, this.qtd]);
+		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController]);
+
+		setInterval(async (process: ProcessData) => {
+			if (process.buffer.length == 0)	{
+				logger.log('Buffer vazio');
+				return;
+			}
+
+			const minute = this.buffer[this.buffer.length -1].time;
+
+			const clone = [...process.buffer];
+
+			await process.prnInfo.insertMany(clone);
+			process.buffer = [];
+			process.counter++;
+
+			if (process.counter >= process.maxCounter) {
+				this.counter = 0;
+				this.processMinute(minute);
+			}
+		}, this.interval, this);
 	}
 
 	public async processData(
@@ -89,7 +97,7 @@ export class ProcessData {
 			process.stdout.write(`${time} Salvando prnindices\n`);
 			this.timeController= time.getMinutes();
 
-			this.processMinute(time);
+			await this.processMinute(time);
 		}
 	}
 
@@ -166,23 +174,23 @@ export class ProcessData {
 			this.timeController = custom.time.getMinutes();
 		}
 
-		this.qtd.aumentar();
+		this.buffer.push(custom);
 
-		await this.prnInfo.insert(
-			custom.prn,
-			custom.snr,
-			custom.azimuth,
-			custom.elevation,
-			custom.lat,
-			custom.lon,
-			custom.time
-		);
+		//await this.prnInfo.insert(
+			//custom.prn,
+			//custom.snr,
+			//custom.azi,
+			//custom.elev,
+			//custom.lat,
+			//custom.lon,
+			//custom.time
+		//);
 
-		if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
-			this.timeController = custom.time.getMinutes();
-			logger.log(this.timeController);
+		//if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
+			//this.timeController = custom.time.getMinutes();
+			//logger.log(this.timeController);
 
-			this.processMinute(custom.time);
-		}
+			//await this.processMinute(custom.time);
+		//}
 	}
 }

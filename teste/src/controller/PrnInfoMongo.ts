@@ -1,7 +1,7 @@
-import { PrnInfoController } from "../../core/controller/PrnInfoController";
-import { CustomData } from "../../core/processData";
-import logger from "../../logger";
+import { PrnInfoController } from "../controller/PrnInfoController";
+import logger from "../logger";
 import { PrnInfoModel } from "../database/prninfo";
+import { CustomData } from "../services/processData";
 
 export class PrnInfoMongo extends PrnInfoController {
     insert(

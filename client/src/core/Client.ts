@@ -17,7 +17,7 @@ export class Client {
     constructor(processData: ProcessData, config: net.SocketConnectOpts) {
         this.config = config;
         this.connectedChannels = new Set<string>();
-        this.buffer = new MessageBuffer('\n', true);
+        this.buffer = new MessageBuffer('\n');
         this.processData = processData;
         this.client = new net.Socket();
 
@@ -75,8 +75,8 @@ export class Client {
             const customData: CustomData = {
                 prn: parseInt(matchCustom[1]),
                 snr: parseFloat(matchCustom[2]) || null,
-                azimuth: parseFloat(matchCustom[3]) || null,
-                elevation: parseFloat(matchCustom[4]) || null,
+                azi: parseFloat(matchCustom[3]) || null,
+                elev: parseFloat(matchCustom[4]) || null,
                 lat: parseFloat(matchCustom[5]),
                 lon: parseFloat(matchCustom[6]),
                 time: new Date(parseInt(matchCustom[7])),

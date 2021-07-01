@@ -1,7 +1,7 @@
 import { SQLite } from "../database/DAO";
-import { PrnIndicesController } from "../../core/controller/PrnIndicesController";
-import logger from "../../logger";
-//import { trackPromises } from "../../utils/trackPromises";
+// import { trackPromises } from "../utils/trackPromises";
+import { PrnIndicesController } from "./PrnIndicesController";
+import logger from "../logger";
 
 export class PrnIndicesSqlite extends PrnIndicesController {
 	private dao: SQLite;
@@ -28,7 +28,6 @@ export class PrnIndicesSqlite extends PrnIndicesController {
 
 		const promise = this.dao.run(sql);
 
-		//return trackPromises(promise);
 		return promise;
 	}
 
@@ -38,8 +37,7 @@ export class PrnIndicesSqlite extends PrnIndicesController {
 			[dpSnr, s4, time, time, prn]
 		);
 
-		//return trackPromises(promise)
-		return promise;
+		return promise
 	}
 
 	async indicesLength(): Promise<number> {

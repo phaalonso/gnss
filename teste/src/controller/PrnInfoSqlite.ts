@@ -1,8 +1,8 @@
 import { SQLite } from "../database/DAO";
-import { PrnInfoController } from "../../core/controller/PrnInfoController";
-import logger from "../../../../dataProvider/src/logger";
-import { trackPromises } from "../../utils/trackPromises";
-import { CustomData } from "../../core/processData";
+import { PrnInfoController } from "./PrnInfoController";
+import logger from "../logger";
+//import { trackPromises } from "../utils/trackPromises";
+import { CustomData } from "../services/processData";
 
 export class PrnInfoSqlite extends PrnInfoController {
 	private dao: SQLite;
@@ -41,7 +41,7 @@ export class PrnInfoSqlite extends PrnInfoController {
 			[prn, snr, azimuth, elevation, lat, lon, time]
 		);
 
-		return trackPromises(promise);
+		return promise;
 	}
 
 	insertMany(data: CustomData[]) {
@@ -62,7 +62,7 @@ export class PrnInfoSqlite extends PrnInfoController {
 			[time, time]
 		);
 
-		return trackPromises(promise);
+		return promise;
 	}
 
 	/**
@@ -76,7 +76,7 @@ export class PrnInfoSqlite extends PrnInfoController {
 			[time, time, prn]
 		);
 
-		return trackPromises(promise);
+		return promise;
 	}
 
 	async infoLength(): Promise<number> {

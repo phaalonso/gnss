@@ -39,8 +39,8 @@ async function run() {
                 const customData: CustomData = {
                     prn: satelite.prn,
                     snr: satelite.snr,
-                    azimuth: satelite.azimuth,
-                    elevation: satelite.elevation,
+                    azi: satelite.azimuth,
+                    elev: satelite.elevation,
                     lat: lat,
                     lon: lon,
                     time: time,

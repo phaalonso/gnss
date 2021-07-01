@@ -1,4 +1,4 @@
-import { CustomData } from "../processData";
+import { CustomData } from "../services/processData";
 
 export abstract class PrnInfoController {
     abstract insert(
