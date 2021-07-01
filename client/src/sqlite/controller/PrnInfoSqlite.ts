@@ -41,13 +41,19 @@ export class PrnInfoSqlite extends PrnInfoController {
 			[prn, snr, azimuth, elevation, lat, lon, time]
 		);
 
-		return trackPromises(promise);
+		//return trackPromises(promise);
+		return promise;
 	}
 
 	insertMany(data: CustomData[]) {
 		const placeholder = data.map(() => ('(?,?,?,?,?,?,?)')).join(',');
 		const query = 'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES ' + placeholder;
-		const flatList = data.map(d => [d.prn, d.snr, d.azi, d.elev, d.lat, d.lon, d.time]);
+
+		const flatList = [];
+
+		for (const d of data) {
+			flatList.push(d.prn, d.snr, d.azi, d.elev, d.lat, d.lon, d.time.getTime());
+		}
 
 		return this.dao.run(query, flatList);
 	}

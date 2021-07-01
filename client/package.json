@@ -8,7 +8,8 @@
   "private": true,
   "scripts": {
     "mongo": "ts-node ./src/mongodb/mongoClient.ts",
-    "sqlite": "ts-node ./src/sqlite/sqliteClient.ts"
+    "sqlite": "ts-node ./src/sqlite/sqliteClient.ts",
+	"bettersqlite": "ts-node ./src/bettersqlite/sqliteClient.ts"
   },
   "dependencies": {
     "better-sqlite3": "^7.4.1",
