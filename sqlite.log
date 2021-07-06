@@ -1,46 +1,14 @@
-[01/07/2021 16:14:19] Conectado ao banco de dados
-[01/07/2021 16:14:19] Criando prninfo
-[01/07/2021 16:14:19] Criando prnindices
-[01/07/2021 16:14:19] Conexão estabelecida
-[01/07/2021 16:14:19] Sending subscribe custom
-[01/07/2021 16:14:19] Client is running
-[01/07/2021 16:14:34] Prninfo: inserted 1787 data
-[01/07/2021 16:14:49] Prninfo: inserted 1800 data
-[01/07/2021 16:15:04] Prninfo: inserted 1800 data
-[01/07/2021 16:15:19] Prninfo: inserted 1800 data
-[01/07/2021 16:15:19] Prossesing prnidices from 01/07/2021 16:15:19
-[01/07/2021 16:15:19] PrninfoGrouped [
-  { prn: 5, total: 599 },
-  { prn: 6, total: 599 },
-  { prn: 7, total: 599 },
-  { prn: 12, total: 599 },
-  { prn: 13, total: 598 },
-  { prn: 14, total: 599 },
-  { prn: 15, total: 599 },
-  { prn: 17, total: 599 },
-  { prn: 19, total: 599 },
-  { prn: 20, total: 220 },
-  { prn: 24, total: 0 },
-  { prn: 30, total: 599 }
-]
-[01/07/2021 16:15:34] Prninfo: inserted 1800 data
-[01/07/2021 16:15:49] Prninfo: inserted 1800 data
-[01/07/2021 16:16:04] Prninfo: inserted 1800 data
-[01/07/2021 16:16:19] Prninfo: inserted 1800 data
-[01/07/2021 16:16:19] Prossesing prnidices from 01/07/2021 16:16:19
-[01/07/2021 16:16:19] PrninfoGrouped [
-  { prn: 5, total: 601 },
-  { prn: 6, total: 601 },
-  { prn: 7, total: 601 },
-  { prn: 12, total: 601 },
-  { prn: 13, total: 601 },
-  { prn: 14, total: 601 },
-  { prn: 15, total: 601 },
-  { prn: 17, total: 601 },
-  { prn: 19, total: 601 },
-  { prn: 20, total: 497 },
-  { prn: 24, total: 0 },
-  { prn: 30, total: 601 }
-]
-[01/07/2021 16:16:34] Prninfo: inserted 1803 data
-[01/07/2021 16:16:49] Prninfo: inserted 1797 data
+[06/07/2021 13:57:06] Conectado ao banco de dados
+[06/07/2021 13:57:06] Criando prninfo
+[06/07/2021 13:57:06] Criando prnindices
+[06/07/2021 13:57:06] Conexão criada
+[06/07/2021 13:57:06] Conexão estabelecida
+[06/07/2021 13:57:06] Sending subscribe custom
+[06/07/2021 13:57:06] Client is running
+[06/07/2021 13:57:21] Prninfo: inserted 1499 data
+[06/07/2021 13:57:36] Prninfo: inserted 1500 data
+[06/07/2021 13:57:51] Prninfo: inserted 1500 data
+[06/07/2021 13:58:06] Prninfo: inserted 1500 data
+[06/07/2021 13:58:21] Prninfo: inserted 1500 data
+[06/07/2021 13:58:36] Prninfo: inserted 1500 data
+[06/07/2021 13:58:51] Prninfo: inserted 1500 data
