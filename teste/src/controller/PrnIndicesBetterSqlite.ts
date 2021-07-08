@@ -1,5 +1,5 @@
-import { PrnIndicesController } from "../../core/controller/PrnIndicesController";
-import logger from "../../logger";
+import { PrnIndicesController } from "..//controller/PrnIndicesController";
+import logger from "../logger";
 import { SQLite } from "../database/DAO";
 
 export class PrnIndicesBetterSqlite extends PrnIndicesController {

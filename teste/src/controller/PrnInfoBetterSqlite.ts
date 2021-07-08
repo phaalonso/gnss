@@ -1,7 +1,7 @@
-import { PrnInfoController } from "../../core/controller/PrnInfoController";
-import { CustomData } from "../../core/processData";
+import { PrnInfoController } from "../controller/PrnInfoController";
 import { SQLite } from "../database/DAO";
-import logger from "../../logger";
+import logger from "../logger";
+import { CustomData } from "../services/processData";
 
 export class PrnInfoBetterSqlite extends PrnInfoController {
 	private dao: SQLite;
