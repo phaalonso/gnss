@@ -45,12 +45,11 @@ export class PrnInfoSqlite extends PrnInfoController {
 	}
 
 	insertMany(data: CustomData[]) {
-		const placeholder = data.map(() => ('(?,?,?,?,?,?,?)')).join(',');
+		const placeholder = data.map(cd => (`(${cd.prn},${cd.snr},${cd.azi},${cd.elev},${cd.lat},${cd.lon},${cd.time.getTime()})`)).join(',');
 		const query = 'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES ' + placeholder;
-		const flatList = data.map(d => [d.prn, d.snr, d.azi, d.elev, d.lat, d.lon, d.time]);
-
-		return this.dao.run(query, flatList);
+		return this.dao.run(query);
 	}
+
 
 	/**
 	 * @description Retorna dados inseridos em prninfo agrupados em um intervalo de um minuto relativo ao parametro time

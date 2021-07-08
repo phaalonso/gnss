@@ -1,8 +1,8 @@
 import path from 'path';
-import { SQLite } from './sqlite/database/DAO';
+//import { SQLite } from './sqlite/database/DAO';
 import { CustomData, ProcessData } from './core/processData';
-import { PrnInfoSqlite } from './sqlite/controller/PrnInfoSqlite';
-import { PrnIndicesSqlite } from './sqlite/controller/PrnIndicesSqlite';
+//import { PrnInfoSqlite } from './sqlite/controller/PrnInfoSqlite';
+//import { PrnIndicesSqlite } from './sqlite/controller/PrnIndicesSqlite';
 import { createReadStream } from 'fs';
 import logger from '../../dataProvider/src/logger';
 import { PrnInfoMongo } from './mongodb/controller/PrnInfoMongo';
