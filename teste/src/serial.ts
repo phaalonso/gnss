@@ -7,9 +7,9 @@ import { PrnIndicesMongo } from "./controller/PrnIndicesMongo";
 import { connect } from "./database/connection";
 import { PrnInfoController } from "./controller/PrnInfoController";
 import { SQLite } from "./database/DAO";
-import { PrnInfoSqlite } from "./controller/PrnInfoSqlite";
-import { PrnIndicesSqlite } from "./controller/PrnIndicesSqlite";
 import { PrnIndicesController } from "./controller/PrnIndicesController";
+import { PrnInfoBetterSqlite } from "./controller/PrnInfoBetterSqlite";
+import { PrnIndicesBetterSqlite } from "./controller/PrnIndicesBetterSqlite";
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -28,8 +28,8 @@ let prnIndices: PrnIndicesController;
 if (process.env.DB === 'SQLITE') {
 	const db = new SQLite();
 
-	prnInfo = new PrnInfoSqlite(db);
-	prnIndices = new PrnIndicesSqlite(db);
+	prnInfo = new PrnInfoBetterSqlite(db);
+	prnIndices = new PrnIndicesBetterSqlite(db);
 
 	//@ts-ignore
 	prnInfo.createTable().then(() => {

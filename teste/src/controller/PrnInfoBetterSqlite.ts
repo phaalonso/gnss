@@ -1,10 +1,9 @@
+import { PrnInfoController } from "../../core/controller/PrnInfoController";
+import { CustomData } from "../../core/processData";
 import { SQLite } from "../database/DAO";
-import { PrnInfoController } from "./PrnInfoController";
-import logger from "../logger";
-//import { trackPromises } from "../utils/trackPromises";
-import { CustomData } from "../services/processData";
+import logger from "../../logger";
 
-export class PrnInfoSqlite extends PrnInfoController {
+export class PrnInfoBetterSqlite extends PrnInfoController {
 	private dao: SQLite;
 
 	/**
@@ -36,12 +35,10 @@ export class PrnInfoSqlite extends PrnInfoController {
 	}
 
 	insert(prn: number, snr: number, azimuth: number, elevation: number, lat: number, lon: number, time: Date) {
-		const promise = this.dao.run(
+		return this.dao.run(
 			'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES(?,?,?,?,?,?,?)',
-			[prn, snr, azimuth, elevation, lat, lon, time]
+			[prn, snr, azimuth, elevation, lat, lon, time.getTime()]
 		);
-
-		return promise;
 	}
 
 	insertMany(data: CustomData[]) {
@@ -50,18 +47,15 @@ export class PrnInfoSqlite extends PrnInfoController {
 		return this.dao.run(query);
 	}
 
-
 	/**
 	 * @description Retorna dados inseridos em prninfo agrupados em um intervalo de um minuto relativo ao parametro time
 	 * @param time tempo sera relativo a esse parametro
 	 */
 	public getGroupedPrn(time: Date): Promise<any> {
-		const promise = this.dao.all(
+		return this.dao.all(
 			'select prn, count(snr) as total from prninfo where time between ?-60000 and ? group by prn',
-			[time, time]
+			[time.getTime(), time.getTime()]
 		);
-
-		return promise;
 	}
 
 	/**
@@ -70,12 +64,10 @@ export class PrnInfoSqlite extends PrnInfoController {
 	 * @param prn informa de qual prn será realizado a filtragem
 	 */
 	public getByPrn(time: Date, prn: number): Promise<any> {
-		const promise = this.dao.all(
+		return this.dao.all(
 			'SELECT prn, snr FROM prninfo WHERE time BETWEEN ?-60000 AND ? AND prn = ?',
-			[time, time, prn]
+			[time.getTime(), time.getTime(), prn]
 		);
-
-		return promise;
 	}
 
 	async infoLength(): Promise<number> {
