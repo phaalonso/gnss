@@ -5,7 +5,7 @@ import fs, { ReadStream, WriteStream } from 'fs';
 import GPS from 'gps';
 import logger from "./logger";
 
-type Callback = (chunk: any) => void;
+//type Callback = (chunk: any) => void;
 
 /**
  * @description GnssDataStream is a class to help extend GPS node package, receiving

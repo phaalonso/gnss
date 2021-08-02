@@ -19,57 +19,67 @@ const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
 
 export class ProcessData {
-	public timeController: number;
-	public prnInfo: PrnInfoController;
-	public prnIndices: PrnIndicesController;
-	public buffer: CustomData[];
-	public interval = 15000;
-	public maxCounter = 60000 / this.interval;
-	public counter = 0;
+	private timeController: number;
+	private buffer: CustomData[];
+	private interval = 15000;
+	private maxCounter = 60000 / this.interval;
+	private counter = 0;
 
-	// TODO escolher controllers de acordo com variável do ambiente a qual indica a base de dados
-	constructor(prnInfoController: PrnInfoController, prnIndicesController: PrnIndicesController) {
-		if (!prnInfoController || !prnIndicesController) {
-			throw new Error('You need to pass the controllers to ProcessData');
-		}
+	private logInterval = 1800000; // 30 minutos
 
-		this.prnIndices = prnIndicesController;
-		this.prnInfo = prnInfoController;
+	//TODO: escolher controllers de acordo com variável do ambiente a qual indica a base de dados
+	constructor(
+		private prnInfo: PrnInfoController, 
+		private prnIndices: PrnIndicesController
+	) {
 
 		this.buffer = [];
 
-		setInterval(async ([prnIndices, prnInfo, qtd]: [PrnIndicesController, PrnInfoController, number]) => {
-			const prninfoLength = await prnInfo.infoLength();
-			const prnindicesLength = await prnIndices.indicesLength();
+		setInterval(this.logDatabaseSize.bind(this), this.logInterval);
 
-			// logger.log(`Quantidade de  dados ${qtd}`);
-			logger.log(`Prninfo: ${prninfoLength}`);
-			logger.log(`Prnindices: ${prnindicesLength}`);
-		}, 1000 * 60 * 30, [prnIndicesController, prnInfoController]);
-
-		setInterval(async (process: ProcessData) => {
-			if (process.buffer.length == 0)	{
-				logger.log('Buffer vazio');
-				return;
-			}
-
-			const minute = this.buffer[this.buffer.length -1].time;
-
-			const clone = [...process.buffer];
-
-			await process.prnInfo.insertMany(clone);
-			logger.log(`Prninfo: inserted ${clone.length} data`);
-			process.buffer = [];
-			process.counter++;
-
-			if (process.counter >= process.maxCounter) {
-				//console.log(process.counter);
-				process.counter = 0;
-				process.processMinute(minute);
-			}
-		}, this.interval, this);
+		//TODO: Testar se está funcionando
+		setInterval(this.processInterval.bind(this), this.interval);
 	}
 
+	//TODO: Talvez seja interssante realizar os loggins em um serviço separado
+	private async logDatabaseSize() {
+		const prninfoLength = await this.prnInfo.infoLength();
+		const prnindicesLength = await this.prnIndices.indicesLength();
+
+		// logger.log(`Quantidade de  dados ${qtd}`);
+		logger.log(`Prninfo: ${prninfoLength}`);
+		logger.log(`Prnindices: ${prnindicesLength}`);
+	}
+
+	/**
+	 * @description Método responsável por realizar o processamento dos dados após a passagem de determinado intervalo de tempo
+	 */
+	private async processInterval() {
+		if (this.buffer.length == 0)	{
+			logger.log('Buffer vazio');
+			return;
+		}
+
+		const minute = this.buffer[this.buffer.length -1].time;
+
+		const clone = [...this.buffer];
+
+		await this.prnInfo.insertMany(clone);
+		logger.log(`Prninfo: inserted ${clone.length} data`);
+		this.buffer = [];
+		this.counter++;
+
+		if (this.counter >= this.maxCounter) {
+			//console.log(this.counter);
+			this.counter = 0;
+			this.processMinute(minute);
+		}
+	}
+
+	/**
+	 * @description função utilizada para inserir dados no DB assim que estes forem recebidos
+	 * @deprecated
+	 */
 	public async processData(
 		satellite: Satellite[],
 		lat: number,
@@ -81,15 +91,7 @@ export class ProcessData {
 		}
 
 		for (const satelite of satellite) {
-			await this.prnInfo.insert(
-				satelite.prn,
-				satelite.snr,
-				satelite.azimuth,
-				satelite.elevation,
-				lat,
-				lon,
-				time
-			);
+			await this.prnInfo.insert(satelite.prn, satelite.snr, satelite.azimuth, satelite.elevation, lat, lon, time);
 		}
 
 		if (
@@ -173,28 +175,14 @@ export class ProcessData {
 		}
 	}
 
-	async processCustomData(custom: CustomData) {
+	/**
+	 * @description Função responsável por enfilerar os dados no buffer, antes que sejam processados
+	 */
+	async sendToBuffer(custom: CustomData) {
 		if (!this.timeController) {
 			this.timeController = custom.time.getMinutes();
 		}
 
 		this.buffer.push(custom);
-
-		//await this.prnInfo.insert(
-			//custom.prn,
-			//custom.snr,
-			//custom.azi,
-			//custom.elev,
-			//custom.lat,
-			//custom.lon,
-			//custom.time
-		//);
-
-		//if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
-			//this.timeController = custom.time.getMinutes();
-			//logger.log(this.timeController);
-
-			//await this.processMinute(custom.time);
-		//}
 	}
 }

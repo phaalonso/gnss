@@ -2,7 +2,7 @@ import { SQLite } from "../database/DAO";
 import { PrnInfoController } from "../../core/controller/PrnInfoController";
 import logger from "../../../../dataProvider/src/logger";
 import { trackPromises } from "../../utils/trackPromises";
-import { CustomData } from "../../core/processData";
+import { CustomData } from "../../core/ProcessData";
 
 export class PrnInfoSqlite extends PrnInfoController {
 	private dao: SQLite;

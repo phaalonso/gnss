@@ -46,7 +46,7 @@ async function run() {
                     time: time,
                 };
 
-                processData.processCustomData(customData);
+                processData.sendToBuffer(customData);
             }
         }
     })

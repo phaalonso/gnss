@@ -1,6 +1,6 @@
 import path from 'path';
 //import { SQLite } from './sqlite/database/DAO';
-import { CustomData, ProcessData } from './core/processData';
+import { CustomData, ProcessData } from './core/ProcessData';
 //import { PrnInfoSqlite } from './sqlite/controller/PrnInfoSqlite';
 //import { PrnIndicesSqlite } from './sqlite/controller/PrnIndicesSqlite';
 import { createReadStream } from 'fs';
@@ -51,7 +51,7 @@ async function run() {
                 };
 
                 //console.log(customData);
-                await processData.processCustomData(customData);
+                await processData.sendToBuffer(customData);
             }
         }
     });

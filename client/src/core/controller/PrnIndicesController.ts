@@ -8,7 +8,7 @@ export abstract class PrnIndicesController {
         s4: number,
         time: Date,
         prn: number
-    );
+	): any;
 
     abstract indicesLength(): Promise<number>;
 }
