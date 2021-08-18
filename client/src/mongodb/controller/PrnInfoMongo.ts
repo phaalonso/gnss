@@ -1,10 +1,10 @@
-import { PrnInfoController } from "../../core/controller/PrnInfoController";
-import { CustomData } from "../../core/processData";
+import { IPrnInfoController } from "../../core/controller/PrnInfoController";
+import { CustomData } from "../../core/ProcessData";
 import logger from "../../logger";
 import { PrnInfoModel } from "../database/prninfo";
 
-export class PrnInfoMongo extends PrnInfoController {
-    insert(
+export class PrnInfoMongo implements IPrnInfoController {
+    public async insert(
         prn: number,
         snr: number,
         azimuth: number,
@@ -41,7 +41,7 @@ export class PrnInfoMongo extends PrnInfoController {
             .match({
                 time: {
                     $lte: time,
-                    $gt: new Date(time.getTime() - 1000 * 60),
+                    $gt: new Date(time.getTime() - 60000),
                 },
             })
             .group({

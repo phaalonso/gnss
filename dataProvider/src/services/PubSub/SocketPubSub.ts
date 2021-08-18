@@ -5,7 +5,7 @@ import logger from "../../logger";
 const PORT = 2108;
 const HOST = 'localhost';
 
-export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
+export class SocketPubSub extends PubSub<net.Socket> {
 	private _socketServer: net.Server;
 
 	constructor() {
@@ -27,7 +27,7 @@ export class SocketPubSub extends PubSub<CustomSocket<net.Socket>> {
 		socket.write(message);
 	}
 
-	private handleNewConnection(socket) {
+	private handleNewConnection(socket: CustomSocket<net.Socket>) {
 		logger.log(`Nova conexão criada`);
 		socket.channels = []; // Canais aos quais o socket está conecatdo
 

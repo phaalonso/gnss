@@ -1,9 +1,9 @@
 import path from 'path';
 import { DataProvider } from '../../dataProvider/src/GnssDataStream';
 import { SQLite } from './sqlite/database/DAO';
-import { CustomData, ProcessData } from './core/processData';
 import { PrnInfoSqlite } from './sqlite/controller/PrnInfoSqlite';
 import { PrnIndicesSqlite } from './sqlite/controller/PrnIndicesSqlite';
+import { CustomData, ProcessData } from './core/ProcessData';
 
 const file = path.join(__dirname, '..', '..', 'gpsData.nmea')
 

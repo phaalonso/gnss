@@ -1,23 +1,14 @@
 import { SQLite } from "../database/DAO";
-import { PrnInfoController } from "../../core/controller/PrnInfoController";
+import { IPrnInfoController } from "../../core/controller/PrnInfoController";
 import logger from "../../../../dataProvider/src/logger";
 import { trackPromises } from "../../utils/trackPromises";
 import { CustomData } from "../../core/ProcessData";
 
-export class PrnInfoSqlite extends PrnInfoController {
-	private dao: SQLite;
+export class PrnInfoSqlite implements IPrnInfoController {
+	constructor(
+		private dao: SQLite
+	) { }
 
-	/**
-	 * @description Construtor com injeção do DAO Sqlite
-	 */
-	constructor(dao: SQLite) {
-		super();
-		this.dao = dao;
-	}
-
-	/**
-	 * @description Cria a tabela prninfo se ela não existir
-	 */
 	async createTable() {
 		logger.log('Criando prninfo');
 		const sql = `
@@ -52,7 +43,15 @@ export class PrnInfoSqlite extends PrnInfoController {
 		const flatList = [];
 
 		for (const d of data) {
-			flatList.push(d.prn, d.snr, d.azi, d.elev, d.lat, d.lon, d.time.getTime());
+			flatList.push(
+				d.prn, 
+				d.snr, 
+				d.azi, 
+				d.elev, 
+				d.lat, 
+				d.lon, 
+				d.time.getTime()
+			);
 		}
 
 		return this.dao.run(query, flatList);
@@ -64,7 +63,7 @@ export class PrnInfoSqlite extends PrnInfoController {
 	 */
 	public getGroupedPrn(time: Date): Promise<any> {
 		const promise = this.dao.all(
-			'select prn, count(snr) as total from prninfo where time between ?-60000 and ? group by prn',
+			'SELECT prn, COUNT(snr) AS total FROM prninfo WHERE time BETWEEN ?-60000 AND ? GROUP BY prn',
 			[time, time]
 		);
 
@@ -86,7 +85,7 @@ export class PrnInfoSqlite extends PrnInfoController {
 	}
 
 	async infoLength(): Promise<number> {
-		const sql = "SELECT COUNT(*) as total FROM prninfo";
+		const sql = "SELECT COUNT(*) AS total FROM prninfo";
 
 		const res: any = await this.dao.get(sql);
 

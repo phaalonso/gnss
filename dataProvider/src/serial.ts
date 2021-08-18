@@ -1,4 +1,4 @@
-import { DataProvider } from "./GnssDataStream";
+import { GPSProvider } from "./GnssDataStream";
 import logger from "./logger";
 import { SocketPubSub } from "./services/PubSub";
 
@@ -24,11 +24,11 @@ function logQtd() {
 
 async function Serial() {
 	try {
-		const dataStream = new DataProvider();
+		const gpsReceiver = new GPSProvider();
 		const socketPubSub = new SocketPubSub();
-		dataStream.setSerialInput('/dev/ttyUSB0');
+		gpsReceiver.setSerialInput('/dev/ttyUSB0');
 
-		dataStream.pipeToGps();
+		gpsReceiver.parseReceptor();
 
 		const qtd = logQtd();
 
@@ -45,7 +45,7 @@ async function Serial() {
 			logger.log(`Quantidade de dados enviadas: ${qtd.getQtd()}`);
 		}, 1000 * 60 * 30, qtd);
 
-		dataStream.on("data", async (data) => {
+		gpsReceiver.on("data", async (data) => {
 			if (data.time) {
 				time = data.time;
 				lat = data.lat;
@@ -63,7 +63,7 @@ async function Serial() {
 			}
 		});
 
-		dataStream.on('error', (err) => {
+		gpsReceiver.on('error', (err) => {
 			logger.log('Erro no GnssDataStream');
 			logger.log(err);
 		});

@@ -1,19 +1,11 @@
 import SerialPort, { parsers } from 'serialport';
 import { GPSConfig } from './config/gpsConfig';
-import { SocketPubSub } from './services/PubSub';
 import fs, { ReadStream, WriteStream } from 'fs';
 import GPS from 'gps';
 import logger from "./logger";
 
-//type Callback = (chunk: any) => void;
-
-/**
- * @description GnssDataStream is a class to help extend GPS node package, receiving
- * the NMEA data directly from the serial port
- */
-export class DataProvider extends GPS {
-	public socket?: SocketPubSub;
-
+//INFO: Talvez seria interessante possuir uma arquitetura Observer para as Streams, permitindo que exista mais de uma Stream no recebimento de dados
+export class GPSProvider extends GPS {
     protected inputStream: SerialPort | ReadStream;
     protected parserStream: parsers.Readline;
     protected writeStream?: WriteStream;
@@ -48,7 +40,7 @@ export class DataProvider extends GPS {
         });
     }
 
-    public setFileInput(fileInput: string) {
+    public readFromFile(fileInput: string) {
         if (this.inputStream) {
             throw new Error('There is already an input stream');
         }
@@ -66,7 +58,11 @@ export class DataProvider extends GPS {
         });
     }
 
-    public pipeToGps(): void {
+	/**
+	* @description método responsável por inicializar as streams utilizadas para
+	* o recebimento de dados no formato NMEA
+	*/
+    public parseReceptor(): void {
         logger.log(`Piping data to GPS`);
 
         this.parserStream = new parsers.Readline({
@@ -92,7 +88,12 @@ export class DataProvider extends GPS {
         })
     }
 
-    public pipeToFile(file: string): void {
+    /**
+     * @description as informações recebidas do receptor serão escritas em um arquivo.
+     * @param {string} file
+     * @returns {void}
+     */
+    public writeToFile(file: string): void {
         logger.log(`Piping data to file ${file}`);
         const writeStream = fs.createWriteStream(file);
 

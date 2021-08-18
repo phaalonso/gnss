@@ -5,28 +5,36 @@ import { SQLite } from "./database/DAO";
 import { Client } from "../core/Client";
 import path from 'path';
 import logger from "../logger";
+import config from "../config/ConfigProvider";
 
+async function run() {
+	const timeStamp = new Date().getTime();
+	const file = path.join(__dirname, '..', '..', '..', `sqlite_${timeStamp}.log`);
+	logger.enableWrite(file)
+	logger.log(`Logging is being saved in the file ${file}`);
+
+	const dao = new SQLite();
+	const prnInfo = new PrnInfoSqlite(dao);
+	const prnIndices = new PrnIndicesSqlite(dao)
+
+	await prnInfo.createTable();
+	await prnIndices.createTable();
+
+	const processData = new ProcessData(prnInfo, prnIndices);
+
+	const clientConfig = config.get('client');
+	//const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
+	const client = new Client(processData,  { 
+		port: clientConfig.port, 
+		host: clientConfig.host 
+	});
+
+	client.run(() => {
+		logger.log('Client is running');
+	})
+}
 
 if (require.main == module) {
-	(async () => {
-			try {
-				const file = path.join(__dirname, '..', '..', '..', `sqlite.log`);
-				logger.enableWrite(file)
-				const dao = new SQLite();
-				const prnInfo = new PrnInfoSqlite(dao);
-				await prnInfo.createTable();
-				const prnIndices = new PrnIndicesSqlite(dao)
-				await prnIndices.createTable();
-				const processData = new ProcessData(prnInfo, prnIndices);
-
-				//const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
-				const client = new Client(processData,  { port: 2108, host: 'localhost' });
-
-				client.run(() => {
-					logger.log('Client is running');
-				})
-			}  catch(err) {
-				logger.exception(err);
-			}
-	})()
+	run()
+		.catch(err => logger.exception(err));
 }
