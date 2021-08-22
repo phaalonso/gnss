@@ -1,8 +1,8 @@
 import SerialPort, { parsers } from 'serialport';
-import { GPSConfig } from './config/gpsConfig';
 import fs, { ReadStream, WriteStream } from 'fs';
 import GPS from 'gps';
 import logger from "./logger";
+import { config } from './config/gpsConfig';
 
 //INFO: Talvez seria interessante possuir uma arquitetura Observer para as Streams, permitindo que exista mais de uma Stream no recebimento de dados
 export class GPSProvider extends GPS {
@@ -19,7 +19,7 @@ export class GPSProvider extends GPS {
         super();
     }
 
-    public setSerialInput(input: string = GPSConfig.serialInput) {
+    public setSerialInput(input: string = config.serialInput): void {
         if (this.inputStream) {
             throw new Error('There is already an input stream');
         }
@@ -27,7 +27,7 @@ export class GPSProvider extends GPS {
         logger.log(`Receiving data from serial input: ${input}`);
 
         this.inputStream = new SerialPort(input, {
-            baudRate: GPSConfig.baudRate,
+            baudRate: config.gps.baudRate,
         });
 
         this.inputStream.on('error', (err: Error) => {

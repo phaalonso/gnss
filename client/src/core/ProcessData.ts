@@ -42,7 +42,7 @@ export class ProcessData {
 		this.counter = 0;
 		this.maxCounter = 60000 / this.interval;
 
-		logger.log(`Intervalo entre as inserções na base de dados: ${this.interval}`);
+		logger.log(`Intervalo entre as inserções na base de dados: ${this.interval / 1000} segundos`);
 		logger.log(`Counter máximo entre as inserções: (60000 / ${this.interval}) = ${this.maxCounter}`);
 
 

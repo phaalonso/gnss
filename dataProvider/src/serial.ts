@@ -1,3 +1,4 @@
+import { config } from "./config/gpsConfig";
 import { GPSProvider } from "./GnssDataStream";
 import logger from "./logger";
 import { SocketPubSub } from "./services/PubSub";
@@ -24,8 +25,10 @@ function logQtd() {
 
 async function Serial() {
 	try {
+		const socketConfig = config.socket;
+
 		const gpsReceiver = new GPSProvider();
-		const socketPubSub = new SocketPubSub();
+		const socketPubSub = new SocketPubSub(socketConfig);
 		gpsReceiver.setSerialInput('/dev/ttyUSB0');
 
 		gpsReceiver.parseReceptor();
@@ -43,7 +46,7 @@ async function Serial() {
 		// 1000 * 60 * 5 -> 5 minutos
 		setInterval((qtd) => {
 			logger.log(`Quantidade de dados enviadas: ${qtd.getQtd()}`);
-		}, 1000 * 60 * 30, qtd);
+		}, config.log.qtdEnvioInterval, qtd);
 
 		gpsReceiver.on("data", async (data) => {
 			if (data.time) {

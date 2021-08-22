@@ -2,13 +2,17 @@ import net from 'net';
 import { PubSub, CustomSocket } from "./PubSub";
 import logger from "../../logger";
 
-const PORT = 2108;
-const HOST = 'localhost';
+interface SocketConfig {
+	host: string;
+	port: number;
+}
 
 export class SocketPubSub extends PubSub<net.Socket> {
 	private _socketServer: net.Server;
 
-	constructor() {
+	constructor(
+		private _socketConfig: SocketConfig,
+	) {
 		super('write');
 		this.createChannel('cpu');
 		this.createChannel('ram');
@@ -18,7 +22,9 @@ export class SocketPubSub extends PubSub<net.Socket> {
 		this._socketServer.on('connection', this.handleNewConnection.bind(this));
 		this._socketServer.on('error', this.handleError.bind(this));
 
-		this._socketServer.listen(PORT, HOST, () => {
+		this._socketServer.listen({
+			...this._socketConfig
+		}, () => {
 			logger.log(`Servidor iniciado em`, this._socketServer.address());
 		});
 	}
@@ -49,7 +55,9 @@ export class SocketPubSub extends PubSub<net.Socket> {
 			logger.log('Endereço já está em uso, tentando novamente...');
 			setTimeout(() => {
 				this._socketServer.close();
-				this._socketServer.listen(PORT, HOST);
+				this._socketServer.listen({ 
+					...this._socketConfig
+				});
 			}, 1000);
 		} else {
 			logger.log(err);
