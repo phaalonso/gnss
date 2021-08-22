@@ -111,7 +111,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/ws@^7.4.2":
+"@types/ws@^7.4.7":
   version "7.4.7"
   resolved "https://registry.yarnpkg.com/@types/ws/-/ws-7.4.7.tgz#f7c390a36f7a0679aa69de2d501319f4f8d9b702"
   integrity sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==
@@ -196,9 +196,9 @@ complex.js@^2.0.15:
   integrity sha512-gDBvQU8IG139ZBQTSo2qvDFP+lANMGluM779csXOr6ny1NUtA3wkUnCFjlDNH/moAVfXtvClYt6G0zarFbtz5w==
 
 config-validation@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/config-validation/-/config-validation-0.1.2.tgz#1f4250d216cede561dbad399c85f0ddd57dc90b0"
-  integrity sha512-nTD6ILQX2l72C4wF18RDtW8y/9w2dNBzoAuLzl5eP8t71VUHB8rzUZSvBuGBxynBjNjqbT50D5u2sRH+C7uzHg==
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/config-validation/-/config-validation-0.1.4.tgz#5bdae57eecde08ce7276db1bc754361d4bc03ad7"
+  integrity sha512-CpFrFHHAlQmVIwgsYtkMnu/5NgZ0rndTpmyzpCGCO0ouNCmUCG8k7lzjRHO+TOAy26mJD3vD7N9t3sxyrVHP4g==
 
 console-control-strings@^1.0.0, console-control-strings@~1.1.0:
   version "1.1.0"

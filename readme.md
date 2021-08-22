@@ -13,7 +13,7 @@ A ferramenta é dívidida em diferentes partes, portanto cada uma possui requeri
 ## Gerenciamento de configurações
 As configurações utilizadas, estão sendo gerenciadas em arquivo do tipo JSON por uma biblioteca desenvolvida durante esse trabalho chamada [config-validation](https://www.npmjs.com/package/config-validation)
 
-### Clientes
+## Clientes
 
 - Sqlite
 	- No sqlite, os dados serão armazenados no arquivo `dados.db` presente no diretório do projeto
@@ -22,12 +22,12 @@ As configurações utilizadas, estão sendo gerenciadas em arquivo do tipo JSON 
 	- É necessário possuir a variável de ambiente `MONGOURI` presente no arquivo `.env` seguindo o exemplo mostrado no arquivo `.env.example`
 	- Executar com `ts-node ./src/mongoClient.ts`
 
-### Data Provider
+## Data Provider
 
 Para executar o data provider é necessário:
 - Possuir o módulo conectado
 - Executar com `yarn start`
 
-### Backend
+## Backend
 TODO
 

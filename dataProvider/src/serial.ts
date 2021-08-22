@@ -1,7 +1,7 @@
 import { config } from "./config/gpsConfig";
 import { GPSProvider } from "./GnssDataStream";
 import logger from "./logger";
-import { SocketPubSub } from "./services/PubSub";
+import { SocketPubSub, WebsocketPubSub } from "./services/PubSub";
 
 /**
  * Types:
@@ -28,7 +28,8 @@ async function Serial() {
 		const socketConfig = config.socket;
 
 		const gpsReceiver = new GPSProvider();
-		const socketPubSub = new SocketPubSub(socketConfig);
+		//const socketPubSub = new SocketPubSub(socketConfig);
+		const socketPubSub = new WebsocketPubSub();
 		gpsReceiver.setSerialInput('/dev/ttyUSB0');
 
 		gpsReceiver.parseReceptor();

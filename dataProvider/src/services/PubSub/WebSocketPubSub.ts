@@ -9,7 +9,7 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 	private wsS: WebSocket.Server;
 
 	constructor() {
-		super('write');
+		super('send');
 		this.createChannel('cpu');
 		this.createChannel('ram');
 
