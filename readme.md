@@ -10,6 +10,9 @@ A ferramenta é dívidida em diferentes partes, portanto cada uma possui requeri
 2. Instalar pacotes com `yarn`
 3. Iniciar o módulo desejado com `yarn start`
 
+## Gerenciamento de configurações
+As configurações utilizadas, estão sendo gerenciadas em arquivo do tipo JSON por uma biblioteca desenvolvida durante esse trabalho chamada [config-validation](https://www.npmjs.com/package/config-validation)
+
 ### Clientes
 
 - Sqlite
