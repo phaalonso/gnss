@@ -1,16 +1,16 @@
-import { PrnIndicesController } from "../../core/controller/PrnIndicesController";
+import { IPrnIndicesController } from "../../core/controller/PrnIndicesController";
 import { IPrnIndices, PrnIndicesModel } from "../database/prnindices";
 import logger from "../../logger";
 import { PrnInfoModel } from "../database/prninfo";
 
-export class PrnIndicesMongo extends PrnIndicesController {
+export class PrnIndicesMongo implements IPrnIndicesController {
     async insertProcessedData(
         dpSnr: number,
         s4: number,
         time: Date,
         prn: number
     ) {
-        const minTime = new Date(time.getTime() - 1000 * 60);
+        const minTime = new Date(time.getTime() - 60000);
 
         const [agregate] = await PrnInfoModel.aggregate([
             {

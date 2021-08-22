@@ -4,12 +4,10 @@ export type CustomSocket<T> = T & { channels?: string[] }
 
 export abstract class PubSub<T> {
     protected readonly listeningChannels = new Map<string, Set<CustomSocket<T>>>();
-    protected _methodName: string;
 
-    // Se é recomendado utilizar um constructor abstrato com Protected, pois só será utilizado por classes que implementam a atual
-    protected constructor(methodName = 'write') {
-        this._methodName = methodName;
-    }
+	protected constructor(
+		protected _methodName = 'write',
+	) { }
 
     protected abstract sendMessage(socket: T, message: string): void;
 
@@ -27,7 +25,7 @@ export abstract class PubSub<T> {
      * @param channelName
      * @param socket
      */
-    public sub(channelName: string, socket) {
+	public sub(channelName: string, socket: CustomSocket<T>) {
         const channel = this.listeningChannels.get(channelName);
 
         if (!channel || channel.has(socket))

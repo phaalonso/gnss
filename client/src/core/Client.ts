@@ -12,7 +12,6 @@ export class Client {
 	private timeout: NodeJS.Timeout;
 	private connectedChannels: Set<string>;
 	private buffer: MessageBuffer;
-	//TODO restabelecer a conexão automaticamente
 
 	constructor(processData: ProcessData, config: net.SocketConnectOpts) {
 		this.config = config;

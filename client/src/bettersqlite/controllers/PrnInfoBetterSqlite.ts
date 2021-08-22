@@ -1,22 +1,13 @@
-import { PrnInfoController } from "../../core/controller/PrnInfoController";
-import { CustomData } from "../../core/processData";
+import { IPrnInfoController } from "../../core/controller/PrnInfoController";
 import { SQLite } from "../database/DAO";
+import { CustomData } from "../../core/ProcessData";
 import logger from "../../logger";
 
-export class PrnInfoBetterSqlite extends PrnInfoController {
-	private dao: SQLite;
+export class PrnInfoBetterSqlite implements IPrnInfoController {
+	constructor(
+		private dao: SQLite,
+	) { }
 
-	/**
-	 * @description Construtor com injeção do DAO Sqlite
-	 */
-	constructor(dao: SQLite) {
-		super();
-		this.dao = dao;
-	}
-
-	/**
-	 * @description Cria a tabela prninfo se ela não existir
-	 */
 	async createTable() {
 		logger.log('Criando prninfo');
 		const sql = `

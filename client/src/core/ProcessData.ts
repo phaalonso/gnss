@@ -1,8 +1,9 @@
 import { std, mean } from "mathjs";
 import { Satellite } from "gps";
 import logger from "../logger";
-import { PrnInfoController } from "./controller/PrnInfoController";
-import { PrnIndicesController } from "./controller/PrnIndicesController";
+import { IPrnInfoController } from "./controller/PrnInfoController";
+import { IPrnIndicesController } from "./controller/PrnIndicesController";
+import config from "../config/ConfigProvider";
 
 export interface CustomData {
 	prn: number;
@@ -21,27 +22,41 @@ const MIN_QTDE = (60 / TAXA) * DISP;
 export class ProcessData {
 	private timeController: number;
 	private buffer: CustomData[];
-	private interval = 15000;
-	private maxCounter = 60000 / this.interval;
-	private counter = 0;
 
-	private logInterval = 1800000; // 30 minutos
+	private interval: number;
+	private counter: number;
+	private maxCounter: number;
+
+	private logInterval: number;
 
 	//TODO: escolher controllers de acordo com variável do ambiente a qual indica a base de dados
 	constructor(
-		private prnInfo: PrnInfoController, 
-		private prnIndices: PrnIndicesController
+		private prnInfo: IPrnInfoController, 
+		private prnIndices: IPrnIndicesController
 	) {
+		logger.log('Iniciando process data');
+		const processConfig = config.get('process');
+		this.interval = processConfig.interval;
+		this.logInterval = processConfig.logInterval;
+
+		this.counter = 0;
+		this.maxCounter = 60000 / this.interval;
+
+		logger.log(`Intervalo entre as inserções na base de dados: ${this.interval / 1000} segundos`);
+		logger.log(`Counter máximo entre as inserções: (60000 / ${this.interval}) = ${this.maxCounter}`);
+
 
 		this.buffer = [];
 
 		setInterval(this.logDatabaseSize.bind(this), this.logInterval);
-
-		//TODO: Testar se está funcionando
 		setInterval(this.processInterval.bind(this), this.interval);
+		logger.log('Intervalos setados');
 	}
 
 	//TODO: Talvez seja interssante realizar os loggins em um serviço separado
+	/**
+	* @description realiza o log do tamanho das bases de dados.
+	*/
 	private async logDatabaseSize() {
 		const prninfoLength = await this.prnInfo.infoLength();
 		const prnindicesLength = await this.prnIndices.indicesLength();
@@ -94,13 +109,9 @@ export class ProcessData {
 			await this.prnInfo.insert(satelite.prn, satelite.snr, satelite.azimuth, satelite.elevation, lat, lon, time);
 		}
 
-		if (
-			time.getSeconds() == 0 &&
-			time.getMinutes() != this.timeController
-		) {
+		if (time.getSeconds() == 0 && time.getMinutes() != this.timeController) {
 			process.stdout.write(`${time} Salvando prnindices\n`);
 			this.timeController= time.getMinutes();
-
 			await this.processMinute(time);
 		}
 	}

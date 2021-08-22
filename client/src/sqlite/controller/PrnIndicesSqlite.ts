@@ -1,15 +1,12 @@
 import { SQLite } from "../database/DAO";
-import { PrnIndicesController } from "../../core/controller/PrnIndicesController";
+import { IPrnIndicesController } from "../../core/controller/PrnIndicesController";
 import logger from "../../logger";
 //import { trackPromises } from "../../utils/trackPromises";
 
-export class PrnIndicesSqlite extends PrnIndicesController {
-	private dao: SQLite;
-
-	constructor(dao: SQLite) {
-		super();
-		this.dao = dao;
-	}
+export class PrnIndicesSqlite implements IPrnIndicesController {
+	constructor(
+		private dao: SQLite,
+	) {}
 
 	public async createTable() {
 		logger.log('Criando prnindices');

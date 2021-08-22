@@ -3,7 +3,7 @@ import logger from "../../logger";
 
 export class SQLite {
 	private readonly filePath: string;
-	public con: TypeDB;
+	public readonly con: TypeDB;
 
 	constructor(dbFilePath?: string) {
 		this.filePath = dbFilePath || 'dados.db';
