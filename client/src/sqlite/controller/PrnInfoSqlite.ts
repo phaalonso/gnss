@@ -50,7 +50,7 @@ export class PrnInfoSqlite implements IPrnInfoController {
 				d.elev, 
 				d.lat, 
 				d.lon, 
-				d.time.getTime()
+				d.time.toISOString()
 			);
 		}
 
