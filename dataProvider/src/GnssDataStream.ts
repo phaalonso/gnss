@@ -34,7 +34,10 @@ export class GPSProvider extends GPS {
             if (err.message.includes('No such file or directory')) {
                 logger.log(`Cant find input file ${input}`);
                 process.exit(1);
-            }
+            } else if (err.message.includes('Permission denied')) {
+				logger.log('Insufficient permissions to access the stream')
+				process.exit(2);
+			}
 
             logger.exception(err, 'Serial port')
         });

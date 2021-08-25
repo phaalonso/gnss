@@ -63,14 +63,4 @@ export class SQLite {
 			}
 		});
 	}
-
-	public async backupData() {
-		try {
-			console.log('Iniciando backup');
-			await this.con.backup("database.backup.db");
-			console.log('Backup realizado com sucesso');
-		} catch (err) {
-			console.error(err);
-		}
-	}
 }

@@ -118,7 +118,7 @@ export class ProcessData {
 
 	public async processMinute(time: Date) {
 		try {
-			console.log(time.getTime())
+			logger.log(`Salvando prnindices relacioando a ${time.toISOString()}!`)
 			//logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
 
 			const rows = await this.prnInfo.getGroupedPrn(time);

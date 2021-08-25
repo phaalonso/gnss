@@ -6,6 +6,7 @@ import path from "path";
 import logger from "../logger";
 import { ProcessData } from "../core/ProcessData";
 import config from "../config/ConfigProvider";
+import { WSClient } from "../core/WSClient";
 
 if (require.main == module) {
 	(async () => {
@@ -19,16 +20,20 @@ if (require.main == module) {
 			await prnIndices.createTable();
 			const processData = new ProcessData(prnInfo, prnIndices);
 
+			/*
 			const clientConfig = config.get('client');
-			//const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
 			const client = new Client(processData,  { 
 				port: clientConfig.port, 
 				host: clientConfig.host 
-			});
+			});*/
+			
+			const client = new WSClient(processData);
 
-			client.run(() => {
-				logger.log("Client is running");
-			});
+			//client.run(() => {
+				//logger.log("Client is running");
+			//});
+			
+			client.run();
 		} catch (err) {
 			logger.exception(err);
 		}
