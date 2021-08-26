@@ -2,6 +2,7 @@ import { SQLite } from "./database/DAO";
 import path from 'path';
 import fs from 'fs';
 import logger from "../logger";
+import { FileInfo, UploadService } from "./UploadService";
 
 interface IBackupConfig {
 	folder: string;
@@ -10,12 +11,13 @@ interface IBackupConfig {
 }
 
 export class BackupService {
+	private timeout: NodeJS.Timeout;
+
 	constructor(
 		private dao: SQLite,
 		private config: IBackupConfig,
-	) {}
-
-	private timeout: NodeJS.Timeout;
+		private upload: UploadService,
+	) { } 
 
 	public async backup(date: Date) {
 		try {
@@ -40,11 +42,28 @@ export class BackupService {
 
 	public async sendToServer() {
 		try {
+			if (!this.upload.isConnected()) {
+				console.log('Connecting')
+				await this.upload.connect();
+			}
+
 			const listFile = await fs.promises.readdir(this.config.folder);
 
 			for (const file of listFile) {
-				//Uplaod to server
+				const info: FileInfo = {
+					path: path.join(this.config.folder, file),
+					fileName: file,
+				}
+
+				logger.log(`Uploading the file to remote storage`);
+				await this.upload.uploadFile(info);
+
+				fs.rm(info.path, () => {
+					logger.log(`Removing the file ${file} from 'local storage'`);
+				});
 			}
+
+			this.upload.disconnect();
 		} catch (err) {
 			logger.exception(err, 'sendToServer');
 		}
@@ -64,7 +83,7 @@ export class BackupService {
 	}
 
 	public async stopAutoBackup() {
-		if (this.timeout) {
+		if (this.hasAutoBackup()) {
 			clearInterval(this.timeout);
 		} else {
 			throw Error("Auto backup is not initialized");

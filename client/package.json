@@ -12,9 +12,11 @@
     "bettersqlite": "ts-node ./src/bettersqlite/sqliteClient.ts"
   },
   "dependencies": {
+    "@types/ftp": "^0.3.32",
     "better-sqlite3": "^7.4.1",
     "config-validation": "^0.1.2",
     "dotenv": "^10.0.0",
+    "ftp": "^0.3.10",
     "gps": "^0.6.0",
     "mathjs": "^9.4.1",
     "mongoose": "^5.12.12",
