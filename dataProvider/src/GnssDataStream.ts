@@ -19,7 +19,7 @@ export class GPSProvider extends GPS {
         super();
     }
 
-    public setSerialInput(input: string = config.serialInput): void {
+    public serialInput(input: string = config.serialInput): void {
         if (this.inputStream) {
             throw new Error('There is already an input stream');
         }
@@ -30,16 +30,9 @@ export class GPSProvider extends GPS {
             baudRate: config.gps.baudRate,
         });
 
-        this.inputStream.on('error', (err: Error) => {
-            if (err.message.includes('No such file or directory')) {
-                logger.log(`Cant find input file ${input}`);
-                process.exit(1);
-            } else if (err.message.includes('Permission denied')) {
-				logger.log('Insufficient permissions to access the stream')
-				process.exit(2);
-			}
-
-            logger.exception(err, 'Serial port')
+        this.inputStream.on('error', (error) => {
+            console.error(error);
+            // process.exit(1);
         });
     }
 
@@ -54,10 +47,12 @@ export class GPSProvider extends GPS {
 
         this.inputStream.on('error', err => {
             logger.exception(err, 'Serial port')
+            process.exit(1);
         });
 
         this.inputStream.on('end', () => {
-            process.exit(0);
+            logger.log('End of the file');
+            process.exit(1);
         });
     }
 
@@ -65,7 +60,7 @@ export class GPSProvider extends GPS {
 	* @description método responsável por inicializar as streams utilizadas para
 	* o recebimento de dados no formato NMEA
 	*/
-    public parseReceptor(): void {
+    public parse(): void {
         logger.log(`Piping data to GPS`);
 
         this.parserStream = new parsers.Readline({
@@ -77,18 +72,9 @@ export class GPSProvider extends GPS {
         });
 
         this.inputStream.pipe(this.parserStream);
-
-        this.parserStream.on('data', data => {
-            try {
-                this.update(data);
-            } catch (err) {
-                logger.exception(err.message);
-            }
+        this.parserStream.on('data', (data) => {
+            this.update(data);
         });
-
-        this.parserStream.on('error', err => {
-            logger.exception(err, 'Parser');
-        })
     }
 
     /**
@@ -104,7 +90,7 @@ export class GPSProvider extends GPS {
     }
 
     public close(): void {
-        this.writeStream?.close();
         this.inputStream?.close();
+        this.writeStream?.close();
     }
 }

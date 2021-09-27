@@ -23,16 +23,13 @@ function logQtd() {
 	}
 }
 
-async function Serial() {
+async function start() {
 	try {
-		const socketConfig = config.socket;
-
 		const gpsReceiver = new GPSProvider();
-		//const socketPubSub = new SocketPubSub(socketConfig);
-		const socketPubSub = new WebsocketPubSub();
-		gpsReceiver.setSerialInput('/dev/ttyUSB0');
 
-		gpsReceiver.parseReceptor();
+		const socketConf = config.socket;
+		// const socketPubSub = new SocketPubSub(config.socket);
+		const socketPubSub = new WebsocketPubSub();
 
 		const qtd = logQtd();
 
@@ -48,6 +45,9 @@ async function Serial() {
 		setInterval((qtd) => {
 			logger.log(`Quantidade de dados enviadas: ${qtd.getQtd()}`);
 		}, config.log.qtdEnvioInterval, qtd);
+
+		gpsReceiver.serialInput('/dev/ttyUSB0');
+		gpsReceiver.parse();
 
 		gpsReceiver.on("data", async (data) => {
 			if (data.time) {
@@ -77,4 +77,4 @@ async function Serial() {
 	}
 }
 
-Serial();
+start();

@@ -11,7 +11,7 @@ if (nmea) {
     const filePath = path.join(__dirname, '..', '..', 'gpsData.nmea');
 
     logger.log(`Saving data into ${filePath}`);
-    stream.setSerialInput('/dev/ttyUSB0');
+    stream.serialInput('/dev/ttyUSB0');
 
     stream.writeToFile(filePath);
 } else {
@@ -20,9 +20,9 @@ if (nmea) {
 
     logger.log(`Saving data into ${filePath}`);
 
-    stream.setSerialInput('/dev/ttyUSB0');
+    stream.serialInput('/dev/ttyUSB0');
 
-    stream.parseReceptor();
+    stream.parse();
 
     let time = new Date();
     let lat: number;
