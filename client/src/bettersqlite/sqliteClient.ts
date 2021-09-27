@@ -1,12 +1,11 @@
 import { SQLite } from "./database/DAO";
-import { Client } from "../core/Client";
 import { PrnInfoBetterSqlite } from "./controllers/PrnInfoBetterSqlite";
 import { PrnIndicesBetterSqlite } from "./controllers/PrnIndicesBetterSqlite";
 import path from "path";
 import logger from "../logger";
-import { ProcessData } from "../core/ProcessData";
+import { ProcessData } from "../ProcessData";
 import config from "../config/ConfigProvider";
-import { WSClient } from "../core/WSClient";
+import { WebSocketClient } from "../clients/WebSocketClient";
 
 if (require.main == module) {
 	(async () => {
@@ -18,6 +17,7 @@ if (require.main == module) {
 			await prnInfo.createTable();
 			const prnIndices = new PrnIndicesBetterSqlite(dao);
 			await prnIndices.createTable();
+
 			const processData = new ProcessData(prnInfo, prnIndices);
 
 			/*
@@ -27,7 +27,7 @@ if (require.main == module) {
 				host: clientConfig.host 
 			});*/
 			
-			const client = new WSClient(processData);
+			const client = new WebSocketClient(processData);
 
 			//client.run(() => {
 				//logger.log("Client is running");

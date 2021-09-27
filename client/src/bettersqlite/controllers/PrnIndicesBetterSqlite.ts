@@ -1,4 +1,4 @@
-import { IPrnIndicesController } from "../../core/controller/PrnIndicesController";
+import { IPrnIndicesController } from "../../controller/IPrnIndicesController";
 import logger from "../../logger";
 import { SQLite } from "../database/DAO";
 

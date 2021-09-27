@@ -1,4 +1,4 @@
-import { IPrnIndicesController } from "../../core/controller/PrnIndicesController";
+import { IPrnIndicesController } from "../../controller/IPrnIndicesController";
 import { IPrnIndices, PrnIndicesModel } from "../database/prnindices";
 import logger from "../../logger";
 import { PrnInfoModel } from "../database/prninfo";

@@ -1,11 +1,9 @@
 import { PrnIndicesSqlite } from "./controller/PrnIndicesSqlite";
 import { PrnInfoSqlite } from "./controller/PrnInfoSqlite";
-import { ProcessData } from "../core/ProcessData";
 import { SQLite } from "./database/DAO";
-import { Client } from "../core/Client";
 import path from 'path';
 import logger from "../logger";
-import config from "../config/ConfigProvider";
+import { Application } from "../Application";
 
 async function run() {
 	const timeStamp = new Date().getTime();
@@ -20,14 +18,10 @@ async function run() {
 	await prnInfo.createTable();
 	await prnIndices.createTable();
 
-	const processData = new ProcessData(prnInfo, prnIndices);
-
-	const clientConfig = config.get('client');
-	//const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
-	const client = new Client(processData,  { 
-		port: clientConfig.port, 
-		host: clientConfig.host 
-	});
+	const client = new Application(
+		prnInfo,
+		prnIndices
+	);
 
 	client.run(() => {
 		logger.log('Client is running');

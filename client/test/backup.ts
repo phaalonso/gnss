@@ -8,9 +8,9 @@ async function backupTest() {
 	const ftp = new UploadService({
 		host: 'localhost',
 		port: 21,
-		user: '',
-		password: '',
-		backupPath: '~/backup',
+		user: 'teste',
+		password: 'teste',
+		backupPath: '~/backup/',
 	});
 
 	const backupService = new BackupService(dao, { 

@@ -1,10 +1,10 @@
 import { PrnIndicesSqlite } from "./controller/PrnIndicesSqlite";
 import { PrnInfoSqlite } from "./controller/PrnInfoSqlite";
-import { ProcessData } from "../core/ProcessData";
+import { ProcessData } from "../ProcessData";
 import { SQLite } from "./database/DAO";
 import path from 'path';
 import logger from "../logger";
-import { WSClient } from "../core/WSClient";
+import { WebSocketClient } from "../clients/WebSocketClient";
 
 async function run() {
 	const timeStamp = new Date().getTime();
@@ -23,7 +23,7 @@ async function run() {
 
 	//const clientConfig = config.get('client');
 	//const client = new Client(processData,  { port: 3000, host: '192.168.3.23' });
-	const client = new WSClient(processData);
+	const client = new WebSocketClient(processData);
 
 	client.run();
 }

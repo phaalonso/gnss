@@ -1,7 +1,7 @@
-import { IPrnInfoController } from "../../core/controller/PrnInfoController";
+import { IPrnInfoController } from "../../controller/IPrnInfoController";
 import { SQLite } from "../database/DAO";
-import { CustomData } from "../../core/ProcessData";
 import logger from "../../logger";
+import { SignalMetrics } from "../../model/SignalMetrics";
 
 export class PrnInfoBetterSqlite implements IPrnInfoController {
 	constructor(
@@ -24,25 +24,35 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 
 		return this.dao.run(sql);
 	}
+	
+	/**
+	 * @description constrói parte da mensagem de inserção, para cada valor recebido 
+	 * @param data - Métricas do sinal
+	 * @returns values com o formato necessário para inserção
+	 */
+	mapData(data: SignalMetrics[]) {
+		return data.map(cd => (`(${cd.prn},${cd.snr},${cd.azi},${cd.elev},${cd.lat},${cd.lon},${cd.time.getTime()})`)).join(',');
+	}
 
-	insert(prn: number, snr: number, azimuth: number, elevation: number, lat: number, lon: number, time: Date) {
+	insert(metric: SignalMetrics) {
+		const placeholder = this.mapData([metric]);
 		return this.dao.run(
-			'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES(?,?,?,?,?,?,?)',
-			[prn, snr, azimuth, elevation, lat, lon, time.getTime()]
+			'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES ' + placeholder,
 		);
 	}
 
-	insertMany(data: CustomData[]) {
-		const placeholder = data.map(cd => (`(${cd.prn},${cd.snr},${cd.azi},${cd.elev},${cd.lat},${cd.lon},${cd.time.getTime()})`)).join(',');
-		const query = 'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES ' + placeholder;
-		return this.dao.run(query);
+	insertMany(data: SignalMetrics[]) {
+		const placeholder = this.mapData(data);
+		return this.dao.run(
+			'INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES ' + placeholder,
+		);
 	}
 
 	/**
 	 * @description Retorna dados inseridos em prninfo agrupados em um intervalo de um minuto relativo ao parametro time
 	 * @param time tempo sera relativo a esse parametro
 	 */
-	public getGroupedPrn(time: Date): Promise<any> {
+	public groupByPrn(time: Date): Promise<any> {
 		return this.dao.all(
 			'select prn, count(snr) as total from prninfo where time between ?-60000 and ? group by prn',
 			[time.getTime(), time.getTime()]
@@ -54,14 +64,14 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 	 * @param time tempo sera relativo a esse parametro
 	 * @param prn informa de qual prn será realizado a filtragem
 	 */
-	public getByPrn(time: Date, prn: number): Promise<any> {
+	public findByPrn(time: Date, prn: number): Promise<any> {
 		return this.dao.all(
 			'SELECT prn, snr FROM prninfo WHERE time BETWEEN ?-60000 AND ? AND prn = ?',
 			[time.getTime(), time.getTime(), prn]
 		);
 	}
 
-	async infoLength(): Promise<number> {
+	async countRows(): Promise<number> {
 		const sql = "SELECT COUNT(*) as total FROM prninfo";
 
 		const res: any = await this.dao.get(sql);

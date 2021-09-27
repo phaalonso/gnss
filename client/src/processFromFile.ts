@@ -1,16 +1,14 @@
 import path from 'path';
-import { DataProvider } from '../../dataProvider/src/GnssDataStream';
+import { GPSProvider } from '../../dataProvider/src/GnssDataStream';
 import { SQLite } from './sqlite/database/DAO';
 import { PrnInfoSqlite } from './sqlite/controller/PrnInfoSqlite';
 import { PrnIndicesSqlite } from './sqlite/controller/PrnIndicesSqlite';
-import { CustomData, ProcessData } from './core/ProcessData';
+import { ProcessData } from './ProcessData';
+import { SignalMetrics } from './model/SignalMetrics';
 
 const file = path.join(__dirname, '..', '..', 'gpsData.nmea')
 
-const dataStream = new DataProvider();
-
-dataStream.setFileInput(file);
-dataStream.pipeToGps();
+const dataStream = new GPSProvider();
 
 let time = new Date();
 let lat: number;
@@ -36,7 +34,7 @@ async function run() {
         } else {
             console.log(data);
             for (const satelite of data.satellites) {
-                const customData: CustomData = {
+                const customData: SignalMetrics = {
                     prn: satelite.prn,
                     snr: satelite.snr,
                     azi: satelite.azimuth,
@@ -50,6 +48,9 @@ async function run() {
             }
         }
     })
+
+    dataStream.readFromFile(file);
+    dataStream.parse();
 }
 
 run();

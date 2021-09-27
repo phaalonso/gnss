@@ -9,7 +9,8 @@
   "scripts": {
     "mongo": "ts-node ./src/mongodb/mongoClient.ts",
     "sqlite": "ts-node ./src/sqlite/sqliteClient.ts",
-    "bettersqlite": "ts-node ./src/bettersqlite/sqliteClient.ts"
+    "bettersqlite": "ts-node ./src/bettersqlite/sqliteClient.ts",
+    "start": "ts-node src/index.ts"
   },
   "dependencies": {
     "@types/ftp": "^0.3.32",

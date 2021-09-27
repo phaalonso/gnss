@@ -1,14 +1,6 @@
 import { Document, Model } from "mongoose";
+import { SignalMetrics } from "../../../model/SignalMetrics";
 
-export interface IPrnInfo {
-	prn: number,
-	snr: number,
-	azi: number,
-	elev: number,
-	lat: number,
-	long: number,
-	time: Date
-}
-
-export interface IPrnInfoDocument extends IPrnInfo, Document {}
+// Possue o mesmo formato que SignalMetrics, então posso simplesmente passa-lo aqui
+export interface IPrnInfoDocument extends SignalMetrics, Document {}
 export interface IPrnInfoModel extends Model<IPrnInfoDocument> {}

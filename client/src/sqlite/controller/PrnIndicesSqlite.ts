@@ -1,5 +1,5 @@
 import { SQLite } from "../database/DAO";
-import { IPrnIndicesController } from "../../core/controller/PrnIndicesController";
+import { IPrnIndicesController } from "../../controller/IPrnIndicesController";
 import logger from "../../logger";
 //import { trackPromises } from "../../utils/trackPromises";
 

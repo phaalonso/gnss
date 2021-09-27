@@ -1,33 +1,17 @@
-import { IPrnInfoController } from "../../core/controller/PrnInfoController";
-import { CustomData } from "../../core/ProcessData";
+import { IPrnInfoController } from "../../controller/IPrnInfoController";
+import { SignalMetrics } from "../../model/SignalMetrics";
 import logger from "../../logger";
 import { PrnInfoModel } from "../database/prninfo";
 
 export class PrnInfoMongo implements IPrnInfoController {
-    public async insert(
-        prn: number,
-        snr: number,
-        azimuth: number,
-        elevation: number,
-        lat: number,
-        lon: number,
-        time: Date
-    ) {
-        return new PrnInfoModel({
-            prn,
-            snr,
-            azi: azimuth,
-            elev: elevation,
-            lat,
-            long: lon,
-            time,
-        }).save()
+    public async insert(metric: SignalMetrics) {
+        return new PrnInfoModel(metric).save()
         .catch(err => {
             logger.exception(err, 'On insert prninfo mongo');
         });
     }
 
-    insertMany(data: CustomData[]) {
+    insertMany(data: SignalMetrics[]) {
         return PrnInfoModel.insertMany(data);
     }
 
@@ -35,7 +19,7 @@ export class PrnInfoMongo implements IPrnInfoController {
      * @description Retorna dados inseridos em prninfo agrupados em um intervalo de um minuto relativo ao parametro time
      * @param time tempo sera relativo a esse parametro
      */
-    public getGroupedPrn(time: Date) {
+    public groupByPrn(time: Date) {
         //console.log('Get gropuped prn');
         return PrnInfoModel.aggregate()
             .match({
@@ -61,7 +45,7 @@ export class PrnInfoMongo implements IPrnInfoController {
      * @param time tempo sera relativo a esse parametro
      * @param prn informa de qual prn será realizado a filtragem
      */
-    public getByPrn(time: Date, prn: number) {
+    public findByPrn(time: Date, prn: number) {
         //return this.dao.all(
         //'SELECT prn, snr FROM prninfo WHERE time BETWEEN ?-60000 AND ? AND prn = ?',
         //[time, time, prn]
@@ -75,7 +59,7 @@ export class PrnInfoMongo implements IPrnInfoController {
         });
     }
 
-    infoLength(): Promise<number> {
+    countRows(): Promise<number> {
         return new Promise((res, rej) => {
             PrnInfoModel.countDocuments()
                 .then((count) => res(count))

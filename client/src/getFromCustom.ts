@@ -1,6 +1,6 @@
 import path from 'path';
 //import { SQLite } from './sqlite/database/DAO';
-import { CustomData, ProcessData } from './core/ProcessData';
+import { ProcessData } from './ProcessData';
 //import { PrnInfoSqlite } from './sqlite/controller/PrnInfoSqlite';
 //import { PrnIndicesSqlite } from './sqlite/controller/PrnIndicesSqlite';
 import { createReadStream } from 'fs';
@@ -8,6 +8,8 @@ import logger from '../../dataProvider/src/logger';
 import { PrnInfoMongo } from './mongodb/controller/PrnInfoMongo';
 import { PrnIndicesMongo } from './mongodb/controller/PrnIndicesMongo';
 import { connect } from './mongodb/database/connection';
+import { SignalMetrics } from './model/SignalMetrics';
+import { MessageHandler } from './clients/MessageHandler';
 
 const file = path.join(__dirname, '..', '..', 'gpsData.custom');
 
@@ -24,37 +26,14 @@ async function run() {
     const processData = new ProcessData(prnInfo, prnIndices);
     const stream = createReadStream(file);
 
+    const messageHandler = new MessageHandler(processData, '\n');
+
     stream.on('open', () => {
         logger.log('Stream open');
     })
 
-    stream.on('data', async data => {
-        // console.log(data.toString());
-        const message = data.toString().split('\n');
-
-        for (const msg of message) {
-            const matchCustom = msg.match(/sat_(.*)_(.*)_(.*)_(.*)_(.*)_(.*)_(.*)/);
-            // console.log(matchCustom);
-
-            if (matchCustom && matchCustom[1] && matchCustom[2] && matchCustom[3] && matchCustom[4] && matchCustom[5] && matchCustom[6] && matchCustom[7]) {
-                console.log(matchCustom);
-				const time = new Date(parseInt(matchCustom[7]));
-				console.log(time);
-                const customData: CustomData = {
-                    prn: parseInt(matchCustom[1]),
-                    snr: parseFloat(matchCustom[2]) || null,
-                    azi: parseFloat(matchCustom[3]) || null,
-                    elev: parseFloat(matchCustom[4]) || null,
-                    lat: parseFloat(matchCustom[5]),
-                    lon: parseFloat(matchCustom[6]),
-                    time,
-                };
-
-                //console.log(customData);
-                await processData.sendToBuffer(customData);
-            }
-        }
-    });
+    //TODO: Verificar se messageHandler funciona neste caso
+    stream.on('data', messageHandler.handle);
 
     stream.on('close', () => {
         process.exit(0);

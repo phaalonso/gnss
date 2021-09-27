@@ -59,7 +59,7 @@ export class BackupService {
 				await this.upload.uploadFile(info);
 
 				fs.rm(info.path, () => {
-					logger.log(`Removing the file ${file} from 'local storage'`);
+					logger.log(`Removing the file ${file} from local storage`);
 				});
 			}
 

@@ -1,0 +1,83 @@
+import logger from "../logger";
+
+type MessageCB = (data: any) => void;
+type ErrorCB = (error: any) => void;
+type EmptyCB = () => void;
+
+export interface IClient {
+    subscribe(channel: string): void;
+    onMessage(cb: MessageCB): void;
+    onError(cb: ErrorCB):void;
+    onEnd(cb: EmptyCB):void;
+    start(): Promise<any>;
+}
+
+export abstract class Client implements IClient {
+    private connectedChannels = new Set<string>();
+    protected connected = false;
+    protected messageCB: MessageCB;
+    protected errorCB: ErrorCB;
+    protected endCB: EmptyCB;
+
+    subscribe(channel: string) {
+        if (!this.connectedChannels.has(channel)) {
+            this.connectedChannels.add(channel);
+
+            if (this.connected) {
+                logger.log(`Sending subscribe message to channel ${channel}`);
+                this._sendSubscribeMessage(channel);
+            }
+        }
+    }
+
+    protected abstract _sendMessage(message: string): void;
+
+    protected abstract _sendSubscribeMessage(channel: string): void;
+
+    onMessage(cb: MessageCB) {
+        this.messageCB = cb;
+    }
+
+    onError(cb: ErrorCB) {
+        this.errorCB = cb;
+    }
+
+    onEnd(cb: EmptyCB) {
+        this.endCB = cb;
+    }
+
+    protected abstract _connect(cb: (...args) => void);
+
+    async start() {
+        return new Promise((resolve, reject) => {
+            if (!this.errorCB) {
+                this.errorCB = (err) => {
+                    console.error(err);
+                    process.exit(1);
+                }
+            }
+
+            if (!this.messageCB)  {
+                throw Error('Message callback is undefined');
+            }
+
+            if (!this.endCB) {
+                this.endCB = () => {
+                    logger.log('End');
+                    process.exit(1);
+                }
+            }
+
+            this._connect(() => {
+                logger.log('Connected');
+
+                this.connectedChannels.forEach(value => {
+                    logger.log(`Subscribing to ${value}`);
+                    this._sendSubscribeMessage(value);
+                })
+
+                return resolve(undefined);
+            });
+        })
+    }
+}

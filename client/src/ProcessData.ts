@@ -1,19 +1,10 @@
 import { std, mean } from "mathjs";
 import { Satellite } from "gps";
-import logger from "../logger";
-import { IPrnInfoController } from "./controller/PrnInfoController";
-import { IPrnIndicesController } from "./controller/PrnIndicesController";
-import config from "../config/ConfigProvider";
-
-export interface CustomData {
-	prn: number;
-	snr: number;
-	azi: number;
-	elev: number;
-	lat: number;
-	lon: number;
-	time: Date;
-}
+import logger from "./logger";
+import { IPrnInfoController } from "./controller/IPrnInfoController";
+import { IPrnIndicesController } from "./controller/IPrnIndicesController";
+import config from "./config/ConfigProvider";
+import { SignalMetrics } from "./model/SignalMetrics";
 
 const TAXA = 0.1;
 const DISP = 0.5;
@@ -21,7 +12,7 @@ const MIN_QTDE = (60 / TAXA) * DISP;
 
 export class ProcessData {
 	private timeController: number;
-	private buffer: CustomData[];
+	private buffer: SignalMetrics[];
 
 	private interval: number;
 	private counter: number;
@@ -29,66 +20,74 @@ export class ProcessData {
 
 	private logInterval: number;
 
-	//TODO: escolher controllers de acordo com variável do ambiente a qual indica a base de dados
 	constructor(
-		private prnInfo: IPrnInfoController, 
-		private prnIndices: IPrnIndicesController
+		private prnInfoController: IPrnInfoController,
+		private prnIndicesController: IPrnIndicesController
 	) {
-		logger.log('Iniciando process data');
 		const processConfig = config.get('process');
+
+		logger.log('Iniciando ProcessData');
+
 		this.interval = processConfig.interval;
 		this.logInterval = processConfig.logInterval;
 
+		this.buffer = [];
 		this.counter = 0;
 		this.maxCounter = 60000 / this.interval;
 
 		logger.log(`Intervalo entre as inserções na base de dados: ${this.interval / 1000} segundos`);
 		logger.log(`Counter máximo entre as inserções: (60000 / ${this.interval}) = ${this.maxCounter}`);
 
-
-		this.buffer = [];
-
-		setInterval(this.logDatabaseSize.bind(this), this.logInterval);
-		setInterval(this.processInterval.bind(this), this.interval);
-		logger.log('Intervalos setados');
-	}
-
-	//TODO: Talvez seja interssante realizar os loggins em um serviço separado
-	/**
-	* @description realiza o log do tamanho das bases de dados.
-	*/
-	private async logDatabaseSize() {
-		const prninfoLength = await this.prnInfo.infoLength();
-		const prnindicesLength = await this.prnIndices.indicesLength();
-
-		// logger.log(`Quantidade de  dados ${qtd}`);
-		logger.log(`Prninfo: ${prninfoLength}`);
-		logger.log(`Prnindices: ${prnindicesLength}`);
+		this.setupDBSizeLog(this.logInterval);
+		this.setupProcess(this.interval);
 	}
 
 	/**
-	 * @description Método responsável por realizar o processamento dos dados após a passagem de determinado intervalo de tempo
+	 * @param interval interval in ms to log the database size
 	 */
-	private async processInterval() {
-		if (this.buffer.length == 0)	{
-			logger.log('Buffer vazio');
-			return;
+	private setupDBSizeLog(interval: number): NodeJS.Timeout {
+		async function logDbSize() {
+			const prninfoLength = await this.prnInfoController.countRows();
+			const prnindicesLength = await this.prnIndicesController.indicesLength();
+
+			// logger.log(`Quantidade de  dados ${qtd}`);
+			logger.log(`Prninfo: ${prninfoLength}`);
+			logger.log(`Prnindices: ${prnindicesLength}`);
 		}
 
-		const minute = this.buffer[this.buffer.length -1].time;
+		return setInterval(
+			logDbSize.bind(this), 
+			interval
+		);
+	}
 
-		const clone = [...this.buffer];
+	private setupProcess(interval: number): NodeJS.Timeout {
+		async function processInterval() {
+			if (this.buffer.length == 0) {
+				logger.log('Buffer vazio');
+				return;
+			}
 
-		await this.prnInfo.insertMany(clone);
-		logger.log(`Prninfo: inserted ${clone.length} data`);
-		this.buffer = [];
-		this.counter++;
+			const minute = this.buffer[this.buffer.length - 1].time;
 
-		if (this.counter >= this.maxCounter) {
-			//console.log(this.counter);
-			this.counter = 0;
-			this.processMinute(minute);
+			const clone = [...this.buffer];
+
+			await this.prnInfoController.insertMany(clone);
+			logger.log(`Prninfo: inserted ${clone.length} data`);
+			this.buffer = [];
+			this.counter++;
+
+			if (this.counter >= this.maxCounter) {
+				//console.log(this.counter);
+				this.counter = 0;
+				this.processMinute(minute);
+			}
 		}
+
+		return setInterval(
+			processInterval.bind(this),
+			interval
+		);
 	}
 
 	/**
@@ -106,22 +105,33 @@ export class ProcessData {
 		}
 
 		for (const satelite of satellite) {
-			await this.prnInfo.insert(satelite.prn, satelite.snr, satelite.azimuth, satelite.elevation, lat, lon, time);
+			await this.prnInfoController.insert({
+				prn: satelite.prn,
+				snr: satelite.snr, 
+				azi: satelite.azimuth, 
+				elev: satelite.elevation, 
+				lat, 
+				lon, 
+				time
+			});
 		}
 
-		if (time.getSeconds() == 0 && time.getMinutes() != this.timeController) {
-			process.stdout.write(`${time} Salvando prnindices\n`);
-			this.timeController= time.getMinutes();
+		if (this.passouUmMinuto(time)) {
+			logger.log(`${time} Salvando prnindices\n`);
+			this.timeController = time.getMinutes();
 			await this.processMinute(time);
 		}
+	}
+
+	public passouUmMinuto(time: Date): boolean {
+		return time.getSeconds() == 0 && time.getMinutes() != this.timeController;
 	}
 
 	public async processMinute(time: Date) {
 		try {
 			logger.log(`Salvando prnindices relacioando a ${time.toISOString()}!`)
-			//logger.log(`Prossesing prnidices from ${time.toLocaleString('pt-br')}`);
 
-			const rows = await this.prnInfo.getGroupedPrn(time);
+			const rows = await this.prnInfoController.groupByPrn(time);
 
 			//logger.log("PrninfoGrouped", rows);
 			for (const row of rows) {
@@ -133,7 +143,7 @@ export class ProcessData {
 					let intensidade = 0;
 
 					try {
-						const prnData = await this.prnInfo.getByPrn(time, row.prn);
+						const prnData = await this.prnInfoController.findByPrn(time, row.prn);
 						//logger.log('Prn info by binute', prnData[0]);
 
 						prnData.forEach((row) => {
@@ -164,11 +174,11 @@ export class ProcessData {
 						let s4 = Math.sqrt(
 							(intensidadeSinalQuadrado -
 								mediaIntensidadeSinalQuadrado) /
-								mediaIntensidadeSinalQuadrado
+							mediaIntensidadeSinalQuadrado
 						);
 
 						//logger.log("S4", s4);
-						this.prnIndices.insertProcessedData(
+						this.prnIndicesController.insertProcessedData(
 							dpSnr,
 							s4,
 							time,
@@ -189,7 +199,7 @@ export class ProcessData {
 	/**
 	 * @description Função responsável por enfilerar os dados no buffer, antes que sejam processados
 	 */
-	async sendToBuffer(custom: CustomData) {
+	async sendToBuffer(custom: SignalMetrics) {
 		if (!this.timeController) {
 			this.timeController = custom.time.getMinutes();
 		}

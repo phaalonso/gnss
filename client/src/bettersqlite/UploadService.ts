@@ -53,20 +53,25 @@ export class UploadService {
 				this.ready = true;
 				logger.log('Backup service (FTP) is ready!');
 
-				this.client.list(this.config.backupPath, (err, list) => {
-					if (err && err.message.startsWith('No such file')) {
-						return this.client.mkdir(this.config.backupPath, true, (err) => {
-							console.log(err);
-							if (err) return reject(err);
+				// this.client.list(this.config.backupPath, (err, list) => {
+				// 	if (err) {
+				// 		const message = err.message.split(':')[1].trimStart();
+				// 		if (message.startsWith('No such file')) {
+				// 			this.client.mkdir(this.config.backupPath, true, (err) => {
+				// 				console.log('AAAAAAa')
+				// 				if (err) return reject(err);
 
-							logger.log('Creating directory');
+				// 				logger.log('Creating directory');
 
-							resolve(undefined);
-						})
-					}
+				// 				resolve(undefined);
+				// 			});
+				// 		}
 
-					return reject(err);
-				})
+				// 		reject(err);
+				// 	}
+
+					resolve(undefined);
+				// })
 			});
 		});
 	}
