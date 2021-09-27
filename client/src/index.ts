@@ -1,13 +1,10 @@
 
 import path from "path";
-import { Application } from "./Application";
 import { PrnIndicesBetterSqlite } from "./bettersqlite/controllers/PrnIndicesBetterSqlite";
 import { PrnInfoBetterSqlite } from "./bettersqlite/controllers/PrnInfoBetterSqlite";
 import { SQLite } from "./bettersqlite/database/DAO";
 import { MessageHandler } from "./clients/MessageHandler";
-import { NewSocketClient } from "./clients/NewSocketClient";
-import { NewWebsocketClient } from "./clients/NewWebsocketClient";
-import { WebSocketClient } from "./clients/WebSocketClient";
+import { WebsocketClient } from "./clients/WebsocketClient";
 import { IPrnIndicesController, IPrnInfoController } from "./controller";
 import logger from "./logger";
 import { PrnIndicesMongo } from "./mongodb/controller/PrnIndicesMongo";
@@ -70,7 +67,7 @@ async function start() {
         //     port: 2108
         // });
 
-        const client = new NewWebsocketClient('ws://localhost:4312')
+        const client = new WebsocketClient('ws://localhost:4312')
 
         client.onMessage(messageHandler.handle.bind(messageHandler));
         
