@@ -4,7 +4,6 @@ import { ProcessData } from "../ProcessData";
 import { SQLite } from "./database/DAO";
 import path from 'path';
 import logger from "../logger";
-import { WebSocketClient } from "../clients/WebSocketClient";
 
 async function run() {
 	const timeStamp = new Date().getTime();

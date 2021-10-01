@@ -20,6 +20,7 @@ export class SQLite {
 
 	public run(sql: string, params = []) {
 		return new Promise((res, rej) => {
+			logger.log(`Running: ${sql}`);
 			this.con.run(sql, params, function(err) {
 				if (err) {
 					logger.log(`Erro ao executar a query ${sql}`);
