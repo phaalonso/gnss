@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import logger from "../logger";
 import { FileInfo, UploadService } from "./UploadService";
+import { IPrnIndicesController, IPrnInfoController } from "../controller";
 
 interface IBackupConfig {
 	folder: string;
@@ -15,11 +16,15 @@ export class BackupService {
 
 	constructor(
 		private dao: SQLite,
+		private prnIndiceService: IPrnIndicesController,
+		private prnInfoService: IPrnInfoController,
 		private config: IBackupConfig,
-		private upload: UploadService,
+		private uploadService: UploadService,
 	) { } 
 
-	public async backup(date: Date) {
+	public async backup() {
+		const date = new Date();
+
 		try {
 			if (!fs.existsSync(this.config.folder)) {
 				fs.mkdirSync(this.config.folder);
@@ -30,52 +35,66 @@ export class BackupService {
 				`backup-${date.toISOString()}.db`
 			);
 
-			console.log(destination);
+			const lastDateTime = await this.prnIndiceService.lastIndice();
+
+			if (!lastDateTime) {
+				logger.log(`Can't locate the last PrnIndices time`);
+			}
+			
+			logger.log(`Backuping data up to ${lastDateTime}`);
 
 			const res = await this.dao.con.backup(destination)
 
+			await this.prnIndiceService.deleteBefore(lastDateTime);
+			await this.prnInfoService.deleteBefore(lastDateTime);
+
 			logger.log(`Backup realizado! Total de páginas ${res.totalPages}, páginas restantes ${res.remainingPages}`);
 		} catch(err) {
+			logger.exception(err);
 			logger.log(`Error while making backup for ${date}`);
 		}
 	}
 
+	private async uploadFile(name: string, path: string) {
+		const info: FileInfo = {
+			path, fileName: name,
+		}
+
+		logger.log(`Uploading the file to remote storage`);
+		await this.uploadService.uploadFile(info);
+	}
+
 	public async sendToServer() {
 		try {
-			if (!this.upload.isConnected()) {
-				console.log('Connecting')
-				await this.upload.connect();
+			if (!this.uploadService.isConnected()) {
+				await this.uploadService.connect();
 			}
 
 			const listFile = await fs.promises.readdir(this.config.folder);
 
 			for (const file of listFile) {
-				const info: FileInfo = {
-					path: path.join(this.config.folder, file),
-					fileName: file,
-				}
+				const filePath = path.join(this.config.folder, file);
 
-				logger.log(`Uploading the file to remote storage`);
-				await this.upload.uploadFile(info);
+				await this.uploadFile(file, filePath);
 
-				fs.rm(info.path, () => {
+				fs.rm(filePath, () => {
 					logger.log(`Removing the file ${file} from local storage`);
 				});
 			}
 
-			this.upload.disconnect();
+			this.uploadService.disconnect();
 		} catch (err) {
 			logger.exception(err, 'sendToServer');
 		}
 	}
 
-	public hasAutoBackup() {
+	public hasAutoBackupEnabled() {
 		return this.timeout != undefined;
 	}
 
 	public async initAutoBackup() {
 		const intervalFn = async () => {
-			await this.backup(new Date());
+			await this.backup();
 			await this.sendToServer();
 		};
 
@@ -83,7 +102,7 @@ export class BackupService {
 	}
 
 	public async stopAutoBackup() {
-		if (this.hasAutoBackup()) {
+		if (this.hasAutoBackupEnabled()) {
 			clearInterval(this.timeout);
 		} else {
 			throw Error("Auto backup is not initialized");

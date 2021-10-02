@@ -60,4 +60,12 @@ export class PrnIndicesMongo implements IPrnIndicesController {
                 .catch(err => rej(err));
         });
     }
+
+    async lastIndice(): Promise<Date> {
+        throw new Error("Method not implemented.");
+    }
+
+    deleteBefore(lastDateTime: Date): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
 }

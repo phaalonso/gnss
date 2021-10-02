@@ -133,6 +133,8 @@ export class ProcessData {
 
 			const rows = await this.prnInfoController.groupByPrn(time);
 
+			logger.log(`Processing ${rows.length} prns`);
+
 			//logger.log("PrninfoGrouped", rows);
 			for (const row of rows) {
 				//logger.log(row)

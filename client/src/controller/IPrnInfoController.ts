@@ -18,4 +18,5 @@ export interface IPrnInfoController {
      */
 	findByPrn(time: Date, prn: number): any;
     countRows(): Promise<number>;
+    deleteBefore(lastDateTime: Date): Promise<void>;
 }

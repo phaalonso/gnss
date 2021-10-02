@@ -41,6 +41,7 @@ export class UploadService {
 
 	public async connect() {
 		return new Promise((resolve, reject) => {
+			logger.log('Connecting to upload service');
 			this.client.connect({
 				host: this.config.host,
 				password: this.config.password,

@@ -28,7 +28,7 @@ export class PrnIndicesBetterSqlite implements IPrnIndicesController {
 	insertProcessedData(dpSnr: number, s4: number, time: Date, prn: number) {
 		return this.dao.run(
 			"INSERT INTO prnindices (prn, mediasnr, mediaazi, mediaelev, tinicial, tfinal, dpsnr, s4) SELECT prn, AVG(snr), AVG(azi), AVG(elev), min(time), max(time), ?, ? from prninfo where time between ?-60000 and ? and prn = ? group by prn",
-			[dpSnr, s4, time.getTime(), time.getTime(), prn]
+			[dpSnr, s4, time.toISOString(), time.toISOString(), prn]
 		);
 	}
 
@@ -39,5 +39,24 @@ export class PrnIndicesBetterSqlite implements IPrnIndicesController {
 
 		return res.total;
 	}
+
+    async lastIndice(): Promise<Date> {
+		const sql = "SELECT tfinal FROM prnindices ORDER BY tfinal DESC LIMIT 1;";
+
+		const res: any = await this.dao.get(sql);
+
+		if (res) 
+			return new Date(res.tfinal);
+		return undefined;
+    }
+
+    async deleteBefore(lastDateTime: Date): Promise<void> {
+		const sql = "DELETE FROM prnindices WHERE tfinal <= ?";
+		const stmt = this.dao.con.prepare(sql);
+
+		const res = stmt.run(lastDateTime.toISOString());
+
+		logger.log(`Removed ${res.changes} rows from PrnIndices`);
+    }
 
 }

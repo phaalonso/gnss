@@ -66,4 +66,8 @@ export class PrnInfoMongo implements IPrnInfoController {
                 .catch(err => rej(err));
         });
     }
+
+    async deleteBefore(lastDateTime: Date): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
 }

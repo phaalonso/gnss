@@ -31,7 +31,7 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 	 * @returns values com o formato necessário para inserção
 	 */
 	mapData(data: SignalMetrics[]) {
-		return data.map(cd => (`(${cd.prn},${cd.snr},${cd.azi},${cd.elev},${cd.lat},${cd.lon},${cd.time.getTime()})`)).join(',');
+		return data.map(cd => (`(${cd.prn},${cd.snr},${cd.azi},${cd.elev},${cd.lat},${cd.lon},'${cd.time.toISOString()}')`)).join(',');
 	}
 
 	insert(metric: SignalMetrics) {
@@ -55,7 +55,7 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 	public groupByPrn(time: Date): Promise<any> {
 		return this.dao.all(
 			'select prn, count(snr) as total from prninfo where time between ?-60000 and ? group by prn',
-			[time.getTime(), time.getTime()]
+			[time.toISOString(), time.toISOString()]
 		);
 	}
 
@@ -67,7 +67,7 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 	public findByPrn(time: Date, prn: number): Promise<any> {
 		return this.dao.all(
 			'SELECT prn, snr FROM prninfo WHERE time BETWEEN ?-60000 AND ? AND prn = ?',
-			[time.getTime(), time.getTime(), prn]
+			[time.toISOString(), time.toISOString(), prn]
 		);
 	}
 
@@ -78,4 +78,13 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 
 		return res.total;
 	}
+
+    async deleteBefore(lastDateTime: Date): Promise<void> {
+		const sql = "DELETE FROM prninfo WHERE time <= ?";
+		const stmt = this.dao.con.prepare(sql);
+
+		const res = stmt.run(lastDateTime.toISOString());
+
+		logger.log(`Removed ${res.changes} rows from PrnInfo`);
+    }
 }
