@@ -1,5 +1,5 @@
 Heap-20210617T004130.heapsnapshot
-*.log
-.vscode/launch.json
-.vscode/settings.json
-*.db
+.vscode/*
+**/*.log
+**/*.db
+**/out/**/*

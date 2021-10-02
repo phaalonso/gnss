@@ -1,10 +1,10 @@
 import path from 'path';
 import { GPSProvider } from '../../dataProvider/src/GnssDataStream';
-import { SQLite } from './sqlite/database/DAO';
-import { PrnInfoSqlite } from './sqlite/controller/PrnInfoSqlite';
-import { PrnIndicesSqlite } from './sqlite/controller/PrnIndicesSqlite';
 import { ProcessData } from './ProcessData';
 import { SignalMetrics } from './model/SignalMetrics';
+import { SQLite } from './bettersqlite/database/DAO';
+import { PrnInfoBetterSqlite } from './bettersqlite/controllers/PrnInfoBetterSqlite';
+import { PrnIndicesBetterSqlite } from './bettersqlite/controllers/PrnIndicesBetterSqlite';
 
 const file = path.join(__dirname, '..', '..', 'gpsData.nmea')
 
@@ -16,9 +16,9 @@ let lon: number;
 
 async function run() {
     const dao = new SQLite();
-    const prnInfo = new PrnInfoSqlite(dao);
+    const prnInfo = new PrnInfoBetterSqlite(dao);
     await prnInfo.createTable();
-    const prnIndices = new PrnIndicesSqlite(dao)
+    const prnIndices = new PrnIndicesBetterSqlite(dao)
     await prnIndices.createTable();
     const processData = new ProcessData(prnInfo, prnIndices);
 

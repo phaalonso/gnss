@@ -8,7 +8,6 @@ import logger from '../../dataProvider/src/logger';
 import { PrnInfoMongo } from './mongodb/controller/PrnInfoMongo';
 import { PrnIndicesMongo } from './mongodb/controller/PrnIndicesMongo';
 import { connect } from './mongodb/database/connection';
-import { SignalMetrics } from './model/SignalMetrics';
 import { MessageHandler } from './clients/MessageHandler';
 
 const file = path.join(__dirname, '..', '..', 'gpsData.custom');
@@ -24,6 +23,7 @@ async function run() {
     const prnInfo = new PrnInfoMongo();
     const prnIndices = new PrnIndicesMongo()
     const processData = new ProcessData(prnInfo, prnIndices);
+
     const stream = createReadStream(file);
 
     const messageHandler = new MessageHandler(processData, '\n');

@@ -17,9 +17,14 @@ let prnIndicesController: IPrnIndicesController;
 
 
 async function initDatabase() {
-    const selectedDB = process.env.DB.toLocaleLowerCase();
+	const selectedDB = process.env.DB;
 
-    switch(selectedDB) {
+	if (!selectedDB) {
+		logger.log('Coun\'t find the DB variable');
+		process.exit(1);
+	}
+
+    switch(selectedDB.toLocaleLowerCase()) {
         case 'sqlite':
             const dao = new SQLite();
             const prnInfo = new PrnInfoBetterSqlite(dao);
