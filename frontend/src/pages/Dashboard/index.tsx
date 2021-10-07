@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import MetricChart from "../../components/MetricChart";
 import { Metrics } from './styles';
 
-const ws = new WebSocket('ws://localhost:4312');
-//const ws = new WebSocket('ws://192.168.3.23:4000');
+const ws = new WebSocket('ws://localhost:3333');
 
 interface GraphicData {
     time: Date,

@@ -35,20 +35,29 @@ export class BackupService {
 				`backup-${date.toISOString()}.db`
 			);
 
+			if (this.dao.con.inTransaction) {
+				throw Error('The database is already in a transaction');
+			}
+
 			const lastDateTime = await this.prnIndiceService.lastIndice();
 
-			if (!lastDateTime) {
-				logger.log(`Can't locate the last PrnIndices time`);
-			}
-			
-			logger.log(`Backuping data up to ${lastDateTime}`);
+			const transaction = this.dao.con.transaction(async (lastTime) => {
+				if (!lastTime) {
+					logger.log(`Can't locate the last PrnIndices time`);
+				}
+				
+				logger.log(`Backuping data up to ${lastTime}`);
 
-			const res = await this.dao.con.backup(destination)
+				const res = await this.dao.con.backup(destination)
 
-			await this.prnIndiceService.deleteBefore(lastDateTime);
-			await this.prnInfoService.deleteBefore(lastDateTime);
+				await this.prnIndiceService.deleteBefore(lastTime);
+				await this.prnInfoService.deleteBefore(lastTime);
 
-			logger.log(`Backup realizado! Total de páginas ${res.totalPages}, páginas restantes ${res.remainingPages}`);
+				logger.log(`Backup realizado! Total de páginas ${res.totalPages}, páginas restantes ${res.remainingPages}`);
+			});
+
+			transaction.immediate(lastDateTime);
+
 		} catch(err) {
 			logger.exception(err);
 			logger.log(`Error while making backup for ${date}`);
