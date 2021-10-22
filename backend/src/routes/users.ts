@@ -1,17 +1,129 @@
+import { Prisma } from "@prisma/client";
 import { Router } from "express";
-import UsuarioController from "../controllers/UsuarioController";
-import { Usuario } from "../model/Usuario";
+import { requireAdmin } from "../middlewares/requireAdmin";
+import { requireAuthentication } from "../middlewares/requireAuthentication";
+import UserService from "../services/UserService";
 
 const user = Router();
 
-user.post( '/', async (req, res) => {
-	const { nome, nickname, email, senha } = req.body;
+user.get(
+	'/',
+	requireAuthentication,
+	requireAdmin,
+	async (req, res) => {
+		const users = await UserService.findMany();
 
-	const user = new Usuario(nome, nickname, email, senha);
+		return res.json(users);
+	});
 
-	const result = await UsuarioController.create(user);
+user.get(
+	'/:id',
+	requireAuthentication,
+	async (req, res) => {
+		const { id } = req.params;
 
-	return res.json(result);
-});
+		// Restringe para pesquisar seus próprios dados, ou permitir
+		// pesquisar dos outros caso seja um administrador
+
+		const users = await UserService.findById(parseInt(id));
+
+		return res.json(users);
+	}
+);
+
+user.post(
+	'/',
+	requireAuthentication,
+	requireAdmin,
+	async (req, res, next) => {
+		try {
+			const { nome, nickname, email, password, administrator } = req.body;
+
+			const result = await UserService.create({
+				nome, 
+				nickname, 
+				email, 
+				password, 
+				administrator: administrator || false
+			});
+
+			return res.status(201).json({ id: result });
+		} catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
+				if (error.meta)
+					return res.status(409).json({
+						message: `Conflict in ${error.meta['target'].join(', ')}`
+					});
+				else
+					return res.sendStatus(409);
+			}
+
+			return next(error);
+		}
+	}
+);
+
+user.put(
+	'/:id',
+	requireAuthentication,
+	requireAdmin,
+	async (req, res, next) => {
+		try {
+			const id = parseInt(req.params.id);
+			const { nome, nickname, email, password, administrator } = req.body;
+
+			if (isNaN(id)) {
+				return res.status(400).send();
+			}
+
+			if (!administrator) {
+				const hasOtherAdmin = await UserService.hasAnotherAdminThan(id);
+
+				if (!hasOtherAdmin) {
+					return res.status(412).json({
+						message: 'Tem que ter pelo menos um adminsitrador',
+					});
+				}
+			}
+
+			const result = await UserService.edit(id, {
+				nome, 
+				nickname, 
+				email, 
+				password, 
+				administrator: administrator || false
+			});
+
+			return res.status(200).json({ id: result });
+		} catch (error) {
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
+				if (error.meta)
+					return res.status(409).json({
+						message: `Conflict in ${error.meta['target'].join(', ')}`
+					});
+				else
+					return res.sendStatus(409);
+			}
+
+			return next(error);
+		}
+	});
+
+user.delete(
+	'/:id',
+	requireAuthentication,
+	requireAdmin,
+	async (req, res) => {
+		try {
+			const { id } = req.params;
+
+			await UserService.delete(parseInt(id));
+
+			return res.status(200).send();
+		} catch (error) {
+			console.log(error);
+			return res.sendStatus(404);
+		}
+	});
 
 export default user;

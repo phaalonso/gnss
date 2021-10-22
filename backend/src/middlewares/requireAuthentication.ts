@@ -7,7 +7,7 @@ import { DecodedJWTContent } from '../routes/sessions';
 export function requireAuthentication(req: Request, res: Response, next: NextFunction): unknown {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
+    if (!authHeader || authHeader.length === 6) {
         return res.status(400).json({ message: 'Token JWT não encontrado' });
     }
 

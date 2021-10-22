@@ -5,11 +5,12 @@ import express from 'express';
 import morgan from 'morgan';
 
 import router from './routes';
-import { connection } from './database/connection';
 
 import cors from 'cors';
 import { createTopic, WebsocketFactory } from "./Websocket";
 import { monitoring } from "./monitoring";
+import prisma from "./client";
+import UserService from "./services/UserService";
 
 const app = express()
 
@@ -23,15 +24,40 @@ app.use(morgan('dev'));
 
 app.use(router);
 
-WebsocketFactory(server);
+async function main() {
+	try {
+		await prisma.$connect();
 
-createTopic('cpu');
-createTopic('ram');
+		const hasAdmin = await UserService.hasAdmin();
 
-connection.create().then(() => {
-	server.listen(3333, () => {
-		console.log('Server is online');
+		if (!hasAdmin) {
+			await UserService.create({
+				nome: 'Administrator',
+				nickname: 'admin',
+				email: 'admin@admin.com',
+				password: 'changeit',
+				administrator: true
+			})
 
-		setInterval(monitoring, 15000);
-	});
-});
+			console.log('Não foi encontrado um usuário administrador, por isso foi criado um usuário padrão. Por favor altere as credenciais de acesso');
+			console.log('Email: administrator@administrator');
+			console.log('Senha: changeit');
+		}
+
+		WebsocketFactory(server);
+
+		createTopic('cpu');
+		createTopic('ram');
+
+		server.listen(3333, () => {
+			console.log('Server is online');
+
+			setInterval(monitoring, 15000);
+		});
+	} catch (err) {
+		await prisma.$disconnect();
+	}
+
+}
+
+main();

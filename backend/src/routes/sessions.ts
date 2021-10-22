@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { SERVER } from '../config/server';
-import UsuarioController from '../controllers/UsuarioController';
 import { requireAuthentication } from '../middlewares/requireAuthentication';
+import UserService from '../services/UserService';
 
 export interface DecodedJWTContent {
 	id: number;
@@ -16,7 +16,7 @@ sessions.post(
         const { email, password } = req.body;
 
         try {
-            const valid = await UsuarioController.login(email, password);
+            const valid = await UserService.login({ email, password });
 
             if (!valid) {
                 return res.status(400).json({ message: 'Can\'t find an user with this email and password' });
