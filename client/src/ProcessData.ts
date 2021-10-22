@@ -179,8 +179,8 @@ export class ProcessData {
 							mediaIntensidadeSinalQuadrado
 						);
 
-						//logger.log("S4", s4);
-						this.prnIndicesController.insertProcessedData(
+						logger.log(`Inserting prnindice`);
+						await this.prnIndicesController.insertProcessedData(
 							dpSnr,
 							s4,
 							time,
