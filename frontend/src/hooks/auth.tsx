@@ -2,14 +2,14 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 import { api } from "../services/api";
 
-interface LoginCredentials {
+export interface LoginCredentials {
     email: string;
     password: string;
 }
 
 interface User {
     id: string;
-    name: string;
+    nome: string;
     email: string;
 }
 
@@ -43,7 +43,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
     const singIn = useCallback(async ({ email, password }: LoginCredentials) => {
 		console.log('Realizando o login');
-        const res = await api.post('/sessions', {
+        const res = await api.post('/session', {
             email,
             password
         });
@@ -81,7 +81,7 @@ const AuthProvider: React.FC = ({ children }) => {
             return;
         }
 
-        api.get('/sessions/validate').catch(() => {
+        api.get('/session/validate').catch(() => {
             singOut();
 
             alert('Sessão expirada, entre novamente');

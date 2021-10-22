@@ -1,43 +1,57 @@
-import React, { ChangeEvent, useState } from "react";
+import { FormHandles } from '@unform/core';
+import { Form } from '@unform/web';
+import React, { useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useAuth } from "../../hooks/auth";
+import * as Yup from 'yup';
+import Input from '../../components/Input';
+import { LoginCredentials, useAuth } from '../../hooks/auth';
+import getValidationError from '../../utils/ValidationErrors';
+import { Main } from './stypes';
+
 
 const Login: React.FC = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const formRef = useRef<FormHandles>(null);
 
     const auth = useAuth();
     const history = useHistory();
 
-    const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
-        setEmail(e.target.value);
-    }
+    const onSubmit = async (data: LoginCredentials) => {
+        try {
+            console.log(data);
+            const schema = Yup.object().shape({
+                email: Yup.string().email('Preencha um email válido').required('Email é obrigatório'),
+                password: Yup.string().required('Preencha uma senha').min(6, 'A senha deve ter pelo menos 6 caracteres'),
+            });
 
-    const onChangeSenha = (e: ChangeEvent<HTMLInputElement>) => {
-        setPassword(e.target.value);
-    }
+            await schema.validate(data, { 
+                abortEarly: false,
+            });
 
-    const onSubmit = async (e: React.SyntheticEvent) => {
-		e.preventDefault();
-
-		try {
-			await auth.singIn({ email, password });
-			console.log('Usuario logado');
+			await auth.singIn(data);
 			history.push('/');
-		} catch (err) {
-			console.error(err);
-		}
+        } catch (err) {
+            if (err instanceof Yup.ValidationError) {
+                const erros = getValidationError(err);
+
+                formRef.current?.setErrors(erros);
+                return;
+            }
+
+            console.error(err);
+			alert('Não foi possível logar');
+        }
     }
 
     return (
-        <div style={{ width: '400px', height: '500px' }}>
-            <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+        <Main>
+            <Form ref={formRef} onSubmit={onSubmit}>
                 <h1>Login</h1>
-                <input name="Email" placeholder="Email" value={email} type="email" required onChange={onChangeEmail} />
-                <input name="Senha" placeholder="Senha" value={password} type="password" required onChange={onChangeSenha} />
+                <Input name="email" label="Email" type="email"/>
+                <Input name="password" label="Senha" type="password"/>
+
                 <button type="submit">Logar</button>
-            </form>
-        </div>
+            </Form>
+        </Main>
     )
 }
 
