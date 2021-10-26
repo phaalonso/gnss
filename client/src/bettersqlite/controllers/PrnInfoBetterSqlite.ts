@@ -12,13 +12,14 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 		logger.log('Criando prninfo');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prninfo (
-				prn INTEGER,
+				time TEXT NOT NULL,
+				prn INTEGER NOT NULL,
 				snr REAL,
 				azi REAL,
 				elev REAL,
 				lat REAl,
 				long REAL,
-				time TEXT
+				PRIMARY KEY(time, prn)
 			)
 		`;
 

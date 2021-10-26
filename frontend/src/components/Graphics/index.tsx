@@ -1,23 +1,29 @@
 import React, { useState } from "react";
+import { useAuth } from "../../hooks/auth";
 import MetricChart from "../MetricChart";
 import { Metrics, SubscribeButton } from './styles';
-
-const ws = new WebSocket('ws://localhost:3333');
 
 interface GraphicData {
     time: Date,
     value: number,
 }
 
-const MAX_DATA_LENGTH = 20;
+const ws = new WebSocket('ws://localhost:3333');
+const MAX_DATA_LENGTH = 100;
 
 const Graphics: React.FC = () => {
+	const { data } = useAuth();
     const [ramData, setRamData] = useState<GraphicData[]>([]);
     const [cpuData, setCpuData] = useState<GraphicData[]>([]);
 
     ws.onopen = () => {
-        console.log('Conexão aberta')
+        console.log('Conexão aberta');
+		ws.send(`token_${data.token}`);
     }
+	
+	ws.onclose = () => {
+		console.log('Conexão fechada');
+	}
 
     ws.onmessage = ev => {
         const msg = ev.data;
@@ -102,7 +108,7 @@ const Graphics: React.FC = () => {
 
                     <MetricChart
                         data={{
-                            labels: ramData.map(r => r.time.toLocaleTimeString('pt-br')),
+							labels: ramData.map(r => r.time.toLocaleTimeString('pt-br')),
                             datasets: [{
                                 data: ramData.map(r => r.value),
                                 backgroundColor: 'rgb(75, 192, 192)',

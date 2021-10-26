@@ -1,13 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "sqlite"
-  url      = "file:../database.db"
-}
-
-generator client {
-  provider = "prisma-client-js"
+  url      = "file:../../client/dados.db"
 }
 
 model User {
@@ -18,4 +15,29 @@ model User {
   password String
   administrator Boolean
   createdAt DateTime @default(now())
+}
+
+model prnindices {
+  prn       Int
+  mediasnr  Float?
+  mediaazi  Float?
+  mediaelev Float?
+  tinicial  String
+  tfinal    String
+  dpsnr     Float?
+  s4        Float
+
+  @@id([prn, tinicial, s4])
+}
+
+model prninfo {
+  time String
+  prn  Int
+  snr  Float?
+  azi  Float?
+  elev Float?
+  lat  Float?
+  long Float?
+
+  @@id([time, prn])
 }

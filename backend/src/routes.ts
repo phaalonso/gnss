@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import { errors } from "celebrate";
 import { Request, Response, Router } from "express";
 import { drive } from "node-os-utils";
 import sessions from "./routes/sessions";
@@ -20,6 +21,8 @@ router.get('/stats', async (req, res) => {
 router.use((req, res) => {
 	return res.sendStatus(404);
 });
+
+router.use(errors());
 
 router.use((error: any, req: Request, res: Response) => {
 	console.log('error handler') 

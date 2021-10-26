@@ -1,6 +1,5 @@
 import { User, Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { abort } from 'process';
 import prisma from '../client';
 import { LoginCredentials } from '../interfaces/LoginDTO';
 import { UserDTO } from '../interfaces/UserDTO';
@@ -57,12 +56,16 @@ const UserService = {
 		return createdUser.id;
 	},
 
-	async edit(userId: number, user: Prisma.UserUpdateInput): Promise<number> {
+	async edit(userId: number, user: Partial<User>): Promise<number> {
 
-		if (user.password && typeof user.password === 'string') {
+		if (user.password) {
 			const encryptedPassword = await bcrypt.hash(user.password, 8);
 			user.password = encryptedPassword;
+		} else {
+			delete user.password;
 		}
+
+		console.log(user);
 
 		const createdUser = await prisma.user.update({
 			where: {

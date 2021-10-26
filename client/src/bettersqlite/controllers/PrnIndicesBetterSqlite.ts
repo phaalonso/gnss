@@ -11,14 +11,15 @@ export class PrnIndicesBetterSqlite implements IPrnIndicesController {
 		logger.log('Criando prnindices');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prnindices (
-				prn INTEGER,
+				prn INTEGER NOT NULL,
 				mediasnr REAL,
 				mediaazi REAL,
 				mediaelev REAL,
-				tinicial TEXT,
-				tfinal TEXT,
+				tinicial TEXT NOT NULL,
+				tfinal TEXT NOT NULL,
 				dpsnr REAL,
-				s4 REAL
+				s4 REAL NOT NULL,
+				PRIMARY KEY(prn, tinicial, s4)
 			)
 		`;
 

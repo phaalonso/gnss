@@ -1,5 +1,7 @@
 import { Server } from "http";
+import jwt from 'jsonwebtoken';
 import Websocket, { RawData } from "ws";
+import { SERVER } from "./config/server";
 
 const subscriptions: Record<string, Websocket[]> = {};
 
@@ -7,50 +9,68 @@ const onError = (ws: Websocket, error: Error) => {
 	console.error(error);
 }
 
-const onMessage = (ws: Websocket, data: RawData) => {
-	const message = data.toString();
-
-	const sub = message.match(/^sub_(.+)/);
-
-	if (sub && sub[1]) {
-		const topic = sub[1];
-		if (!subscriptions[topic]) {
-			return ws.send('err_unknow topic');
-		}
-
-		subscriptions[topic].push(ws);
-
-		ws.send(`subscribe_${topic}`);
-	}
-
-	ws.send(`received_${message}`);
-}
-
 export function WebsocketFactory(server: Server) {
 	const wss = new Websocket.Server({ server });
 
 	wss.on('connection', (ws: Websocket) => {
-		ws.on('message', (data) => onMessage(ws, data));
+		const timeout = setTimeout(() => {
+			ws.close();
+		}, 300);
 
-		ws.on('error', (error) => onError(ws, error));
+		ws.on('message', (data: RawData) => {
+			const message = data.toString();
 
-		ws.on('close', (ws, code ,reason: Buffer) => {
-			cancelSubscription(ws, 'cpu');
-			cancelSubscription(ws, 'ram');
+			const sub = message.match(/^sub_(.+)/);
 
-			console.log('An cliend closed the connection');
-		});
+			if (sub && sub[1]) {
+				const topic = sub[1];
+				if (!subscriptions[topic]) {
+					return ws.send('err_unknow topic');
+				}
 
-		ws.send('Hi there, I am a Websocket server');
+				subscriptions[topic].push(ws);
+
+				ws.send(`subscribe_${topic}`);
+			}
+
+			const sub2 = message.match(/^token_(.+)/);
+
+			if (sub2 && sub2[1]) {
+				try {
+					const token = sub2[1];
+
+					jwt.verify(token,  SERVER.JWT)
+
+					clearTimeout(timeout);
+					console.log('Conexão websocket autenticada');
+				} catch (error) {
+					console.log('Fechando conexão não autenticada');
+					ws.close();
+				}
+			}
+
+			ws.send(`received_${message}`);
+		}
+			 );
+
+			 ws.on('error', (error) => onError(ws, error));
+
+			 ws.on('close', (ws, code ,reason: Buffer) => {
+				 cancelSubscription(ws, 'cpu');
+				 cancelSubscription(ws, 'ram');
+
+				 console.log('Uma conexão foi fechada');
+			 });
+
+			 //ws.send('Hi there, I am a Websocket server');
 	});
 }
 
-export function createTopic (topicName: string) {
-	if (subscriptions[topicName]) {
-		throw Error('Topic already exist');
-	}
+export function createTopic (topicName: string) { if (subscriptions[topicName]) {
+	throw Error('Topic already exist');
+}
 
-	subscriptions[topicName] = [];
+subscriptions[topicName] = [];
 }
 
 export function cancelSubscription(ws: Websocket, topicName: string) {

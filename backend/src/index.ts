@@ -40,7 +40,7 @@ async function main() {
 			})
 
 			console.log('Não foi encontrado um usuário administrador, por isso foi criado um usuário padrão. Por favor altere as credenciais de acesso');
-			console.log('Email: administrator@administrator');
+			console.log('Email: admin@admin.com');
 			console.log('Senha: changeit');
 		}
 
@@ -52,9 +52,10 @@ async function main() {
 		server.listen(3333, () => {
 			console.log('Server is online');
 
-			setInterval(monitoring, 15000);
+			setInterval(monitoring, 1000);
 		});
 	} catch (err) {
+		console.error(err);
 		await prisma.$disconnect();
 	}
 

@@ -6,7 +6,7 @@ export async function requireAdmin(req: Request, res: Response, next: NextFuncti
         if (req.user && req.user.id) {
             const user = await UserService.findById(req.user.id);
 
-            if (user.administrator)
+            if (user && user.administrator)
                 return next();
         }
 
