@@ -10,7 +10,7 @@ const onError = (ws: Websocket, error: Error) => {
 }
 
 export function WebsocketFactory(server: Server) {
-	const wss = new Websocket.Server({ server });
+	const wss = new Websocket.Server({ path: '/websocket', server });
 
 	wss.on('connection', (ws: Websocket) => {
 		const timeout = setTimeout(() => {

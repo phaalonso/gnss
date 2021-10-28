@@ -8,7 +8,7 @@ interface GraphicData {
     value: number,
 }
 
-const ws = new WebSocket('ws://localhost:3333');
+const ws = new WebSocket('ws://localhost:3333/websocket');
 const MAX_DATA_LENGTH = 100;
 
 const Graphics: React.FC = () => {
