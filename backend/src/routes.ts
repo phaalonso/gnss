@@ -48,7 +48,6 @@ router.get('/scintilation', async (req, res) => {
 					s4: true,
 					dpsnr: true
 				},
-				take: 100,
 				orderBy: {
 					tinicial: 'desc',
 				},

@@ -68,7 +68,13 @@ export abstract class Client implements IClient {
                 }
             }
 
+			const timeout = setTimeout(() => {
+				logger.log('Não foi possível conectar com o provedor de dados');
+				process.exit(2);
+			}, 5000);
+
             this._connect(() => {
+				clearTimeout(timeout);
                 logger.log('Connected');
 
                 this.connectedChannels.forEach(value => {

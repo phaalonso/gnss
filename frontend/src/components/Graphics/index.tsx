@@ -25,6 +25,16 @@ interface IndicesPorPrn {
 	indices: Omit<IIndices, 'prn'>[];
 }
 
+const randomNum = () => Math.floor(Math.random() * (235 - 52 + 1) + 52);
+
+const randomRGB = () => `rgb(${randomNum()}, ${randomNum()}, ${randomNum()})`;
+
+const colors: string[] = [];
+
+for (let i = 0; i < 20; i++) {
+	colors.push(randomRGB());
+}
+
 const ws = new WebSocket('ws://localhost:3333/websocket');
 const MAX_DATA_LENGTH = 100;
 
@@ -120,7 +130,7 @@ const Graphics: React.FC = () => {
 			console.log(res.data.data);
 
 			setIndices(res.data.data);
-			console.log(indices);
+
 		} catch (err) {
 			console.error(err);
 		}
@@ -170,6 +180,12 @@ const Graphics: React.FC = () => {
                         }}
                         options={{
                             animation: false,
+							scales: {
+								y: {
+									max: 100,
+									min: 0
+								}
+							}
                         }}
                     />
                 </div>
@@ -180,15 +196,37 @@ const Graphics: React.FC = () => {
 				<div>
 					<MetricChart 
 						data={{
+							labels: indices[0].indices.map(ind => new Date(ind.tinicial).toLocaleTimeString('pt-br')),
 							datasets: indices
-								.map(i => ({
+								.map((i, index) => ({
 									label: i.prn.toString(),
-									labels: i.indices.map(ind => ind.tinicial),
 									data: i.indices.map(ind => ind.s4),
-									backgroundColor: 'rgb(75, 192, 192)',
-									borderColor: 'rgb(75, 192, 192)',
+									backgroundColor: colors[index],
+									borderColor: colors[index],
 									borderWidth: 1
 								}))
+						}}
+
+						options={{
+							interaction: {
+								intersect: false
+							},
+							plugins: {
+								legend: {
+									//display: false
+								},
+							},
+							scales: {
+								x: {
+									////time: {
+										////tooltipFormat: 'DD T',
+									////}
+								},
+								y: {
+									max: 1.5,
+									min: 0
+								}
+							}
 						}}
 					/>
 				</div>

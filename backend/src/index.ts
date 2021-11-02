@@ -52,7 +52,7 @@ async function main() {
 		server.listen(3333, () => {
 			console.log('Server is online');
 
-			setInterval(monitoring, 1000);
+			setInterval(monitoring, 500);
 		});
 	} catch (err) {
 		console.error(err);

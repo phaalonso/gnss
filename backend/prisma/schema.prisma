@@ -18,6 +18,7 @@ model User {
 }
 
 model prnindices {
+  id        Int    @id @default(autoincrement())
   prn       Int
   mediasnr  Float?
   mediaazi  Float?
@@ -26,11 +27,10 @@ model prnindices {
   tfinal    String
   dpsnr     Float?
   s4        Float
-
-  @@id([prn, tinicial, s4])
 }
 
 model prninfo {
+  id   Int    @id @default(autoincrement())
   time String
   prn  Int
   snr  Float?
@@ -38,6 +38,4 @@ model prninfo {
   elev Float?
   lat  Float?
   long Float?
-
-  @@id([time, prn])
 }

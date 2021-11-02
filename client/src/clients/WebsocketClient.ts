@@ -1,4 +1,5 @@
 import WebSocket from "ws";
+import logger from "../logger";
 import { Client } from "./IClient";
 
 export class WebsocketClient extends Client {
@@ -17,6 +18,7 @@ export class WebsocketClient extends Client {
         this.client.send(`sub_${channel}\n`);
     }
     protected _connect(cb: (...args: any[]) => void) {
+		logger.log(`Conectando com ${this.websocketUrl}`);
         this.client = new WebSocket(this.websocketUrl);
         this.client.on('open', cb);
         this.client.on('message', this.messageCB);
