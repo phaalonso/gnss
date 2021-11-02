@@ -74,7 +74,11 @@ export class GPSProvider extends GPS {
         this.inputStream.pipe(this.parserStream);
 
         this.parserStream.on('data', (data) => {
-            this.update(data);
+			try {
+				this.update(data);
+			} catch (error) {
+				logger.exception(error, 'Parser');
+			}
         });
 
 		this.on('error', err => logger.exception(err));
