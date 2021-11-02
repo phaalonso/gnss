@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { api } from "../services/api";
@@ -81,10 +82,14 @@ const AuthProvider: React.FC = ({ children }) => {
             return;
         }
 
-        api.get('/session/validate').catch(() => {
-            singOut();
+        api.get('/session/validate').catch((err) => {
+			if (axios.isAxiosError(err) && err.response) {
+				singOut();
+				alert('Sessão expirada, entre novamente');
+				return;
+			}
 
-            alert('Sessão expirada, entre novamente');
+			alert('Erro desconhecido, tente novamente mais tarde');
         });
     }, [data.token, singOut]);
 

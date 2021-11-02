@@ -1,11 +1,28 @@
 import React, { useState } from "react";
 import { useAuth } from "../../hooks/auth";
+import { api } from "../../services/api";
 import MetricChart from "../MetricChart";
 import { Metrics, SubscribeButton } from './styles';
 
 interface GraphicData {
     time: Date,
     value: number,
+}
+
+interface IIndices {
+	prn: number,
+	mediasnr: number,
+	mediaazi: number,
+	mediaelev: number,
+	tinicial: string,
+	tfinal: string,
+	dpsnr: number,
+	s4: number,
+}
+
+interface IndicesPorPrn {
+	prn: number;
+	indices: Omit<IIndices, 'prn'>[];
 }
 
 const ws = new WebSocket('ws://localhost:3333/websocket');
@@ -15,6 +32,7 @@ const Graphics: React.FC = () => {
 	const { data } = useAuth();
     const [ramData, setRamData] = useState<GraphicData[]>([]);
     const [cpuData, setCpuData] = useState<GraphicData[]>([]);
+	const [indices, setIndices] = useState<IndicesPorPrn[]>([])
 
     ws.onopen = () => {
         console.log('Conexão aberta');
@@ -96,6 +114,18 @@ const Graphics: React.FC = () => {
         ws.send('sub_cpu');
     }
 
+	const onIndices = async () => {
+		try {
+			const res = await api.get('/scintilation');
+			console.log(res.data.data);
+
+			setIndices(res.data.data);
+			console.log(indices);
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
     return (
         <Metrics>
             <SubscribeButton onClick={onClickRam} type="submit">Obter dados de RAM</SubscribeButton>
@@ -144,6 +174,25 @@ const Graphics: React.FC = () => {
                     />
                 </div>
             )}
+
+			<SubscribeButton onClick={onIndices} type="submit">Obter dados dos indices</SubscribeButton>
+			{indices?.length > 0 && (
+				<div>
+					<MetricChart 
+						data={{
+							datasets: indices
+								.map(i => ({
+									label: i.prn.toString(),
+									labels: i.indices.map(ind => ind.tinicial),
+									data: i.indices.map(ind => ind.s4),
+									backgroundColor: 'rgb(75, 192, 192)',
+									borderColor: 'rgb(75, 192, 192)',
+									borderWidth: 1
+								}))
+						}}
+					/>
+				</div>
+			)}
         </Metrics>
     );
 }

@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { errors } from "celebrate";
 import { Request, Response, Router } from "express";
 import { drive } from "node-os-utils";
+import prisma from "./client";
 import sessions from "./routes/sessions";
 import user from "./routes/users";
 
@@ -9,6 +10,62 @@ const router = Router();
 
 router.use('/user', user);
 router.use('/session', sessions);
+
+interface IIndices {
+	prn: number,
+	mediasnr: number,
+	mediaazi: number,
+	mediaelev: number,
+	tinicial: string,
+	tfinal: string,
+	dpsnr: number,
+	s4: number,
+}
+
+interface IndicesPorPrn {
+	prn: number;
+	indices: Omit<IIndices, 'prn'>[];
+}
+
+router.get('/scintilation', async (req, res) => {
+	try {
+		const prns = await prisma.prnindices.groupBy({
+			by: ['prn']
+		});
+
+		//@ts-ignore
+		const data: IndicesPorPrn[] = prns;
+		console.log(prns);
+
+		for (const prn of data) {
+			const scintilation = await prisma.prnindices.findMany({ 
+				select: {
+					mediasnr: true,
+					mediaazi: true,
+					mediaelev: true,
+					tinicial: true,
+					tfinal: true,
+					s4: true,
+					dpsnr: true
+				},
+				take: 100,
+				orderBy: {
+					tinicial: 'desc',
+				},
+				where: {
+					prn: prn.prn
+				}
+			});
+
+			prn.indices = scintilation;
+		}
+
+		return res.json({ data });
+	} catch (error) {
+		console.log(error);
+		res.send(400).json({ message: 'Erro desconhecido' });
+	}
+});
 
 router.get('/stats', async (req, res) => {
 	const data = await drive.info('/');

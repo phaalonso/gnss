@@ -50,19 +50,18 @@ export function WebsocketFactory(server: Server) {
 			}
 
 			ws.send(`received_${message}`);
-		}
-			 );
+		});
 
-			 ws.on('error', (error) => onError(ws, error));
+		ws.on('error', (error) => onError(ws, error));
 
-			 ws.on('close', (ws, code ,reason: Buffer) => {
-				 cancelSubscription(ws, 'cpu');
-				 cancelSubscription(ws, 'ram');
+		ws.on('close', (ws, code ,reason: Buffer) => {
+			cancelSubscription(ws, 'cpu');
+			cancelSubscription(ws, 'ram');
 
-				 console.log('Uma conexão foi fechada');
-			 });
+			console.log('Uma conexão foi fechada');
+		});
 
-			 //ws.send('Hi there, I am a Websocket server');
+		//ws.send('Hi there, I am a Websocket server');
 	});
 }
 
@@ -74,6 +73,8 @@ subscriptions[topicName] = [];
 }
 
 export function cancelSubscription(ws: Websocket, topicName: string) {
+	console.log(`Canceling the subscription for ${topicName}`);
+
 	if (!subscriptions[topicName]) {
 		throw Error('Topic not exist');
 	}
