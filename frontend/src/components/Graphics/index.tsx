@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/auth";
 import { api } from "../../services/api";
 import MetricChart from "../MetricChart";
@@ -40,9 +40,17 @@ const MAX_DATA_LENGTH = 100;
 
 const Graphics: React.FC = () => {
 	const { data } = useAuth();
+	const [totalRam, setTotalRam] = useState<number>();
     const [ramData, setRamData] = useState<GraphicData[]>([]);
     const [cpuData, setCpuData] = useState<GraphicData[]>([]);
 	const [indices, setIndices] = useState<IndicesPorPrn[]>([])
+
+	useEffect(() => {
+		api.get('/stats/ram').then(res => {
+			console.log(res.data);
+			setTotalRam(res.data.totalMemMb);
+		});
+	});
 
     ws.onopen = () => {
         console.log('Conexão aberta');
@@ -68,7 +76,6 @@ const Graphics: React.FC = () => {
 
             if (ramData.length > MAX_DATA_LENGTH) {
                 const diff = ramData.length - MAX_DATA_LENGTH;
-
                 array = ramData.slice(diff, ramData.length);
             }
 
@@ -131,6 +138,8 @@ const Graphics: React.FC = () => {
 
 			setIndices(res.data.data);
 
+			console.log(res.data.data.map((data: IndicesPorPrn) => data.indices.length));
+
 		} catch (err) {
 			console.error(err);
 		}
@@ -156,6 +165,20 @@ const Graphics: React.FC = () => {
                                 borderWidth: 1,
                             }]
                         }}
+
+						options={{
+							plugins: {
+								legend: {
+									display: false,
+								}
+							},
+							scales: {
+								y: {
+									min: 0,
+									max: totalRam
+								}
+							}
+						}}
                     />
                 </div>
             )}
@@ -180,6 +203,11 @@ const Graphics: React.FC = () => {
                         }}
                         options={{
                             animation: false,
+							plugins: {
+								legend: {
+									display: false,
+								}
+							},
 							scales: {
 								y: {
 									max: 100,

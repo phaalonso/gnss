@@ -5,7 +5,6 @@ import express from 'express';
 import morgan from 'morgan';
 
 import router from './routes';
-
 import cors from 'cors';
 import { createTopic, WebsocketFactory } from "./Websocket";
 import { monitoring } from "./monitoring";

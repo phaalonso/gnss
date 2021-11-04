@@ -14,7 +14,7 @@ const DiskStats: React.FC = () => {
     const [diskStats, setDiskStats] = useState<Stats>();
 
     useEffect(() => {
-        api.get('/stats').then(res => {
+		api.get('/stats/disk').then(res => {
             if (res.status === 200)
                 setDiskStats(res.data);
         });

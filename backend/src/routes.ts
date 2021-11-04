@@ -1,15 +1,16 @@
 import { Prisma } from "@prisma/client";
 import { errors } from "celebrate";
 import { Request, Response, Router } from "express";
-import { drive } from "node-os-utils";
 import prisma from "./client";
 import sessions from "./routes/sessions";
 import user from "./routes/users";
+import { statsRouter } from './routes/stats';
 
 const router = Router();
 
 router.use('/user', user);
 router.use('/session', sessions);
+router.use('/stats', statsRouter);
 
 interface IIndices {
 	prn: number,
@@ -65,14 +66,6 @@ router.get('/scintilation', async (req, res) => {
 		res.send(400).json({ message: 'Erro desconhecido' });
 	}
 });
-
-router.get('/stats', async (req, res) => {
-	const data = await drive.info('/');
-
-	console.log(data);
-
-	return res.json(data);
-})
 
 router.use((req, res) => {
 	return res.sendStatus(404);
