@@ -19,6 +19,7 @@ export class SQLite {
 
 	public run(sql: string, params = []) {
 		return new Promise((resolve, reject) => {
+			console.log(sql);
 			const stmt = this.con.prepare(sql);
 
 			try {

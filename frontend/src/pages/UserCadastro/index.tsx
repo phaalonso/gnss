@@ -96,8 +96,7 @@ const UserCadastro: React.FC = () => {
 
 				console.log(error.response);
 			}
-		
-			console.dir(error.response);
+
 			alert(`Não foi possível ${editId ? 'editar' : 'cadastrar'} o usuário`);
 		}
 	}

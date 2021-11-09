@@ -50,7 +50,7 @@ router.get('/scintilation', async (req, res) => {
 					dpsnr: true
 				},
 				orderBy: {
-					tinicial: 'desc',
+					tinicial: 'asc',
 				},
 				where: {
 					prn: prn.prn

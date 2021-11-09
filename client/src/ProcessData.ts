@@ -11,7 +11,7 @@ const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
 
 export class ProcessData {
-	private timeController: number;
+	private timeController: Date;
 	private buffer: SignalMetrics[];
 
 	private interval: number;
@@ -68,8 +68,6 @@ export class ProcessData {
 				return;
 			}
 
-			const minute = this.buffer[this.buffer.length - 1].time;
-
 			const clone = [...this.buffer];
 
 			await this.prnInfoController.insertMany(clone);
@@ -80,7 +78,10 @@ export class ProcessData {
 			if (this.counter >= this.maxCounter) {
 				//console.log(this.counter);
 				this.counter = 0;
-				this.processMinute(minute);
+				this.processMinute(this.timeController);
+
+				const timestamp = this.timeController.getTime()
+				this.timeController = new Date(timestamp + 60000);
 			}
 		}
 
@@ -101,7 +102,7 @@ export class ProcessData {
 		time: Date
 	) {
 		if (!this.timeController) {
-			this.timeController = time.getMinutes();
+			this.timeController = time;
 		}
 
 		for (const satelite of satellite) {
@@ -118,20 +119,20 @@ export class ProcessData {
 
 		if (this.passouUmMinuto(time)) {
 			logger.log(`${time} Salvando prnindices\n`);
-			this.timeController = time.getMinutes();
-			await this.processMinute(time);
+			this.timeController = time;
+			await this.processMinute();
 		}
 	}
 
 	public passouUmMinuto(time: Date): boolean {
-		return time.getSeconds() == 0 && time.getMinutes() != this.timeController;
+		return time.getMinutes() > this.timeController.getMinutes() || time.getHours() > this.timeController.getHours();
 	}
 
-	public async processMinute(time: Date) {
+	public async processMinute() {
 		try {
-			logger.log(`Salvando prnindices relacioando a ${time.toISOString()}!`)
+			logger.log(`Salvando prnindices relacioando a ${this.timeController.toISOString()}!`)
 
-			const rows = await this.prnInfoController.groupByPrn(time);
+			const rows = await this.prnInfoController.groupByPrn(this.timeController);
 
 			logger.log(`Processing ${rows.length} prns`);
 
@@ -145,7 +146,7 @@ export class ProcessData {
 					let intensidade = 0;
 
 					try {
-						const prnData = await this.prnInfoController.findByPrn(time, row.prn);
+						const prnData = await this.prnInfoController.findByPrn(this.timeController, row.prn);
 						//logger.log('Prn info by binute', prnData[0]);
 
 						prnData.forEach((row) => {
@@ -183,7 +184,7 @@ export class ProcessData {
 						await this.prnIndicesController.insertProcessedData(
 							dpSnr,
 							s4,
-							time,
+							this.timeController,
 							row.prn
 						);
 					} catch (err) {
@@ -203,7 +204,7 @@ export class ProcessData {
 	 */
 	async sendToBuffer(custom: SignalMetrics) {
 		if (!this.timeController) {
-			this.timeController = custom.time.getMinutes();
+			this.timeController = custom.time;
 		}
 
 		this.buffer.push(custom);

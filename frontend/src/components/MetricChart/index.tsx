@@ -3,16 +3,23 @@ import { Line } from "react-chartjs-2";
 import { ChartData, ChartOptions } from "chart.js";
 
 interface MetricChartProps {
-	data: ChartData,
-		options?: ChartOptions,
+	data: ChartData<'line'>,
+	options?: ChartOptions<'line'>,
+	width?: number
 }
 
-const MetricChart: React.FC<MetricChartProps> = ({ data, options }) => {
+const MetricChart: React.FC<MetricChartProps> = ({ data, options, width }) => {
+	if (!width) width = 700;
+
 	useEffect(() => console.log('b'), []);
 	return (
-		<div style={{ width: 700 }}>
+		<div
+			style={{
+				width
+			}}
+		>
 			<Line
-				type='line'
+				//width={width}
 				title="Uso de RAM"
 				lang='pt-br'
 				data={data}

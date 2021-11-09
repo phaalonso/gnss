@@ -1,4 +1,3 @@
-
 import path from "path";
 import { PrnIndicesBetterSqlite } from "./bettersqlite/controllers/PrnIndicesBetterSqlite";
 import { PrnInfoBetterSqlite } from "./bettersqlite/controllers/PrnInfoBetterSqlite";
@@ -14,7 +13,6 @@ import { ProcessData } from "./ProcessData";
 
 let prnInfoController: IPrnInfoController;
 let prnIndicesController: IPrnIndicesController;
-
 
 async function initDatabase() {
 	const selectedDB = process.env.DB;
@@ -59,7 +57,6 @@ async function start() {
             prnIndicesController,
         );
 
-        //TODO: Fazer clientes serem compativeis para passar a utilizar `Application`
         // const client = new WebSocketClient(processData);
 
         const messageHandler = new MessageHandler(
@@ -72,22 +69,13 @@ async function start() {
         //     port: 2108
         // });
 
-        const client = new WebsocketClient('ws://localhost:4312')
+        //const client = new WebsocketClient('ws://192.168.3.23:4312');
+		const client = new WebsocketClient('ws://localhost:4312');
 
         client.onMessage(messageHandler.handle.bind(messageHandler));
         
         client.subscribe('custom');
         await client.start();
-
-        // const app = new Application(
-        //     prnInfoController,
-        //     prnIndicesController,
-        // );
-
-        // app.run(() => {
-        //     logger.log('Client is running');
-        // });
-
     } catch (err) {
         logger.exception(err);
     }

@@ -36,9 +36,7 @@ async function start() {
 		socketPubSub.createChannel('custom');
 		//webSocketPubSub.createChannel('custom');
 
-		let time = new Date();
-		let lat: number;
-		let lon: number;
+		let time = new Date(); let lat: number; let lon: number;
 
 		// Inicia o log do contador, tempo em ms
 		// 1000 * 60 * 5 -> 5 minutos
