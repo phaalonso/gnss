@@ -146,8 +146,7 @@ const Graphics: React.FC = () => {
 
 	return (
 		<Metrics>
-			<SubscribeButton onClick={onClickRam} type="submit">Obter dados de RAM</SubscribeButton>
-			{ramData.length > 0 && (
+			{ramData.length > 0 ? (
 				<div>
 					<div>
 						<span>Ram: </span>
@@ -180,10 +179,11 @@ const Graphics: React.FC = () => {
 						}}
 					/>
 				</div>
+			) : (
+				<SubscribeButton onClick={onClickRam} type="submit">Obter dados de RAM</SubscribeButton>
 			)}
 
-			<SubscribeButton onClick={onClickCpu} type="submit">Obter dados de CPU</SubscribeButton>
-			{cpuData.length > 0 && (
+			{cpuData.length > 0 ? (
 				<div>
 					<div>
 						<span>Cpu: </span>
@@ -216,10 +216,11 @@ const Graphics: React.FC = () => {
 						}}
 					/>
 				</div>
+		) : (
+			<SubscribeButton onClick={onClickCpu} type="submit">Obter dados de CPU</SubscribeButton>
 		)}
 
-		<SubscribeButton onClick={onIndices} type="submit">Obter dados dos indices</SubscribeButton>
-		{indices?.length > 0 && (
+		{indices?.length > 0 ? (
 			<div>
 				<MetricChart 
 					data={{
@@ -258,6 +259,8 @@ const Graphics: React.FC = () => {
 					}}
 			/>
 			</div>
+		) : (
+			<SubscribeButton onClick={onIndices} type="submit">Obter dados dos indices</SubscribeButton>
 		)}
 		</Metrics>
 	);

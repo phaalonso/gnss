@@ -6,7 +6,6 @@
    "scripts": {
       "start": "ts-node src/index.ts",
       "dev": "ts-node-dev src/index.ts",
-      "typeorm": "ts-node ./node_modules/typeorm/cli.js"
    },
    "dependencies": {
       "@prisma/client": "^3.2.1",
