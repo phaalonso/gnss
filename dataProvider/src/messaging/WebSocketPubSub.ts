@@ -1,11 +1,11 @@
-import { CustomSocket, PubSub } from "./PubSub";
+import { CustomSocket, AbstractPubSub } from "../messaging/AbstractPubSub";
 import osu from 'node-os-utils';
 import WebSocket from 'ws';
-import logger from "../../logger";
+import logger from "../logger";
 
 const { cpu, mem } = osu;
 
-export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
+export class WebsocketPubSub extends AbstractPubSub<CustomSocket<WebSocket>> {
 	private wsS: WebSocket.Server;
 
 	constructor() {

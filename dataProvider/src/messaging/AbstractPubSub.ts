@@ -1,8 +1,8 @@
-import logger from "../../logger";
+import logger from "../logger";
 
 export type CustomSocket<T> = T & { channels?: string[] }
 
-export abstract class PubSub<T> {
+export abstract class AbstractPubSub<T> {
     protected readonly listeningChannels = new Map<string, Set<CustomSocket<T>>>();
 
 	protected constructor(

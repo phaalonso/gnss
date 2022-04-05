@@ -5,6 +5,9 @@
   "scripts": {
     "start": "ts-node src/index.ts"
   },
+  "engines": {
+    "node": "15.14.0"
+  },
   "license": "ISC",
   "dependencies": {
     "config-validation": "^0.1.2",

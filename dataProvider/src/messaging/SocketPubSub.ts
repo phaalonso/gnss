@@ -1,13 +1,13 @@
 import net from 'net';
-import { PubSub, CustomSocket } from "./PubSub";
-import logger from "../../logger";
+import { AbstractPubSub, CustomSocket } from "./AbstractPubSub";
+import logger from "../logger";
 
 interface SocketConfig {
 	host: string;
 	port: number;
 }
 
-export class SocketPubSub extends PubSub<net.Socket> {
+export class SocketPubSub extends AbstractPubSub<net.Socket> {
 	private _socketServer: net.Server;
 
 	constructor(

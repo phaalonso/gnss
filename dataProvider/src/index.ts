@@ -1,7 +1,8 @@
-import { config } from "./config/gpsConfig";
-import { GPSProvider } from "./GnssDataStream";
+import { config } from "./config";
+import { GNSSService } from "./services/GNSSProvider";
 import logger from "./logger";
-import { SocketPubSub, WebsocketPubSub } from "./services/PubSub";
+import { WebsocketPubSub } from "./messaging/WebSocketPubSub";
+// import { SocketPubSub } from "./messaging/SocketPubSub";
 
 /**
  * Types:
@@ -24,19 +25,19 @@ function logQtd() {
 }
 
 async function start() {
-	try {
-		const gpsReceiver = new GPSProvider();
+		const gnssService = new GNSSService();
 
 		const socketConf = config.socket;
-		// const socketPubSub = new SocketPubSub(config.socket);
-		const socketPubSub = new WebsocketPubSub();
+		// const messagingService = new SocketPubSub(config.socket);
+		const messagingService = new WebsocketPubSub();
 
 		const qtd = logQtd();
 
-		socketPubSub.createChannel('custom');
-		//webSocketPubSub.createChannel('custom');
+		messagingService.createChannel('custom');
 
-		let time = new Date(); let lat: number; let lon: number;
+		let time = new Date(); 
+		let lat: number; 
+		let lon: number;
 
 		// Inicia o log do contador, tempo em ms
 		// 1000 * 60 * 5 -> 5 minutos
@@ -44,10 +45,10 @@ async function start() {
 			logger.log(`Quantidade de dados enviadas: ${qtd.getQtd()}`);
 		}, config.log.qtdEnvioInterval, qtd);
 
-		gpsReceiver.serialInput('/dev/ttyUSB0');
-		gpsReceiver.parse();
+		gnssService.serialInput('/dev/ttyUSB0');
+		gnssService.parse();
 
-		gpsReceiver.on("data", async (data) => {
+		gnssService.on("data", async (data) => {
 			if (data.time) {
 				time = data.time;
 				lat = data.lat;
@@ -58,21 +59,19 @@ async function start() {
 				return;
 			} else {
 				for (const satelite of data.satellites) {
--					socketPubSub.pub('custom', `sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`);
-//-					webSocketPubSub.pub('custom', `sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`);
+					messagingService.pub('custom', `sat_${satelite.prn}_${satelite.snr}_${satelite.azimuth}_${satelite.elevation}_${lat}_${lon}_${time.getTime()}\n`);
 					qtd.aumentar();
 				}
 			}
 		});
 
-		gpsReceiver.on('error', (err) => {
+		gnssService.on('error', (err) => {
 			logger.log('Erro no GnssDataStream');
 			logger.log(err);
 		});
-	} catch (err) {
-		logger.exception(err);
-		process.exit(1);
-	}
 }
 
-start();
+start().catch(err => {
+	logger.exception(err);
+	process.exit(1);
+});

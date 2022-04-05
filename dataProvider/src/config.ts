@@ -1,6 +1,6 @@
 import { configurator } from "config-validation"
 import path from 'path';
-import logger from "../logger";
+import logger from "./logger";
 
 interface GpsConfig {
 	serialInput: string;

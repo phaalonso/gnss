@@ -1,11 +1,11 @@
 import path from 'path';
-import { GPSProvider } from './GnssDataStream';
+import { GNSSService } from '../services/GNSSProvider';
 import { createWriteStream } from 'fs';
-import logger from './logger';
+import logger from '../logger';
 
 const nmea = false;
 
-const stream = new GPSProvider();
+const stream = new GNSSService();
 
 if (nmea) {
     const filePath = path.join(__dirname, '..', '..', 'gpsData.nmea');
