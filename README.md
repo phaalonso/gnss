@@ -2,7 +2,7 @@
 
 Está é uma ferramenta a qual está sendo desenvolvida em um trabalho de Iniciação Científica, assim como em um Trabalho de Conclusão de Curso.
 
-O sistema é dividio entre vários módulos. Os quais podem ser observados na imagem abaixo.
+O sistema é dividio entre vários módulos. Podendo ser organizado de diversas maneiras, desde a utilização de todos componentes em uma única maquina, como pode ser observado na imagem abaixo, até sua distribuição em equipamentos diferente, permitindo possuir componentes focados apenas na coleta de dados que podem ser enviadas para uma central de processamento.
 
 ![Diagrama do sistema](./diagram.png)
 
