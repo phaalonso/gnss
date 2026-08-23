@@ -1,36 +1,47 @@
 import SerialPort, { parsers } from 'serialport';
 import { GPSConfig } from '../config/gpsConfig';
-import fs, { ReadStream, WriteStream } from 'fs';
+import fs, { ReadStream, WriteStream } from 'node:fs';
 import GPS from 'gps';
 import logger from "../logger";
+import { EventEmitter } from "node:events";
 
-type Callback = (chunk: any) => void;
+interface DataProviderConfig {
+    serialInput?: string;
+    fileInput?: string;
+}
 
 /**
  * @description GnssDataStream is a class to help extend GPS node package, receiving
  * the NMEA data directly from the serial port
  */
-export class DataProvider extends GPS {
+export class DataProvider {
+    private readonly gps = new GPS()
+    private readonly eventEmitter = new EventEmitter();
     protected inputStream: SerialPort | ReadStream;
     protected parserStream: parsers.Readline;
     protected writeStream?: WriteStream;
 
-    /**
-     * @description receives input value that indicate from where the device will receive
-     * NMEA data, defaults to /dev/ttyUSB0
-     * @param input
-     */
-    constructor() {
-        super();
-    }
-
-    public setSerialInput(input: string = GPSConfig.serialInput) {
-        if (this.inputStream) {
-            throw new Error('There is already an input stream');
+    constructor(config: DataProviderConfig) {
+        if (!config.serialInput && !config.fileInput) {
+            throw new Error('You must provide a serial input or a file input');
         }
 
-        logger.log(`Receiving data from serial input: ${input}`);
+        if (config.serialInput && config.fileInput) {
+            throw new Error('You can only provide a serial input or a file input, not both');
+        }
 
+        this.gps.on('data', (data) => {
+            this.eventEmitter.emit('data', data)
+        })
+
+        if (config.serialInput) {
+            this.setSerialInput(config.serialInput);
+        } else if (config.fileInput) {
+            this.setFileInput(config.fileInput);
+        }
+    }
+
+    private setSerialInput(input: string) {
         this.inputStream = new SerialPort(input, {
             baudRate: GPSConfig.baudRate,
         });
@@ -45,11 +56,7 @@ export class DataProvider extends GPS {
         });
     }
 
-    public setFileInput(fileInput: string) {
-        if (this.inputStream) {
-            throw new Error('There is already an input stream');
-        }
-
+    private setFileInput(fileInput: string) {
         logger.log(`Receiving data from file input ${fileInput}`);
 
         this.inputStream = fs.createReadStream(fileInput);
@@ -78,7 +85,7 @@ export class DataProvider extends GPS {
 
         this.parserStream.on('data', data => {
             try {
-                this.update(data);
+                this.gps.update(data);
             } catch (err) {
                 logger.exception(err.message);
             }

@@ -1,7 +1,6 @@
-import axios from "axios";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
-import { api } from "../services/api";
+import { api, isApiError } from "../services/api";
 
 export interface LoginCredentials {
     email: string;
@@ -83,13 +82,12 @@ const AuthProvider: React.FC = ({ children }) => {
         }
 
         api.get('/session/validate').catch((err) => {
-			if (axios.isAxiosError(err) && err.response) {
+			if (isApiError(err) && err.response) {
 				singOut();
 				alert('Sessão expirada, entre novamente');
-				return;
-			}
-
-			alert('Erro desconhecido, tente novamente mais tarde');
+			} else {
+                alert('Erro desconhecido, tente novamente mais tarde');
+            }
         });
     }, [data.token, singOut]);
 

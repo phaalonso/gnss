@@ -13,7 +13,7 @@ export interface IClient {
 }
 
 export abstract class Client implements IClient {
-    private connectedChannels = new Set<string>();
+    private readonly connectedChannels = new Set<string>();
     protected connected = false;
     protected messageCB!: MessageCB;
     protected errorCB!: ErrorCB;

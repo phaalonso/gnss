@@ -7,9 +7,8 @@ import { Container } from './styled';
 import * as Yup from 'yup';
 import getValidationError from '../../utils/ValidationErrors';
 import Toggle from '../../components/Toggle';
-import { api } from '../../services/api';
+import { api, isApiError } from '../../services/api';
 import { useHistory, useLocation } from 'react-router';
-import axios, { AxiosError, AxiosResponse } from 'axios';
 
 function useQuery() {
 	return new URLSearchParams(useLocation().search);
@@ -88,7 +87,7 @@ const UserCadastro: React.FC = () => {
 				return;
 			}
 
-			if (axios.isAxiosError(error)) {
+			if (isApiError(error)) {
 				if (error.response?.status === 412) {
 					alert('Não é possível remover o único usuário adminsitrador');
 					return;

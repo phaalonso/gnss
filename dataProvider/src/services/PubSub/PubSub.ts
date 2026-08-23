@@ -6,8 +6,7 @@ export abstract class PubSub<T> {
     protected readonly listeningChannels = new Map<string, Set<CustomSocket<T>>>();
 
 	protected constructor(
-		protected _methodName = 'write',
-	) { }
+    ) { }
 
     protected abstract sendMessage(socket: T, message: string): void;
 
@@ -21,7 +20,7 @@ export abstract class PubSub<T> {
     }
 
     /**
-     * @description Subscribe a socket in determined channel
+     * @description Subscribe a socket in a determined channel
      * @param channelName
      * @param socket
      */
@@ -52,7 +51,7 @@ export abstract class PubSub<T> {
     }
 
     /**
-     * @description Publish a message in determined channel
+     * @description Publish a message in a determined channel
      * @param channelName
      * @param message
      */
@@ -88,23 +87,23 @@ export abstract class PubSub<T> {
 
             const matchSub = msg.match(/^sub_(.*)$/);
 
-            if (matchSub && matchSub[1]) {
+            if (matchSub?.[1]) {
                 const channel = matchSub[1];
                 this.sub(channel, socket);
 				this.sendMessage(socket, `rec_${msg}`);
                 return;
             }
 
-            const matchPub = msg.match(/^pub_(.*)_(.*)$/);
-
-            if (matchPub && matchPub[1] && matchPub[2]) {
-                const channel = matchPub[1];
-                const message = matchPub[2];
-
-                this.pub(channel, message);
-				this.sendMessage(socket, `rec_${msg}`);
-                return;
-            }
+            // const matchPub = msg.match(/^pub_(.*)_(.*)$/);
+            //
+            // if (matchPub?.[1] && matchPub[2]) {
+            //     const channel = matchPub[1];
+            //     const message = matchPub[2];
+            //
+            //     this.pub(channel, message);
+			// 	this.sendMessage(socket, `rec_${msg}`);
+            //     return;
+            // }
 
             logger.exception(new Error(`Comando desconhecido ${msg}`));
         }

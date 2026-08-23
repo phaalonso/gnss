@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { errors } from "celebrate";
 import { Request, Response, Router } from "express";
 import prisma from "./client";
@@ -34,12 +33,11 @@ router.get('/scintilation', async (req, res) => {
 			by: ['prn']
 		});
 
-		//@ts-ignore
 		const data: IndicesPorPrn[] = prns;
 		console.log(prns);
 
 		for (const prn of data) {
-			const scintilation = await prisma.prnindices.findMany({ 
+			const scintilation = await prisma.prnindices.findMany({
 				select: {
 					mediasnr: true,
 					mediaazi: true,
@@ -63,7 +61,7 @@ router.get('/scintilation', async (req, res) => {
 		return res.json({ data });
 	} catch (error) {
 		console.log(error);
-		res.send(400).json({ message: 'Erro desconhecido' });
+		return res.status(400).json({ message: 'Erro desconhecido' });
 	}
 });
 
@@ -76,7 +74,7 @@ router.use(errors());
 router.use((error: any, req: Request, res: Response) => {
 	console.log('error handler') 
 	console.log('Error type', typeof error);
-	if (error instanceof Prisma.PrismaClientKnownRequestError) {
+	if (error instanceof PrismaClientKnownRequestError) {
 		console.log(error.message);
 		return res.sendStatus(409);
 	}

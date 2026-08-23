@@ -1,11 +1,11 @@
-import { IPrnInfoController } from "../../controller/IPrnInfoController";
+import { IPrnInfoController } from "../../controller";
 import { SQLite } from "../database/DAO";
 import logger from "../../logger";
 import { SignalMetrics } from "../../model/SignalMetrics";
 
 export class PrnInfoBetterSqlite implements IPrnInfoController {
 	constructor(
-		private dao: SQLite,
+		private readonly dao: SQLite,
 	) { }
 
 	async createTable() {
@@ -61,11 +61,11 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 	}
 
 	/**
-	 * @description Seleciona prn e snr de determinado prn em um periodo de um minuto relativo ao parametro time
+	 * @description seleciona prn e snr de determinado prn em um período de um minuto relativo ao parametro time
 	 * @param time tempo sera relativo a esse parametro
 	 * @param prn informa de qual prn será realizado a filtragem
 	 */
-	public findByPrn(time: Date, prn: number): Promise<any> {
+	public findByPrn(time: Date, prn: number): Promise<{ prn: number, snr: number }[]> {
 		return this.dao.all(
 			"SELECT prn, snr FROM prninfo WHERE time BETWEEN datetime(?, '-1 minute') AND datetime(?) AND prn = ?",
 			[time.toISOString(), time.toISOString(), prn]

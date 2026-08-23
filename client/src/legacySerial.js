@@ -57,7 +57,6 @@ db.serialize(function () {
     var stmt = db.prepare("INSERT INTO prninfo (prn, snr, azi, elev, lat, long, time) VALUES(?,?,?,?,?,?,?)");
 
     gps.on('data', function (data) {
-
         if (data.time != undefined) {
             time = data.time;
             latitude = data.lat;
@@ -154,5 +153,4 @@ db.serialize(function () {
 
 parser.on('data', function (data) {
     gps.update(data);
-
 });

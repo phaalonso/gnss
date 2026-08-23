@@ -10,9 +10,10 @@ export class SQLite {
 		try {
 			this.con = new Database(this.filePath);
 			logger.log('Conectado ao banco de dados');
-			this.con.pragma("synchronous=OFF");
+			// this.con.pragma('synchronous=OFF');
+			this.con.pragma('journal_mode=WAL')
 		} catch (err) {
-			logger.exception('Não foi possível conectar com o banco de dados');
+			logger.exception(err, 'Não foi possível conectar com o banco de dados');
 			process.exit(1);
 		}
 	}

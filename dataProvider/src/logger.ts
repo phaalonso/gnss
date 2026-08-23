@@ -1,4 +1,5 @@
-import { inspect } from 'util';
+import { inspect } from 'node:util';
+
 const stdout = process.stdout;
 
 const log = (...args: any[]) => {
@@ -10,8 +11,8 @@ const log = (...args: any[]) => {
 }
 
 const exception = (err: Error | string, prefix?: string) => {
-    let message = '';
-    let stack = '';
+    let message: string;
+    let stack: string;
 
     if (err instanceof Error) {
         message = err.message;
@@ -21,7 +22,7 @@ const exception = (err: Error | string, prefix?: string) => {
         stack = new Error(message).stack || '';
     }
 
-    log(`\x1b[34m${prefix ? prefix : ''}\x1b[0m ${message}, stack ${stack}`);
+    log(`\x1b[34m${prefix || ''}\x1b[0m ${message}, stack ${stack}`);
 }
 
 const logger = {

@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { PrnIndicesBetterSqlite } from "./bettersqlite/controllers/PrnIndicesBetterSqlite";
 import { PrnInfoBetterSqlite } from "./bettersqlite/controllers/PrnInfoBetterSqlite";
 import { SQLite } from "./bettersqlite/database/DAO";
@@ -10,19 +10,20 @@ import { PrnIndicesMongo } from "./mongodb/controller/PrnIndicesMongo";
 import { PrnInfoMongo } from "./mongodb/controller/PrnInfoMongo";
 import { connect } from "./mongodb/database/connection";
 import { ProcessData } from "./ProcessData";
+import { MessageBuffer } from "./clients/MessageBuffer";
 
 let prnInfoController: IPrnInfoController;
 let prnIndicesController: IPrnIndicesController;
 
 async function initDatabase() {
-	const selectedDB = process.env.DB;
+    const selectedDB = process.env.DB;
 
-	if (!selectedDB) {
-		logger.log('Coun\'t find the DB variable');
-		process.exit(1);
-	}
+    if (!selectedDB) {
+        logger.log('Coun\'t find the DB variable');
+        process.exit(1);
+    }
 
-    switch(selectedDB.toLocaleLowerCase()) {
+    switch (selectedDB.toLocaleLowerCase()) {
         case 'sqlite':
             const dao = new SQLite();
             const prnInfo = new PrnInfoBetterSqlite(dao);
@@ -49,7 +50,7 @@ async function start() {
         const file = path.join(__dirname, "..", "..", `sqlite.log`);
         console.log(file);
         logger.enableWrite(file);
-        
+
         await initDatabase();
 
         const processData = new ProcessData(
@@ -61,7 +62,7 @@ async function start() {
 
         const messageHandler = new MessageHandler(
             processData,
-            '\n'
+            new MessageBuffer('\n')
         );
 
         // const client = new NewSocketClient({
@@ -70,10 +71,10 @@ async function start() {
         // });
 
         //const client = new WebsocketClient('ws://192.168.3.23:4312');
-		const client = new WebsocketClient('ws://localhost:4312');
+        const client = new WebsocketClient('ws://localhost:4312');
 
         client.onMessage(messageHandler.handle.bind(messageHandler));
-        
+
         client.subscribe('custom');
         await client.start();
     } catch (err: any) {

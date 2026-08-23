@@ -1,4 +1,3 @@
-import { std, mean } from "mathjs";
 import { Satellite } from "gps";
 import logger from "../logger";
 import { PrnInfoController } from "../controller/PrnInfoController";
@@ -18,11 +17,45 @@ const TAXA = 0.1;
 const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
 
+function std(flat: number[], normalization = 'unbiased'): number {
+	const n = flat.length;
+
+	if (n === 0) return Number.NaN;
+
+	// 2. Calculate the mean
+	const mean = flat.reduce((sum, val) => sum + val, 0) / n;
+
+	// 3. Calculate the sum of squared errors
+	const sumSquaredErrors = flat.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0);
+
+	// 4. Determine the denominator based on the normalization type
+	let denominator;
+	switch (normalization) {
+		case 'uncorrected':
+			denominator = n;
+			break;
+		case 'biased':
+			denominator = n + 1;
+			break;
+		case 'unbiased':
+		default:
+			denominator = n - 1;
+			break;
+	}
+
+	// Handle edge case where denominator is 0 (e.g., unbiased with 1 element)
+	if (denominator === 0) return Number.NaN;
+
+	// 5. Calculate variance and return the square root (standard deviation)
+	const variance = sumSquaredErrors / denominator;
+	return Math.sqrt(variance);
+}
+
 export class ProcessData {
 	private timeController: number;
-	private prnInfo: PrnInfoController;
-	private prnIndices: PrnIndicesController;
-	private qtdDados = 0;
+	private readonly prnInfo: PrnInfoController;
+	private readonly prnIndices: PrnIndicesController;
+	private readonly qtdDados = 0;
 
 	constructor(prnInfoController: PrnInfoController, prnIndicesController: PrnIndicesController) {
 		if (!prnInfoController || !prnIndicesController) {
@@ -115,10 +148,10 @@ export class ProcessData {
 
 					let dpSnr = std(vSnr);
 					intensidadeSinalQuadrado /= vIntensidadeSinal.length;
-					let mediaIntensidadeSinalQuadrado = Math.pow(
-						mean(vIntensidadeSinal),
-						2
-					);
+
+					const meanVIntensidadeSinal = vIntensidadeSinal.reduce((sum, current) => sum + current, 0) / vIntensidadeSinal.length;
+					let mediaIntensidadeSinalQuadrado = Math.pow(meanVIntensidadeSinal, 2);
+
 					let s4 = Math.sqrt(
 						(intensidadeSinalQuadrado -
 							mediaIntensidadeSinalQuadrado) /
@@ -154,7 +187,7 @@ export class ProcessData {
 			custom.time
 		);
 
-		if (custom.time && custom.time.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
+		if (custom.time?.getSeconds() == 0 && custom.time.getMinutes() != this.timeController) {
 			this.timeController = custom.time.getMinutes();
 			logger.log(this.timeController);
 

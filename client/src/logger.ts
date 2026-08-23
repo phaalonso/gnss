@@ -1,5 +1,5 @@
-import { inspect } from 'util';
-import { createWriteStream, WriteStream } from 'fs';
+import { inspect } from 'node:util';
+import { createWriteStream, WriteStream } from 'node:fs';
 
 const stdout = process.stdout;
 let stream: WriteStream;

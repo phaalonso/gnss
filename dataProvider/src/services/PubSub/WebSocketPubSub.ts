@@ -6,14 +6,14 @@ import logger from "../../logger";
 const { cpu, mem } = osu;
 
 export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
-	private wsS: WebSocket.Server;
+	private readonly websocketServer: WebSocket.Server;
 
 	constructor() {
-		super('send');
+		super();
 		this.createChannel('cpu');
 		this.createChannel('ram');
 
-		this.wsS = new WebSocket.Server({
+		this.websocketServer = new WebSocket.Server({
 			port: 4312
 		});
 
@@ -28,7 +28,7 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 	}
 
 	private handleNewConnection() {
-		this.wsS.on('connection', (socket: CustomSocket<WebSocket>) => {
+		this.websocketServer.on('connection', (socket: CustomSocket<WebSocket>) => {
 			console.log(`Nova conexão criada`);
 			socket.channels = []; // Canais aos quais o socket está conecatdo
 
@@ -43,10 +43,10 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 	}
 
 	private errorHandler() {
-		this.wsS.on('error', (err) => {
+		this.websocketServer.on('error', (err) => {
 			if (err.name === 'EADDRINUSE') {
 				logger.log('Endereço já está em uso, tentando novamente...');
-				this.wsS.close()
+				this.websocketServer.close()
 			} else {
 				logger.log(err);
 			}
@@ -54,8 +54,8 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 	}
 	
 	private listening() {
-		this.wsS.on('listening', () => {
-			logger.log(`Servidor iniciado em`, this.wsS.address());
+		this.websocketServer.on('listening', () => {
+			logger.log(`Servidor iniciado em`, this.websocketServer.address());
 
 			setInterval((server: WebsocketPubSub) => {
 				if (server.listeningChannels.get('cpu') && server.listeningChannels.get('cpu')!.size > 0) {

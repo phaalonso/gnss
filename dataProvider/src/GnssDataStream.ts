@@ -1,75 +1,79 @@
-import SerialPort, { parsers } from 'serialport';
-import fs, { ReadStream, WriteStream } from 'fs';
+import fs, { ReadStream, WriteStream } from 'node:fs';
 import GPS from 'gps';
 import logger from "./logger";
-import { config } from './config/gpsConfig';
+import { ReadlineParser, SerialPort } from "serialport";
 
-//INFO: Talvez seria interessante possuir uma arquitetura Observer para as Streams, permitindo que exista mais de uma Stream no recebimento de dados
+interface DataProviderConfig {
+    serialInput?: string;
+    fileInput?: string;
+    baudRate?: number;
+}
+
 export class GPSProvider extends GPS {
+    private readonly config: DataProviderConfig;
     protected inputStream!: SerialPort | ReadStream;
-    protected parserStream!: parsers.Readline;
+    protected parserStream!: ReadlineParser;
     protected writeStream?: WriteStream;
 
-    /**
-     * @description receives input value that indicate from where the device will receive
-     * NMEA data, defaults to /dev/ttyUSB0
-     * @param input
-     */
-    constructor() {
+    constructor(config: DataProviderConfig) {
         super();
-    }
-
-    public serialInput(input: string = config.serialInput): void {
-        if (this.inputStream) {
-            throw new Error('There is already an input stream');
+        if (!config.serialInput && !config.fileInput) {
+            throw new Error('You must provide a serial input or a file input');
         }
 
-        logger.log(`Receiving data from serial input: ${input}`);
-
-        this.inputStream = new SerialPort(input, {
-            baudRate: config.gps.baudRate,
-        });
-
-        this.inputStream.on('error', (error) => {
-            console.error(error);
-            // process.exit(1);
-        });
-    }
-
-    public readFromFile(fileInput: string) {
-        if (this.inputStream) {
-            throw new Error('There is already an input stream');
+        if (config.serialInput && config.fileInput) {
+            throw new Error('You can only provide a serial input or a file input, not both');
         }
 
-        logger.log(`Receiving data from file input ${fileInput}`);
+        this.config = config;
 
-        this.inputStream = fs.createReadStream(fileInput);
-
-        this.inputStream.on('error', err => {
-            logger.exception(err, 'Serial port')
-            process.exit(1);
-        });
-
-        this.inputStream.on('end', () => {
-            logger.log('End of the file');
-            process.exit(1);
-        });
-    }
-
-	/**
-	* @description método responsável por inicializar as streams utilizadas para
-	* o recebimento de dados no formato NMEA
-	*/
-    public parse(): void {
-        logger.log(`Piping data to GPS`);
-
-        this.parserStream = new parsers.Readline({
+        this.parserStream = new ReadlineParser({
             delimiter: '\r\n',
         });
 
         this.parserStream.on('error', err => {
             logger.exception(err, 'Parser');
         });
+    }
+
+    private inputSetup() {
+        if (this.config.serialInput) {
+            logger.log(`Receiving data from serial input: ${this.config.serialInput}`);
+
+            this.inputStream = new SerialPort({
+                path: this.config.serialInput,
+                baudRate: this.config.baudRate || 115200,
+            }, error => {
+                console.error(error);
+                process.exit(1)
+            });
+
+            this.inputStream.on('error', (err: Error) => {
+                logger.exception(err);
+            });
+        } else if (this.config.fileInput) {
+            logger.log(`Receiving data from file input ${this.config.fileInput}`);
+
+            this.inputStream = fs.createReadStream(this.config.fileInput);
+
+            this.inputStream.on('error', (err: Error) => {
+                logger.exception(err, `Exception while reading input stream from file ${this.config.fileInput}`)
+            });
+
+            this.inputStream.on('end', () => {
+                logger.log('End of the file');
+            });
+        }
+    }
+
+    /**
+     * @description método responsável por inicializar as streams utilizadas para
+     * o recebimento de dados no formato NMEA
+     */
+    public parse(): void {
+        logger.log(`Piping data to GPS`);
+
+        this.inputSetup();
 
         this.inputStream.pipe(this.parserStream);
 
@@ -81,14 +85,9 @@ export class GPSProvider extends GPS {
 			}
         });
 
-		this.on('error', (err: Error) => logger.exception(err));
+        this.on('error', (err: Error) => logger.exception(err));
     }
 
-    /**
-     * @description as informações recebidas do receptor serão escritas em um arquivo.
-     * @param {string} file
-     * @returns {void}
-     */
     public writeToFile(file: string): void {
         logger.log(`Piping data to file ${file}`);
         const writeStream = fs.createWriteStream(file);
