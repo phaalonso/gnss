@@ -23,25 +23,25 @@ async function initDatabase() {
         process.exit(1);
     }
 
-    switch (selectedDB.toLocaleLowerCase()) {
-        case 'sqlite':
-            const dao = new SQLite();
-            const prnInfo = new PrnInfoBetterSqlite(dao);
-            await prnInfo.createTable();
-            prnInfoController = prnInfo;
+    const db = selectedDB.toLocaleLowerCase();
 
-            const prnIndices = new PrnIndicesBetterSqlite(dao);
-            await prnIndices.createTable();
-            prnIndicesController = prnIndices;
-            break;
-        case 'mongo':
-            await connect()
-            prnInfoController = new PrnInfoMongo();
-            prnIndicesController = new PrnIndicesMongo()
-            break;
-        default:
-            logger.log('Unknown DB env variable, use sqlite or mongo');
-            process.exit(1);
+    if (db === 'sqlite') {
+        const dao = new SQLite();
+        const prnInfo = new PrnInfoBetterSqlite(dao);
+        await prnInfo.createTable();
+        prnInfoController = prnInfo;
+
+        const prnIndices = new PrnIndicesBetterSqlite(dao);
+        await prnIndices.createTable();
+        prnIndicesController = prnIndices;
+    } else if (db === 'mongo') {
+        await connect()
+        prnInfoController = new PrnInfoMongo();
+        prnIndicesController = new PrnIndicesMongo()
+
+    } else {
+        logger.log('Unknown DB env variable, use sqlite or mongo');
+        process.exit(1);
     }
 }
 

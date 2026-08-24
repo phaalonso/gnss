@@ -9,11 +9,6 @@ export class MessageBuffer {
         this.buffer = "";
     }
 
-    public logBuffer() {
-        logger.log(`Buffer content: ${this.buffer}`);
-        logger.log(`Buffer length: ${this.buffer.length}`);
-    }
-
     /**
      * @returns true when buffer is empty or don't have an delimiter
      */
@@ -29,13 +24,13 @@ export class MessageBuffer {
     public getMessage() {
         const delimiterIndex = this.buffer.indexOf(this.delimiter);
 
-        if (delimiterIndex !== -1) {
-            let message = this.buffer.slice(0, delimiterIndex);
-            this.buffer = this.buffer.replace(message + this.delimiter, "");
-            return message;
+        if (delimiterIndex === -1) {
+            return null
         }
 
-        return null
+        const message = this.buffer.slice(0, delimiterIndex);
+        this.buffer = this.buffer.slice(delimiterIndex + this.delimiter.length);
+        return message;
     }
 
 }
