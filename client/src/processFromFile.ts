@@ -8,7 +8,9 @@ import { PrnIndicesBetterSqlite } from './bettersqlite/controllers/PrnIndicesBet
 
 const file = path.join(__dirname, '..', '..', 'gpsData.nmea')
 
-const dataStream = new GPSProvider();
+const dataStream = new GPSProvider({
+	fileInput: file,
+});
 
 let time = new Date();
 let lat: number;
@@ -49,7 +51,6 @@ async function run() {
         }
     })
 
-    dataStream.readFromFile(file);
     dataStream.parse();
 }
 

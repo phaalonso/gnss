@@ -69,7 +69,7 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 		return this.dao.all(
 			"SELECT prn, snr FROM prninfo WHERE time BETWEEN datetime(?, '-1 minute') AND datetime(?) AND prn = ?",
 			[time.toISOString(), time.toISOString(), prn]
-		);
+		) as Promise<{ prn: number, snr: number }[]>;
 	}
 
 	async countRows(): Promise<number> {

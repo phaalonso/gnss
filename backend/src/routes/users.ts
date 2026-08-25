@@ -26,7 +26,8 @@ user.get(
 		}),
 	}),
 	async (req, res) => {
-		const { id } = req.params;
+		// Express 5 types params as string | string[]; route is a single :id segment
+		const id = String(req.params.id);
 
 		// Restringe para pesquisar seus próprios dados, ou permitir
 		// pesquisar dos outros caso seja um administrador
@@ -67,7 +68,7 @@ user.post(
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.meta)
 					return res.status(409).json({
-						message: `Conflict in ${error.meta['target'].join(', ')}`
+						message: `Conflict in ${(error.meta['target'] as string[]).join(', ')}`
 					});
 				else
 					return res.sendStatus(409);
@@ -96,7 +97,7 @@ user.put(
 	}),
 	async (req, res, next) => {
 		try {
-			const id = parseInt(req.params.id);
+			const id = parseInt(String(req.params.id));
 			const { nome, nickname, email, password, administrator } = req.body;
 
 			if (isNaN(id)) {
@@ -130,7 +131,7 @@ user.put(
 				}
 				if (error.code == 'P2002')
 					return res.status(409).json({
-						message: `Conflict in ${error.meta['target'].join(', ')}`
+						message: `Conflict in ${(error.meta['target'] as string[]).join(', ')}`
 					});
 				else
 					return res.sendStatus(409);
@@ -151,7 +152,7 @@ user.delete(
 	}),
 	async (req, res) => {
 		try {
-			const { id } = req.params;
+			const id = String(req.params.id);
 
 			await UserService.delete(parseInt(id));
 

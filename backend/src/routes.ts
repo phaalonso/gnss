@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { errors } from "celebrate";
 import { Request, Response, Router } from "express";
 import prisma from "./client";
@@ -33,7 +34,7 @@ router.get('/scintilation', async (req, res) => {
 			by: ['prn']
 		});
 
-		const data: IndicesPorPrn[] = prns;
+		const data: IndicesPorPrn[] = prns.map((p) => ({ prn: p.prn, indices: [] }));
 		console.log(prns);
 
 		for (const prn of data) {
@@ -74,7 +75,7 @@ router.use(errors());
 router.use((error: any, req: Request, res: Response) => {
 	console.log('error handler') 
 	console.log('Error type', typeof error);
-	if (error instanceof PrismaClientKnownRequestError) {
+	if (error instanceof Prisma.PrismaClientKnownRequestError) {
 		console.log(error.message);
 		return res.sendStatus(409);
 	}

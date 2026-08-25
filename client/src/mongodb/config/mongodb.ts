@@ -11,11 +11,8 @@ interface Config {
 export const MongoConfig: Config = {
 	url: process.env.MONGOURI || '',
 	options: {
-		useNewUrlParser: true,
-		useCreateIndex: true,
-		useUnifiedTopology: true,
-		useFindAndModify: false,
-		keepAlive: true,
-		poolSize: 30,
+		// Mongoose 5-era options (useNewUrlParser/useCreateIndex/useUnifiedTopology/useFindAndModify/keepAlive/poolSize)
+		// were removed in Mongoose 6+; driver defaults apply. maxPoolSize replaces the old poolSize.
+		maxPoolSize: 30,
 	}
 }
