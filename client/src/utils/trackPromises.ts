@@ -8,6 +8,8 @@ export function trackPromises(promise: Promise<any>) {
     })
 }
 
-//setInterval(() => {
-	//console.log(`Promises: ${count}`);
-//}, 1000 * 60);
+if (process.env.TRACK_PROMISSES_FLAG === 'true') {
+    setInterval(() => {
+        console.log(`Promises: ${count}`);
+    }, 1000 * 60);
+}

@@ -3,4 +3,5 @@ export interface IPrnIndicesController {
 	indicesLength(): Promise<number>;
     lastIndice(): Promise<Date | undefined>;
     deleteBefore(lastDateTime: Date): Promise<void>;
+    initialize(): Promise<void>;
 }

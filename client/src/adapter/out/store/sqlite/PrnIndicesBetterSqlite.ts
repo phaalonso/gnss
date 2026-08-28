@@ -1,13 +1,13 @@
-import { IPrnIndicesController } from "../../controller/IPrnIndicesController";
-import logger from "../../logger";
-import { SQLite } from "../database/DAO";
+import { SQLite } from "./DAO";
+import logger from "../../../../logger";
+import { IPrnIndicesController } from "../IPrnIndicesController";
 
 export class PrnIndicesBetterSqlite implements IPrnIndicesController {
 	constructor(
-		private dao: SQLite,
+		private readonly dao: SQLite,
 	) { }
 
-	public async createTable() {
+	public async initialize() {
 		logger.log('Criando prnindices');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prnindices (
@@ -23,7 +23,7 @@ export class PrnIndicesBetterSqlite implements IPrnIndicesController {
 			)
 		`;
 
-		return this.dao.run(sql);
+		await this.dao.run(sql);
 	}
 
 	insertProcessedData(dpSnr: number, s4: number, time: Date, prn: number) {

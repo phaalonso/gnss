@@ -1,4 +1,4 @@
-import net from "net";
+import net from "node:net";
 import logger from "../logger";
 import { Client } from "./IClient";
 

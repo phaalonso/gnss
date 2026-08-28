@@ -1,5 +1,5 @@
 import Database, { Database as TypeDB } from "better-sqlite3";
-import logger from "../../logger";
+import logger from "../../../../logger";
 
 export class SQLite {
 	private readonly filePath: string;

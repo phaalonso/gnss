@@ -1,7 +1,7 @@
-import { IPrnIndicesController } from "../../controller/IPrnIndicesController";
-import { IPrnIndices, PrnIndicesModel } from "../database/prnindices";
-import logger from "../../logger";
-import { PrnInfoModel } from "../database/prninfo";
+import { IPrnIndicesController } from "../IPrnIndicesController";
+import { PrnInfoModel } from "./model/prninfo";
+import { IPrnIndices, PrnIndicesModel } from "./model/prnindices";
+import logger from "../../../../logger";
 
 export class PrnIndicesMongo implements IPrnIndicesController {
     async insertProcessedData(
@@ -67,5 +67,9 @@ export class PrnIndicesMongo implements IPrnIndicesController {
 
     deleteBefore(lastDateTime: Date): Promise<void> {
         throw new Error("Method not implemented.");
+    }
+
+    initialize(): Promise<void> {
+        return;
     }
 }

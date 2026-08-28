@@ -1,10 +1,10 @@
 import Mongoose, { Connection } from "mongoose";
-import logger from "../../logger";
-import { MongoConfig } from "../config/mongodb";
+import logger from "../../../../../logger";
+import { MongoConfig } from "../mongodb";
 
 let connection: Connection;
 
-export const connect = async () => {
+export const connectMongoDB = async () => {
 	return new Promise((resolve, reject) => {
 		if (connection) return resolve(connection);
 
@@ -30,7 +30,7 @@ export const connect = async () => {
 	});
 };
 
-export const disconnect = async () => {
+export const disconnectMongoDB = async () => {
 	if (!connection) return;
 
 	await Mongoose.disconnect();

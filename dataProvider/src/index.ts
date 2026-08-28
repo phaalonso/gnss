@@ -56,7 +56,7 @@ async function start() {
                 lon = data.lon;
             }
 
-            if (!data.msgNumber || data.msgNumber == "null" || !data.satellites || !lat || !lon) {
+            if (!data.msgNumber || data.msgNumber === "null" || !data.satellites || !lat || !lon) {
                 return;
             } else {
                 for (const satelite of data.satellites) {

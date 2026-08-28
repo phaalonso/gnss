@@ -1,16 +1,14 @@
 import path from "node:path";
-import { PrnIndicesBetterSqlite } from "./bettersqlite/controllers/PrnIndicesBetterSqlite";
-import { PrnInfoBetterSqlite } from "./bettersqlite/controllers/PrnInfoBetterSqlite";
-import { SQLite } from "./bettersqlite/database/DAO";
 import { MessageHandler } from "./clients/MessageHandler";
 import { WebsocketClient } from "./clients/WebsocketClient";
-import { IPrnIndicesController, IPrnInfoController } from "./controller";
 import logger from "./logger";
-import { PrnIndicesMongo } from "./mongodb/controller/PrnIndicesMongo";
-import { PrnInfoMongo } from "./mongodb/controller/PrnInfoMongo";
-import { connect } from "./mongodb/database/connection";
 import { ProcessData } from "./ProcessData";
 import { MessageBuffer } from "./clients/MessageBuffer";
+import { IPrnIndicesController, IPrnInfoController } from "./adapter/out/store";
+import { PrnIndicesBetterSqlite, PrnInfoBetterSqlite, SQLite } from "./adapter/out/store/sqlite";
+import { connectMongoDB } from "./adapter/out/store/mongodb/model/connection";
+import { PrnInfoMongo } from "./adapter/out/store/mongodb/PrnInfoMongo";
+import { PrnIndicesMongo } from "./adapter/out/store/mongodb/PrnIndicesMongo";
 
 let prnInfoController: IPrnInfoController;
 let prnIndicesController: IPrnIndicesController;
@@ -27,22 +25,19 @@ async function initDatabase() {
 
     if (db === 'sqlite') {
         const dao = new SQLite();
-        const prnInfo = new PrnInfoBetterSqlite(dao);
-        await prnInfo.createTable();
-        prnInfoController = prnInfo;
-
-        const prnIndices = new PrnIndicesBetterSqlite(dao);
-        await prnIndices.createTable();
-        prnIndicesController = prnIndices;
+        prnInfoController = new PrnInfoBetterSqlite(dao);
+        prnIndicesController = new PrnIndicesBetterSqlite(dao);
     } else if (db === 'mongo') {
-        await connect()
+        await connectMongoDB()
         prnInfoController = new PrnInfoMongo();
         prnIndicesController = new PrnIndicesMongo()
-
     } else {
         logger.log('Unknown DB env variable, use sqlite or mongo');
         process.exit(1);
     }
+
+    await prnIndicesController.initialize();
+    await prnInfoController.initialize();
 }
 
 async function start() {

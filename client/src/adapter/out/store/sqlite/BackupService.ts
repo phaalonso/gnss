@@ -1,9 +1,10 @@
-import { SQLite } from "./database/DAO";
+import { SQLite } from "./DAO";
 import path from 'path';
 import fs from 'fs';
-import logger from "../logger";
 import { FileInfo, UploadService } from "./UploadService";
-import { IPrnIndicesController, IPrnInfoController } from "../controller";
+import { IPrnIndicesController } from "../IPrnIndicesController";
+import { IPrnInfoController } from "../IPrnInfoController";
+import logger from "../../../../logger";
 
 interface IBackupConfig {
 	folder: string;

@@ -2,8 +2,10 @@ import { SignalMetrics } from "../model/SignalMetrics";
 
 export interface IPrnInfoController {
     insert(metric: SignalMetrics): any;
-
 	insertMany(data: SignalMetrics[]): any;
+    countRows(): Promise<number>;
+    deleteBefore(lastDateTime: Date): Promise<void>;
+    initialize(): Promise<void>;
 
     /**
      * @description Retorna dados inseridos em prninfo agrupados em um intervalo de um minuto relativo ao parametro time
@@ -17,6 +19,4 @@ export interface IPrnInfoController {
      * @param prn informa de qual prn será realizado a filtragem
      */
 	findByPrn(time: Date, prn: number): any;
-    countRows(): Promise<number>;
-    deleteBefore(lastDateTime: Date): Promise<void>;
 }

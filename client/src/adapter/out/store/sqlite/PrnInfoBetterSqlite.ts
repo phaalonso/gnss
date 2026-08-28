@@ -1,14 +1,14 @@
-import { IPrnInfoController } from "../../controller";
-import { SQLite } from "../database/DAO";
-import logger from "../../logger";
-import { SignalMetrics } from "../../model/SignalMetrics";
+import { IPrnInfoController } from "../IPrnInfoController";
+import { SQLite } from "./DAO";
+import logger from "../../../../logger";
+import { SignalMetrics } from "../../../../model/SignalMetrics";
 
 export class PrnInfoBetterSqlite implements IPrnInfoController {
 	constructor(
 		private readonly dao: SQLite,
 	) { }
 
-	async createTable() {
+	async initialize() {
 		logger.log('Criando prninfo');
 		const sql = `
 			CREATE TABLE IF NOT EXISTS prninfo (
@@ -23,7 +23,7 @@ export class PrnInfoBetterSqlite implements IPrnInfoController {
 			)
 		`;
 
-		return this.dao.run(sql);
+		await this.dao.run(sql);
 	}
 	
 	/**

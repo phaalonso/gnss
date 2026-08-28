@@ -1,7 +1,7 @@
-import { IPrnInfoController } from "../../controller/IPrnInfoController";
-import { SignalMetrics } from "../../model/SignalMetrics";
-import logger from "../../logger";
-import { PrnInfoModel } from "../database/prninfo";
+import { IPrnInfoController } from "../IPrnInfoController";
+import { SignalMetrics } from "../../../../model/SignalMetrics";
+import { PrnInfoModel } from "./model/prninfo";
+import logger from "../../../../logger";
 
 export class PrnInfoMongo implements IPrnInfoController {
     public async insert(metric: SignalMetrics) {
@@ -9,6 +9,10 @@ export class PrnInfoMongo implements IPrnInfoController {
         .catch(err => {
             logger.exception(err, 'On insert prninfo mongo');
         });
+    }
+
+    initialize(): Promise<void> {
+        return;
     }
 
     insertMany(data: SignalMetrics[]) {
