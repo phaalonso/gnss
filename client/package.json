@@ -10,10 +10,9 @@
     "node": ">=26.0.0"
   },
   "scripts": {
-    "mongo": "ts-node src/adapter/out/store/mongodb/mongoClient.ts",
-    "sqlite": "ts-node ./src/sqlite/sqliteClient.ts",
-    "bettersqlite": "ts-node ./src/bettersqlite/sqliteClient.ts",
-    "start": "ts-node src/index.ts"
+    "start": "node dist/index.js",
+    "start:dev": "ts-node src/index.ts",
+    "build": "tsc"
   },
   "dependencies": {
     "@types/ftp": "^0.3.32",

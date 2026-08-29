@@ -1,31 +1,36 @@
-# Ferramenta de monitoramento GNSS
+# GNSS – Ionospheric Scintillation Monitor
 
-Está é uma ferramenta a qual está a ser desenvolvida num trabalho de Iniciação Científica, assim como num Trabalho de Conclusão de Curso.
+> Initially developed for a final paper on a computer science course
 
-O sistema é dividio entre vários módulos. Podendo ser organizado de diversas maneiras, desde a utilização de todos os componentes numa única maquina, como pode ser observado na imagem abaixo, até a sua distribuição em equipamento diferente, permitindo possuir componentes focados apenas na coleta de dados que podem ser enviadas para uma central de processamento.
+This project consists of four modules:
+- **dataProvider**: permit the reading and transmitting GNSS NMEA data using sockets or WebSockets using a custom format
+- **client**: connect to the dataProvider data stream and store the information on SQLite or MongoDB
+- **backend/frontend**: provide an API and web interface to visualize the data and impacts of ionospheric scintillation
 
-![Diagrama do sistema](./diagram.png)
+![System diagram](./diagram.png)
 
-[Repositório do projeto](https://github.com/phaalonso/gnss)
+## How to use
 
-Email de contato: phaalonso@gmail.com
+Requirements:
+- Node.js: v26.8.1
+- NPM
+- GNNS module to use as a data source
+- Linux (This was tested on Windows but probaly can work on other OS with minor adjustments)
+- Typescript
 
-## Configurações
+### Configuring the device
 
-O sistema onde este projeto for executado deve possuir [Node.js](https://nodejs.org/en/) instalado, assim como o gerenciador de pacotes [yarn](https://yarnpkg.com/).
+It's essential that you know the device name in your OS. Normally on linux it's identified as /dev/ttyUSB0, but it can vary depending on the device and operating system. I recomend running the command `ls /dev/tty*` to check the device name before and after plug in the device and see what changed.
 
-> Durante o desenvolvimento do sistema, foi utilizado a versão `v15.14.0` do Node e `v1.22.5` do yarn. Note que sempre deve dar prioridade a utilização das versões LTS (Long Term Support).
-
-### DataProvider
-
-A primeira configuração que precisa ser realizada no DataProvider, é habilitar o recebimento de informações via o módulo GNSS. Para isso devemos utilizar um comando com a antena conectada ao dispositivo, nesse comando deve ser passado [o arquivo o representa](https://youtu.be/b58CnY7qxpk).
-
+Configure the device to receive the data via GNSS module. Giving permission to read the data via the command:
 ```bash
-$ sudo chmod 666 /dev/ttyUSB0 # Permitir que outros usuários além do `sudo` acesse o arquivo
-$ sudo stty -F /dev/ttyUSB0 115200 # Abre o disposítivo e seta a velocidade de transmissão
+# give permission so that all users can read the data
+sudo chmod 666 /dev/ttyUSB0 
+# configure the transfer rate for the device, this can vary depending on the device
+sudo stty -F /dev/ttyUSB0 115200
 ```
 
-É possível utilizar o comando `cat /dev/ttyUSB0` para identificar se o comando foi executado corretamente, o output do `cat` deve ser parecido com o seguinte exemplo:
+It's possible to thest if the device is receiving correctly using the linux cat command on the device. For example, im my computer the output of `cat /dev/ttyUSB0` is:
 
 ```nmea
 $GPGGA,153718.900,2152.0707,S,05150.3215,W,1,10,0.78,400.3,M,-2.1,M,,*74
@@ -37,26 +42,27 @@ $GPRMC,153718.900,A,2152.0707,S,05150.3215,W,0.01,341.19,150621,,,A*6F
 $GPVTG,341.19,T,,M,0.01,N,0.03,K,A*31
 ```
 
-A partir do momento em que confirmar os dados recebidos via satélite, pode ser realizado a execução do DataProvider. Para realizar isso, basta entrar na pasta `dataProvider` e o executá-lo com o comando `yarn start`.
+If the data is malformed, check if the transfer rate of the device is correclty configured.
 
-> *Obs: em casos de primeira execução do serviço, ou alteração de dependências, é necessário utilizar o comando `yarn` para que estas sejam baixadas para o dispositivo.*
+From the moment the data is received via GNSS module, it's possible to run the DataProvider. To do this, go to the dataProvider folder and run it with the command `node dist/index.js`
 
-> *Este serviço carrega as suas configurações a partir do arquivo config.json, buscava inicialmente a possibilidade de permitir mudar dinamicamente a configuração, para que as estações pudessem ser configuradas remotamente sem a necessidade de que cada módulo utilizasse um banco de dados. Entretanto, este se tornou um item que não foi implementado devido a restrições de tempo, sendo assim o serviço pode ser alterado para carregar as configurações do arquivo `.env`*
+### Code setup
 
-## Client
-Serviço o qual irá consumir o websocket fornecido pelo DataProvider, armazenando e processando as informações coletadas em intervalos de tempo regulares.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
 
-> *Obs: note que para o client ser capaz de consumir as informações, ele deve possuir apontamento correto para a porta.*
-> 
-> *Obs2: caso deseje consumir de um websocket a partir de uma máquina externa, é necessário que a porta dele esteja exposto. Isso pode ser realizaado de duas maneiras, simplesmente expondo a porta, ou através de uma proxy reversa (como o Nginx)*
+1. Visit each folder that will be used and run the command `npm i` to install the dependencies.
+2. Compile the code using the command `npm run build`
+3. Run the code using the command `npm start`
 
-O serviço também deve ser inicializado através do comando `yarn start`. Sendo que, caso não exista o arquivo `node_modules` (primeira execução), ou tenha ocorrido uma alteração deste, deve ser executado o comando `yarn` antes do `yarn start`.
+You can configure the dataProvider to use a different port by changing the value of the `PORT` variable in the `config.json` file. The same is applied to the client and backend.
 
-> *Obs: o código deste serviço, ainda conta com partes legadas referentes a utilização de MongoDB, e a dependência SQLite (a foi substituída pelo BetterSQlite, devido a este contar com ganhos de performance)*
+If you are using the client to connect to the dataProvider, you can change the value of the `WS_URL` variable in the `config.json` file. This variable is used to configure the URL of the websocket server. The default value is `ws://localhost:2108`.
 
-#### **Exposição de stream TCP pelo Nginx**
+> It's extra mandatory to configure the dataProvider and client to use the same port and verify that they are able to communicate with each other.
 
-A exposição de uma stream TCP através do Web-server Nginx pode ser realizada através da utilização da seguinte configuração ao arquivo `/etc/nginx/nginx.conf`.
+Note that it's possible to run the dataProvider and client on different machines, but it's necessary to configure the firewall to allow the communication between them. For example, if the dataProvider is running on a Raspberry Pi, we can configure the firewall to allow the communication between the Raspberry Pi and the client machine. This can be done by running the command `sudo ufw allow PORT` to allow the communication between the Raspberry Pi and the client machine.
+
+Note that it's also possible to use NGINX to expose the dataProvider to the internet.
 
 ```nginx
 stream {
@@ -67,34 +73,27 @@ stream {
 }
 ```
 
-## Backend
+### Backend
 
-O Backend é o serviço responsável por fornecer uma API REST para que dispositivos presentes na Web consigam executar querys dos dados.
+During the development of the backend, there were some restrictions to use the same database as the client. Making necessary to run `npx prisma push` to update the schema of the database.
 
-> Devido à decisão de utilizar apenas um único banco de dados SQLite (dois serviços lendo e escrevendo nele), em casos onde ele é recriado é necessário executar o comando `npx prisma push` para subir o schema do prisma para ele.
-> 
-> Também foi criado um [arquivo](./TABLES.sql), o qual contem todas as alterações a serem realizadas no banco de dados, é ideal que futuramente os serviços executem ele no lugar de cada um criar as suas tabelas.
+> An example schema of the whole project can be found [here](./TABLES.sql).
 
-Assim como os outros serviços, o backend pode ser executado através do comando `yarn start`.
+### Frontend
 
-Porta padrão: 3333
+The frontend was developed using [React.js](https://reactjs.org/). And it can be compiled and provided by the web server nginx (by placing the compiled files in the `/var/www/html` folder) or using the public folder of the backend.
 
-## Frontend
+1. Run the command `npm i` to install the dependencies.
+2. Build the code using the command `npm run build`
+3. Run the code using the command `npm start`
 
-Como interface a API desenvolvida, foi criada uma aplicação com [React.js](https://pt-br.reactjs.org/), esta aplicação pode ser compilada e fornecida pelo servidor web nginx (coloando os arquivos compilados na pasta `/var/www/html`) ou utilizando a pasta publica do Backend. Note que é necessário fazer os devidos ajustes relacionados a URL's utilizadas para consultar o serviço.
-
----
-
-Note-que estes serviços, menos o client e backed, podem ser desacoplados dos Raspberry Pi, e executados em outros dispositivos. Todos os serviços devem funcionar, desde-que eles consigam acessar através da configuração de URL/IP de acesso e portas de rede. (Também pode ser necessário configurar firewall)
 
 ---
 
-Comandos utils:
+Utils
 
 ```bash
-$ sudo nginx -t # verifica se a sintaxe de configuração está correta
-$ stty --help # Obtém mais informações sobre o stty
-$ curl cheat.sh/stty # Cheatsheet sobre o comando ssty (pode alterar o nome após a barra para ver outros comandos ex: curl cheat.sh/nginx)
+$ sudo nginx -t # verify if the nginx configuration is correct
+$ stty --help # help on stty options
+$ curl cheat.sh/stty # stty cheat sheet
 ```
-
-> OBS: sempre apague os diretórios `node_modules` antes de realizar o compartilhamento dos arquivos, ele armazena apenas dependências as quais são baixadas/instaladas ao executar o comando `yarn`. (Também é essencial que os adicione ao `.gitignore` para evitar que elas sejam gerenciadas pelo git)
