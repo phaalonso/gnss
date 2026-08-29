@@ -20,7 +20,7 @@ const log = (...args: any[]) => {
 
 const exception = (err: Error | string, prefix?: string) => {
     let message: string;
-    let stack: string;
+    let stack: string | undefined;
 
     if (err instanceof Error) {
         message = err.message;
@@ -30,7 +30,7 @@ const exception = (err: Error | string, prefix?: string) => {
         stack = new Error(message).stack;
     }
 
-    log(`${prefix ? `\x1b[34m${prefix}\x1b[0m ` : ''} ${message}, stack ${stack}`);
+    log(`${prefix ? `\x1b[34m${prefix}\x1b[0m ` : ''} ${message}, stack ${stack || 'N/A'}`);
 }
 
 const logger = {

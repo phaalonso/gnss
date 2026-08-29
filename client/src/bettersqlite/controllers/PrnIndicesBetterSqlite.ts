@@ -41,7 +41,7 @@ export class PrnIndicesBetterSqlite implements IPrnIndicesController {
 		return res.total;
 	}
 
-    async lastIndice(): Promise<Date> {
+    async lastIndice(): Promise<Date | undefined> {
 		const sql = "SELECT tfinal FROM prnindices ORDER BY tfinal DESC LIMIT 1;";
 
 		const res: any = await this.dao.get(sql);

@@ -11,7 +11,7 @@ const DISP = 0.5;
 const MIN_QTDE = (60 / TAXA) * DISP;
 
 export class ProcessData {
-	private timeController: Date;
+	private timeController!: Date;
 	private buffer: SignalMetrics[];
 
 	private interval: number;
@@ -46,7 +46,7 @@ export class ProcessData {
 	 * @param interval interval in ms to log the database size
 	 */
 	private setupDBSizeLog(interval: number): NodeJS.Timeout {
-		async function logDbSize() {
+		const logDbSize = async () => {
 			const prninfoLength = await this.prnInfoController.countRows();
 			const prnindicesLength = await this.prnIndicesController.indicesLength();
 
@@ -56,13 +56,13 @@ export class ProcessData {
 		}
 
 		return setInterval(
-			logDbSize.bind(this), 
+			logDbSize, 
 			interval
 		);
 	}
 
 	private setupProcess(interval: number): NodeJS.Timeout {
-		async function processInterval() {
+		const processInterval = async () => {
 			if (this.buffer.length == 0) {
 				logger.log('Buffer vazio');
 				return;
@@ -78,7 +78,7 @@ export class ProcessData {
 			if (this.counter >= this.maxCounter) {
 				//console.log(this.counter);
 				this.counter = 0;
-				this.processMinute(this.timeController);
+				this.processMinute();
 
 				const timestamp = this.timeController.getTime()
 				this.timeController = new Date(timestamp + 60000);
@@ -86,7 +86,7 @@ export class ProcessData {
 		}
 
 		return setInterval(
-			processInterval.bind(this),
+			processInterval,
 			interval
 		);
 	}
@@ -140,8 +140,8 @@ export class ProcessData {
 			for (const row of rows) {
 				//logger.log(row)
 				if (row.total >= MIN_QTDE) {
-					let vSnr = [];
-					let vIntensidadeSinal = [];
+					let vSnr: number[] = [];
+					let vIntensidadeSinal: number[] = [];
 					let intensidadeSinalQuadrado = 0;
 					let intensidade = 0;
 
@@ -149,7 +149,7 @@ export class ProcessData {
 						const prnData = await this.prnInfoController.findByPrn(this.timeController, row.prn);
 						//logger.log('Prn info by binute', prnData[0]);
 
-						prnData.forEach((row) => {
+						prnData.forEach((row: any) => {
 							if (row.snr) {
 								// logger.log(row.prn + " -->" + row.snr);
 								intensidade = Math.pow(10, row.snr / 10);
@@ -187,13 +187,13 @@ export class ProcessData {
 							this.timeController,
 							row.prn
 						);
-					} catch (err) {
+					} catch (err: any) {
 						console.log(err);
 						logger.exception(err);
 					}
 				}
 			}
-		} catch (err) {
+		} catch (err: any) {
 			logger.exception(err);
 			process.exit(1);
 		}

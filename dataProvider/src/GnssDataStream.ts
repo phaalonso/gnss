@@ -6,8 +6,8 @@ import { config } from './config/gpsConfig';
 
 //INFO: Talvez seria interessante possuir uma arquitetura Observer para as Streams, permitindo que exista mais de uma Stream no recebimento de dados
 export class GPSProvider extends GPS {
-    protected inputStream: SerialPort | ReadStream;
-    protected parserStream: parsers.Readline;
+    protected inputStream!: SerialPort | ReadStream;
+    protected parserStream!: parsers.Readline;
     protected writeStream?: WriteStream;
 
     /**
@@ -77,11 +77,11 @@ export class GPSProvider extends GPS {
 			try {
 				this.update(data);
 			} catch (error) {
-				logger.exception(error, 'Parser');
+				logger.exception(error instanceof Error ? error : String(error), 'Parser');
 			}
         });
 
-		this.on('error', err => logger.exception(err));
+		this.on('error', (err: Error) => logger.exception(err));
     }
 
     /**

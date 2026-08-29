@@ -15,9 +15,9 @@ export interface IClient {
 export abstract class Client implements IClient {
     private connectedChannels = new Set<string>();
     protected connected = false;
-    protected messageCB: MessageCB;
-    protected errorCB: ErrorCB;
-    protected endCB: EmptyCB;
+    protected messageCB!: MessageCB;
+    protected errorCB!: ErrorCB;
+    protected endCB!: EmptyCB;
 
     subscribe(channel: string) {
         if (!this.connectedChannels.has(channel)) {
@@ -46,7 +46,7 @@ export abstract class Client implements IClient {
         this.endCB = cb;
     }
 
-    protected abstract _connect(cb: (...args) => void);
+    protected abstract _connect(cb: (...args: any[]) => void): void;
 
     async start() {
         return new Promise((resolve, reject) => {

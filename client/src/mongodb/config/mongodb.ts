@@ -9,7 +9,7 @@ interface Config {
 }
 
 export const MongoConfig: Config = {
-	url: process.env.MONGOURI,
+	url: process.env.MONGOURI || '',
 	options: {
 		useNewUrlParser: true,
 		useCreateIndex: true,

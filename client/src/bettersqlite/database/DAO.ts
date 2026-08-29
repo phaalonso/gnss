@@ -17,9 +17,8 @@ export class SQLite {
 		}
 	}
 
-	public run(sql: string, params = []) {
+	public run(sql: string, params: any[] = []) {
 		return new Promise((resolve, reject) => {
-			console.log(sql);
 			const stmt = this.con.prepare(sql);
 
 			try {
@@ -33,7 +32,7 @@ export class SQLite {
 		});
 	}
 
-	public get(sql: string, params = []) {
+	public get(sql: string, params: any[] = []) {
 		return new Promise((res, rej) => {
 			const stmt = this.con.prepare(sql);
 
@@ -41,7 +40,7 @@ export class SQLite {
 				const result = stmt.get(params);
 
 				res(result);
-			} catch (err) {
+			} catch (err: any) {
 				logger.log(`Exception ao executar ${sql}`);
 				logger.exception(err);
 				rej(err);
@@ -49,7 +48,7 @@ export class SQLite {
 		});
 	}
 
-	public all(sql: string, params = []) {
+	public all(sql: string, params: any[] = []) {
 		return new Promise((res, rej) => {
 			const stmt = this.con.prepare(sql);
 
@@ -57,7 +56,7 @@ export class SQLite {
 				const result = stmt.all(params);	
 
 				res(result);
-			} catch (err) {
+			} catch (err: any) {
 				logger.log(`Exception ao executar ${sql}`);
 				logger.exception(err);
 				rej(err);

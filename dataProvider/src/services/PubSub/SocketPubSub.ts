@@ -50,7 +50,7 @@ export class SocketPubSub extends PubSub<net.Socket> {
 		})
 	}
 
-	private handleError(err) {
+	private handleError(err: NodeJS.ErrnoException) {
 		if (err.code === 'EADDRINUSE') {
 			logger.log('Endereço já está em uso, tentando novamente...');
 			setTimeout(() => {

@@ -13,11 +13,12 @@ export class MessageHandler {
 		this.buffer = new MessageBuffer(separator);
     }
     
-    async handle(data) {
+    async handle(data: Buffer) {
         this.buffer.push(data.toString());
 
         while (!this.buffer.isDone()) { 
 			const message = this.buffer.getMessage();
+            if (!message) continue;
 
             this.processMessage(message);
         }

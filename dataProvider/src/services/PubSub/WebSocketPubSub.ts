@@ -58,14 +58,14 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 			logger.log(`Servidor iniciado em`, this.wsS.address());
 
 			setInterval((server: WebsocketPubSub) => {
-				if (server.listeningChannels.get('cpu').size > 0) {
+				if (server.listeningChannels.get('cpu') && server.listeningChannels.get('cpu')!.size > 0) {
 					cpu.usage().then(cpu => {
 						logger.log(cpu);
 						server.pub('cpu', `cpu_${cpu}`);
 					});
 				}
 
-				if (server.listeningChannels.get('ram').size > 0) {
+				if (server.listeningChannels.get('ram') && server.listeningChannels.get('ram')!.size > 0) {
 					//logger.log(mem.totalMem());
 					mem.used().then(ram => {
 						logger.log(ram.usedMemMb);

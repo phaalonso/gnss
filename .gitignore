@@ -3,3 +3,4 @@ Heap-20210617T004130.heapsnapshot
 **/*.log
 **/*.db
 **/out/**/*
+client/dist/

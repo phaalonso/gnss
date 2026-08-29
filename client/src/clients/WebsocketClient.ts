@@ -3,7 +3,7 @@ import logger from "../logger";
 import { Client } from "./IClient";
 
 export class WebsocketClient extends Client {
-    private client: WebSocket;
+    private client!: WebSocket;
 
     constructor(
         private websocketUrl: string,

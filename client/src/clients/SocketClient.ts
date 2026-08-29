@@ -26,7 +26,7 @@ export class SocketClient extends Client {
 		this._sendMessage(`sub_${channel}\n`);
 	}
 
-	protected _connect(cb: (...args) => void) {
+	protected _connect(cb: (...args: any[]) => void) {
 		this.client.on("connect", cb);
 		this.client.on("data", this.messageCB);
 

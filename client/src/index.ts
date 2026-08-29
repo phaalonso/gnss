@@ -76,7 +76,7 @@ async function start() {
         
         client.subscribe('custom');
         await client.start();
-    } catch (err) {
+    } catch (err: any) {
         logger.exception(err);
     }
 }

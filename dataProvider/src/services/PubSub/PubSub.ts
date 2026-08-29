@@ -33,6 +33,7 @@ export abstract class PubSub<T> {
 
         channel.add(socket);
         logger.log(`Subscribe in ${channelName}`);
+        socket.channels = socket.channels || [];
         socket.channels.push(channelName);
     }
 
@@ -79,7 +80,7 @@ export abstract class PubSub<T> {
         })
     }
 
-    public handleMessage(socket, data) {
+    public handleMessage(socket: CustomSocket<T>, data: any) {
         const msgArray = data.toString().split('\n');
 
         for (const msg of msgArray) {

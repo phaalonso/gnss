@@ -15,10 +15,10 @@ const exception = (err: Error | string, prefix?: string) => {
 
     if (err instanceof Error) {
         message = err.message;
-        stack = err.stack;
+        stack = err.stack || '';
     } else {
         message = typeof err === 'string' ? err : inspect(err);
-        stack = new Error(message).stack;
+        stack = new Error(message).stack || '';
     }
 
     log(`\x1b[34m${prefix ? prefix : ''}\x1b[0m ${message}, stack ${stack}`);

@@ -12,7 +12,7 @@ interface IBackupConfig {
 }
 
 export class BackupService {
-	private timeout: NodeJS.Timeout;
+	private timeout?: NodeJS.Timeout;
 
 	constructor(
 		private dao: SQLite,
@@ -58,7 +58,7 @@ export class BackupService {
 
 			transaction.immediate(lastDateTime);
 
-		} catch(err) {
+		} catch (err: any) {
 			logger.exception(err);
 			logger.log(`Error while making backup for ${date}`);
 		}
@@ -92,13 +92,13 @@ export class BackupService {
 			}
 
 			this.uploadService.disconnect();
-		} catch (err) {
+		} catch (err: any) {
 			logger.exception(err, 'sendToServer');
 		}
 	}
 
 	public hasAutoBackupEnabled() {
-		return this.timeout != undefined;
+		return this.timeout !== undefined;
 	}
 
 	public async initAutoBackup() {
@@ -112,7 +112,7 @@ export class BackupService {
 
 	public async stopAutoBackup() {
 		if (this.hasAutoBackupEnabled()) {
-			clearInterval(this.timeout);
+			clearInterval(this.timeout!);
 		} else {
 			throw Error("Auto backup is not initialized");
 		}

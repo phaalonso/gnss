@@ -65,12 +65,12 @@ async function start() {
 			}
 		});
 
-		gpsReceiver.on('error', (err) => {
+		gpsReceiver.on('error', (err: Error) => {
 			logger.log('Erro no GnssDataStream');
 			logger.log(err);
 		});
 	} catch (err) {
-		logger.exception(err);
+		logger.exception(err instanceof Error ? err : String(err));
 		process.exit(1);
 	}
 }

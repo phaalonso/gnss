@@ -1,6 +1,6 @@
 let count = 0;
 
-export function trackPromises(promise) {
+export function trackPromises(promise: Promise<any>) {
     count++;
 
     return promise.finally(() => {

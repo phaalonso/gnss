@@ -22,7 +22,7 @@ const config = configurator({
 			default: 1800000,
 		}
 	}
-})
+}) as any;
 
 config.load(path.join(__dirname, '..', '..','config.json'));
 
