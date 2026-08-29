@@ -25,7 +25,7 @@ export class SocketPubSub extends PubSub<net.Socket> {
 		this._socketServer.listen({
 			...this._socketConfig
 		}, () => {
-			logger.log(`servidor iniciado em`, this._socketServer.address());
+			logger.log(`servidor socket iniciado em ${this._socketServer.address()}`);
 		});
 	}
 
