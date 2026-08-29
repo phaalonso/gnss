@@ -16,10 +16,6 @@ const config = configurator({
 			type: 'number',
 			description: 'Intervalo em microsegundos',
 			default: 15000,
-		},
-		logInterval: {
-			type: 'number',
-			default: 1800000,
 		}
 	}
 }) as any;
