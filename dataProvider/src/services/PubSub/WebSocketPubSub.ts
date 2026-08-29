@@ -55,7 +55,8 @@ export class WebsocketPubSub extends PubSub<CustomSocket<WebSocket>> {
 	
 	private listening() {
 		this.websocketServer.on('listening', () => {
-			logger.log(`Servidor websocket iniciado em ${this.websocketServer.address()}`);
+			let address = this.websocketServer.address();
+			logger.log(`Servidor websocket iniciado em ${typeof address === 'string' ? address : address.address + ':' + address.port}`);
 
 			setInterval((server: WebsocketPubSub) => {
 				if (server.listeningChannels.get('cpu') && server.listeningChannels.get('cpu')!.size > 0) {
